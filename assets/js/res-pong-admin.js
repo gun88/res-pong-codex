@@ -405,7 +405,7 @@
                 { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + '</a>'; } },
                 { data: 'created_at', title: 'Created At' },
                 { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
-                { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Disiscrivi</button>' : ''; } }
+                { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Unsubscribe</button>' : ''; } }
             ]
         });
         table.on('click', '.rp-unsign', function(){
@@ -436,7 +436,7 @@
                 { data: 'user_id', title: 'User ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
                 { data: 'username', title: 'Username' },
                 { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
-                { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Disiscrivi</button>' : ''; } }
+                { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Unsubscribe</button>' : ''; } }
             ]
         });
         table.on('click', '.rp-unsign', function(){
