@@ -107,7 +107,7 @@ class Res_Pong_Repository {
             $now = current_time('mysql');
             $where = $this->wpdb->prepare('WHERE e.start_datetime > %s', $now);
         }
-        $sql = "SELECT e.*, COUNT(r.id) AS players_count FROM {$this->table_event} e LEFT JOIN {$this->table_reservation} r ON e.id = r.event_id {$where} GROUP BY e.id";
+        $sql = "SELECT e.*, g.name AS group_name, COUNT(r.id) AS players_count FROM {$this->table_event} e LEFT JOIN {$this->table_event} g ON e.group_id = g.id LEFT JOIN {$this->table_reservation} r ON e.id = r.event_id {$where} GROUP BY e.id";
         return $this->wpdb->get_results($sql, ARRAY_A);
     }
 
@@ -116,7 +116,8 @@ class Res_Pong_Repository {
     }
 
     public function insert_event($data) {
-        return $this->wpdb->insert($this->table_event, $data);
+        $this->wpdb->insert($this->table_event, $data);
+        return $this->wpdb->insert_id;
     }
 
     public function update_event($id, $data) {
@@ -125,6 +126,14 @@ class Res_Pong_Repository {
 
     public function delete_event($id) {
         return $this->wpdb->delete($this->table_event, ['id' => $id]);
+    }
+
+    public function update_events_by_group($group_id, $data) {
+        return $this->wpdb->update($this->table_event, $data, ['group_id' => $group_id]);
+    }
+
+    public function delete_events_by_group($group_id) {
+        return $this->wpdb->delete($this->table_event, ['group_id' => $group_id]);
     }
 
     // ------------------------
