@@ -2,9 +2,11 @@
 
 class Res_Pong_Admin {
     private $repository;
+    private $configuration;
 
-    public function __construct($repository) {
+    public function __construct($repository, $configuration) {
         $this->repository = $repository;
+        $this->configuration = $configuration;
         add_action('admin_menu', [ $this, 'register_menu' ]);
         add_action('admin_enqueue_scripts', [ $this, 'enqueue_assets' ]);
     }
@@ -18,6 +20,7 @@ class Res_Pong_Admin {
         add_submenu_page('res-pong-users', 'Users', 'Users', 'manage_options', 'res-pong-users', [ $this, 'render_users_page' ]);
         add_submenu_page('res-pong-users', 'Events', 'Events', 'manage_options', 'res-pong-events', [ $this, 'render_events_page' ]);
         add_submenu_page('res-pong-users', 'Reservations', 'Reservations', 'manage_options', 'res-pong-reservations', [ $this, 'render_reservations_page' ]);
+        add_submenu_page('res-pong-users', 'Configurations', 'Configurations', 'manage_options', 'res-pong-configurations', [ $this, 'render_configurations_page' ]);
         add_submenu_page(null, 'User Detail', 'User Detail', 'manage_options', 'res-pong-user-detail', [ $this, 'render_user_detail' ]);
         add_submenu_page(null, 'Event Detail', 'Event Detail', 'manage_options', 'res-pong-event-detail', [ $this, 'render_event_detail' ]);
         add_submenu_page(null, 'Reservation Detail', 'Reservation Detail', 'manage_options', 'res-pong-reservation-detail', [ $this, 'render_reservation_detail' ]);
@@ -60,6 +63,37 @@ class Res_Pong_Admin {
         echo '<h1>' . esc_html__('Reservations', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="reservations"></table>';
         $this->render_progress_overlay();
+        echo '</div>';
+    }
+
+    public function render_configurations_page() {
+        if (isset($_POST['rp_configurations_nonce']) && wp_verify_nonce($_POST['rp_configurations_nonce'], 'rp_save_configurations')) {
+            $data = [
+                'almost_closed_minutes'     => isset($_POST['almost_closed_minutes']) ? intval($_POST['almost_closed_minutes']) : 0,
+                'almost_full_players'      => isset($_POST['almost_full_players']) ? intval($_POST['almost_full_players']) : 0,
+                'max_active_reservations'  => isset($_POST['max_active_reservations']) ? intval($_POST['max_active_reservations']) : 0,
+                'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
+                'first_access_page_url'    => isset($_POST['first_access_page_url']) ? esc_url_raw($_POST['first_access_page_url']) : '',
+                'password_update_page_url' => isset($_POST['password_update_page_url']) ? esc_url_raw($_POST['password_update_page_url']) : '',
+            ];
+            $this->configuration->update($data);
+            echo '<div class="updated"><p>' . esc_html__('Settings saved', 'res-pong') . '</p></div>';
+        }
+        $config = $this->configuration->get_all();
+        echo '<div class="wrap">';
+        echo '<h1>' . esc_html__('Configurations', 'res-pong') . '</h1>';
+        echo '<form method="post">';
+        wp_nonce_field('rp_save_configurations', 'rp_configurations_nonce');
+        echo '<table class="form-table">';
+        echo '<tr><th><label for="almost_closed_minutes">Almost closed minutes</label></th><td><input name="almost_closed_minutes" id="almost_closed_minutes" type="number" value="' . esc_attr($config['almost_closed_minutes']) . '"></td></tr>';
+        echo '<tr><th><label for="almost_full_players">Almost full players</label></th><td><input name="almost_full_players" id="almost_full_players" type="number" value="' . esc_attr($config['almost_full_players']) . '"></td></tr>';
+        echo '<tr><th><label for="max_active_reservations">Max active reservations</label></th><td><input name="max_active_reservations" id="max_active_reservations" type="number" value="' . esc_attr($config['max_active_reservations']) . '"></td></tr>';
+        echo '<tr><th><label for="next_reservation_delay">Next reservation delay</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
+        echo '<tr><th><label for="first_access_page_url">First access page URL</label></th><td><input name="first_access_page_url" id="first_access_page_url" type="text" value="' . esc_attr($config['first_access_page_url']) . '"></td></tr>';
+        echo '<tr><th><label for="password_update_page_url">Password update page URL</label></th><td><input name="password_update_page_url" id="password_update_page_url" type="text" value="' . esc_attr($config['password_update_page_url']) . '"></td></tr>';
+        echo '</table>';
+        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button></p>';
+        echo '</form>';
         echo '</div>';
     }
 
