@@ -170,4 +170,65 @@ class Res_Pong_Repository {
         return $this->wpdb->delete($this->table_reservation, ['id' => $id]);
     }
 
+    private function rows_to_csv($rows) {
+        $fh = fopen('php://temp', 'r+');
+        if (!empty($rows)) {
+            fputcsv($fh, array_keys($rows[0]));
+            foreach ($rows as $row) {
+                fputcsv($fh, $row);
+            }
+        }
+        rewind($fh);
+        $csv = stream_get_contents($fh);
+        fclose($fh);
+        return $csv;
+    }
+
+    private function import_csv($file, $table) {
+        $handle = fopen($file, 'r');
+        if (!$handle) {
+            return false;
+        }
+
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        $allowed = array_fill_keys($columns, true);
+        $header = fgetcsv($handle);
+        $header = array_values(array_intersect($header, $columns));
+
+        while (($data = fgetcsv($handle)) !== false) {
+            $data = array_slice($data, 0, count($header));
+            $row = array_combine($header, $data);
+            $row = array_intersect_key($row, $allowed);
+            $this->wpdb->replace($table, $row);
+        }
+
+        fclose($handle);
+        return true;
+    }
+
+    public function export_users_csv() {
+        return $this->rows_to_csv($this->get_users());
+    }
+
+    public function import_users_csv($file) {
+        return $this->import_csv($file, $this->table_user);
+    }
+
+    public function export_events_csv() {
+        $sql = "SELECT * FROM {$this->table_event}";
+        return $this->rows_to_csv($this->wpdb->get_results($sql, ARRAY_A));
+    }
+
+    public function import_events_csv($file) {
+        return $this->import_csv($file, $this->table_event);
+    }
+
+    public function export_reservations_csv() {
+        return $this->rows_to_csv($this->get_reservations(null, null, false));
+    }
+
+    public function import_reservations_csv($file) {
+        return $this->import_csv($file, $this->table_reservation);
+    }
+
 }
