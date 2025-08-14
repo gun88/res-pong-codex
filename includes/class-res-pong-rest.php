@@ -271,12 +271,12 @@ class Res_Pong_Rest {
     }
 
     public function rest_invite_user($request) {
-        // TODO: implement invite logic
+        error_log('Ciao, sono qui');
         return new WP_REST_Response(null, 200);
     }
 
     public function rest_reset_password($request) {
-        // TODO: implement reset password logic
+        error_log('Ciao, sono qui');
         return new WP_REST_Response(null, 200);
     }
 
