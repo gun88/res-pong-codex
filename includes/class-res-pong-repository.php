@@ -189,9 +189,15 @@ class Res_Pong_Repository {
         if (!$handle) {
             return false;
         }
+        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
+        $allowed = array_fill_keys($columns, true);
         $header = fgetcsv($handle);
+        $header = array_values(array_intersect($header, $columns));
+
         while (($data = fgetcsv($handle)) !== false) {
+            $data = array_slice($data, 0, count($header));
             $row = array_combine($header, $data);
+            $row = array_intersect_key($row, $allowed);
             $this->wpdb->replace($table, $row);
         }
         fclose($handle);
@@ -207,7 +213,8 @@ class Res_Pong_Repository {
     }
 
     public function export_events_csv() {
-        return $this->rows_to_csv($this->get_events(false));
+        $sql = "SELECT * FROM {$this->table_event}";
+        return $this->rows_to_csv($this->wpdb->get_results($sql, ARRAY_A));
     }
 
     public function import_events_csv($file) {
