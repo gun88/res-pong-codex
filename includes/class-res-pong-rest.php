@@ -271,12 +271,30 @@ class Res_Pong_Rest {
     }
 
     public function rest_invite_user($request) {
-        error_log('Ciao, sono qui');
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
+        }
+        $token = $this->generate_reset_token();
+        $this->repository->update_user($id, [ 'reset_token' => $token ]);
+        $config = new Res_Pong_Configuration();
+        $url = $config->get('first_access_page_url') . '?token=' . $this->base64url_encode($token);
+        wp_mail($user['email'], 'Accedi al Portale Prenotazioni', 'Clicca sul link per effettuare il primo accesso: ' . $url);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_reset_password($request) {
-        error_log('Ciao, sono qui');
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
+        }
+        $token = $this->generate_reset_token();
+        $this->repository->update_user($id, [ 'reset_token' => $token ]);
+        $config = new Res_Pong_Configuration();
+        $url = $config->get('password_update_page_url') . '?token=' . $this->base64url_encode($token);
+        wp_mail($user['email'], 'Reset password', 'Clicca sul link per reimpostare la tua password: ' . $url);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
 
@@ -378,6 +396,16 @@ class Res_Pong_Rest {
             return new WP_Error('import_failed', 'Failed to import reservations', [ 'status' => 500 ]);
         }
         return new WP_REST_Response([ 'success' => true ], 200);
+    }
+
+    private function generate_reset_token() {
+        $expires = time() + 3600;
+        $random = bin2hex(random_bytes(16));
+        return $expires . '|' . $random;
+    }
+
+    private function base64url_encode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }
 }
 
