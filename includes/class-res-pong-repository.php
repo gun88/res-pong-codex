@@ -248,7 +248,7 @@ class Res_Pong_Repository {
                     'last_name'   => $last,
                     'first_name'  => $first_name,
                     'category'    => $category,
-                    'password'    => null,
+                    'password'    => '',
                     'timeout'     => null,
                     'reset_token' => null,
                     'enabled'     => 1,
