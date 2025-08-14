@@ -68,7 +68,13 @@
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'group_id', title: 'Gruppo' },
+            { data: 'group_id', title: 'Gruppo', render: function(d, type, row){
+                if(!d){ return ''; }
+                if(type === 'display'){
+                    return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + row.group_name + ' (' + d + ')</a>';
+                }
+                return d;
+            } },
             { data: 'start_datetime', title: 'Inizio' },
             { data: 'end_datetime', title: 'Fine' },
             { data: 'category', title: 'Categoria' },
@@ -97,10 +103,15 @@
         });
         table.on('click', '.rp-delete', function(){
             var id = $(this).data('id');
+            var row = table.DataTable().row($(this).closest('tr')).data();
+            var url = rp_admin.rest_url + entity + '/' + id;
+            if(entity === 'events' && row.group_id){
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+            }
             if(!confirm('Delete item?')){ return; }
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + entity + '/' + id,
+                url: url,
                 method: 'DELETE',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
@@ -116,9 +127,13 @@
             }else{
                 data.enabled = row.enabled == 1 ? 0 : 1;
             }
+            var url = rp_admin.rest_url + entity + '/' + id;
+            if(entity === 'events' && row.group_id){
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+            }
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + entity + '/' + id,
+                url: url,
                 method: 'PUT',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
@@ -128,7 +143,8 @@
             });
         });
     }
-    function initTable(table, entity, urlFunc){
+    function initTable(table, entity, urlFunc, opts){
+        opts = opts || {};
         var dt = table.DataTable({
             ajax: {
                 url: urlFunc(),
@@ -169,17 +185,24 @@
         var separator0 = $('<span>•</span>');
         var separator1 = $('<span>•</span>');
         var separator2 = $('<span>•</span>');
-        var addBtn = $('<button class="button" id="res-pong-add">Aggiungi</button>');
+        var addBtn = $('<button class="button rp-button-add" id="res-pong-add"><span class="dashicons dashicons-plus"></span> Aggiungi</button>');
         var importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
         var exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
         toolbar.append(separator0, bulk);
-        toolbar.append(separator1, addBtn, separator2, importBtn, exportBtn);
+        toolbar.append(separator1, addBtn);
+        if(!opts.noCsv){
+            toolbar.append(separator2, importBtn, exportBtn);
+        }
         toolbar.append(filter);
         wrapper.prepend(toolbar);
 
         addBtn.on('click', function(e){
             e.preventDefault();
-            window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail';
+            var url = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail';
+            if(opts.addParams){
+                url += '&' + opts.addParams;
+            }
+            window.location = url;
         });
         exportBtn.on('click', function(e){
             e.preventDefault();
@@ -281,6 +304,9 @@
         if(!form.length){ return; }
         var entity = form.data('entity');
         var id = form.data('id');
+        var params = new URLSearchParams(window.location.search);
+        var preUser = params.get('user_id');
+        var preEvent = params.get('event_id');
         function loadReservationOptions(callback){
             var uReq = $.ajax({
                 url: rp_admin.rest_url + 'users',
@@ -304,12 +330,52 @@
                     var dt = e.start_datetime.substring(0,16);
                     eSel.append('<option value="' + e.id + '">' + e.name + ' - ' + dt + ' (' + e.id + ')</option>');
                 });
+                if(!id){
+                    if(preUser){ uSel.val(preUser); }
+                    if(preEvent){ eSel.val(preEvent); }
+                }
                 if(callback){ callback(); }
             });
+        }
+        function loadEventGroupOptions(callback){
+            $.ajax({
+                url: rp_admin.rest_url + 'events&open_only=0',
+                method: 'GET',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                success: function(events){
+                    var sel = $('#group_id');
+                    sel.append('<option value="">Nessuno</option>');
+                    $.each(events, function(_, e){
+                        sel.append('<option value="' + e.id + '">' + e.name + ' (' + e.id + ')</option>');
+                    });
+                    if(callback){ callback(); }
+                }
+            });
+        }
+        function setupRecurrence(){
+            function toggle(){
+                if($('#group_id').val()){
+                    $('#recurrence_row, #recurrence_end_row').hide();
+                }else{
+                    $('#recurrence_row, #recurrence_end_row').show();
+                    $('#recurrence_end').prop('disabled', $('#recurrence').val() === 'none');
+                }
+            }
+            $('#group_id').on('change', toggle);
+            $('#recurrence').on('change', function(){
+                $('#recurrence_end').prop('disabled', $('#recurrence').val() === 'none');
+            });
+            if(id){
+                $('#recurrence_row, #recurrence_end_row').hide();
+            }else{
+                toggle();
+            }
         }
         function initForm(){ if(id){ populateForm(entity, id, form); } }
         if(entity === 'reservations'){
             loadReservationOptions(initForm);
+        }else if(entity === 'events'){
+            loadEventGroupOptions(function(){ initForm(); setupRecurrence(); });
         }else{
             initForm();
         }
@@ -321,6 +387,9 @@
             form.find('input[type=datetime-local]').each(function(){ data[this.name] = this.value.replace('T', ' '); });
             var method = id ? 'PUT' : 'POST';
             var url = rp_admin.rest_url + entity + (id ? '/' + id : '');
+            if(entity === 'events' && id && $('#group_id').val()){
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+            }
             showOverlay(true);
             $.ajax({
                 url: url,
@@ -335,6 +404,9 @@
                         id = resp.id;
                         form.attr('data-id', id);
                         history.replaceState(null, '', rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + id);
+                        if(entity === 'events'){
+                            $('#recurrence_row, #recurrence_end_row').hide();
+                        }
                     }
                 },
                 error: function(){
@@ -344,10 +416,19 @@
         });
         $('#res-pong-delete').on('click', function(e){
             e.preventDefault();
-            if(!id || !confirm('Delete item?')){ return; }
+            if(!id){ return; }
+            var url = rp_admin.rest_url + entity + '/' + id;
+            var proceed = true;
+            if(entity === 'events' && $('#group_id').val()){
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+                proceed = confirm('Delete item?');
+            }else{
+                proceed = confirm('Delete item?');
+            }
+            if(!proceed){ return; }
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + entity + '/' + id,
+                url: url,
                 method: 'DELETE',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
@@ -429,12 +510,12 @@
         var ur = $('#res-pong-user-reservations');
         if(ur.length){
             var uid = ur.data('user');
-            initTable(ur, 'reservations', function(){ return restUrl('reservations', 'user_id=' + uid + '&active_only=1'); });
+            initTable(ur, 'reservations', function(){ return restUrl('reservations', 'user_id=' + uid + '&active_only=1'); }, { addParams: 'user_id=' + uid, noCsv: true });
         }
         var er = $('#res-pong-event-reservations');
         if(er.length){
             var eid = er.data('event');
-            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=1'); });
+            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=1'); }, { addParams: 'event_id=' + eid, noCsv: true });
         }
         initDetail();
     });

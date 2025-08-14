@@ -184,20 +184,79 @@ class Res_Pong_Rest {
 
     public function rest_create_event($request) {
         $data = $request->get_json_params();
-        $this->repository->insert_event($data);
+        unset($data['id']);
+        $group_id = isset($data['group_id']) && $data['group_id'] !== '' ? (int) $data['group_id'] : null;
+        $recurrence = isset($data['recurrence']) ? $data['recurrence'] : 'none';
+        $recurrence_end = isset($data['recurrence_end']) ? $data['recurrence_end'] : null;
+        unset($data['recurrence'], $data['recurrence_end']);
+        if ($group_id) {
+            $data['group_id'] = $group_id;
+            $id = $this->repository->insert_event($data);
+            $data['id'] = $id;
+            return new WP_REST_Response($data, 201);
+        }
+        $data['group_id'] = null;
+        $id = $this->repository->insert_event($data);
+        $data['id'] = $id;
+        if ($recurrence !== 'none' && $recurrence_end) {
+            $this->repository->update_event($id, [ 'group_id' => $id ]);
+            $start = new DateTime($data['start_datetime']);
+            $end = new DateTime($data['end_datetime']);
+            $limit = new DateTime($recurrence_end . ' 23:59:59');
+            switch ($recurrence) {
+                case 'daily': $interval = new DateInterval('P1D'); break;
+                case 'weekly': $interval = new DateInterval('P1W'); break;
+                case 'monthly': $interval = new DateInterval('P1M'); break;
+                default: $interval = null; break;
+            }
+            if ($interval) {
+                while (true) {
+                    $start->add($interval);
+                    $end->add($interval);
+                    if ($start > $limit) { break; }
+                    $e = $data;
+                    unset($e['id']);
+                    $e['start_datetime'] = $start->format('Y-m-d H:i:s');
+                    $e['end_datetime'] = $end->format('Y-m-d H:i:s');
+                    $e['group_id'] = $id;
+                    $this->repository->insert_event($e);
+                }
+            }
+            $data['group_id'] = $id;
+        }
         return new WP_REST_Response($data, 201);
     }
 
     public function rest_update_event($request) {
         $id = (int) $request['id'];
         $data = $request->get_json_params();
-        $this->repository->update_event($id, $data);
+        $apply = $request->get_param('apply_group');
+        if ($apply) {
+            $event = $this->repository->get_event($id);
+            if ($event && $event['group_id']) {
+                $this->repository->update_events_by_group($event['group_id'], $data);
+            } else {
+                $this->repository->update_event($id, $data);
+            }
+        } else {
+            $this->repository->update_event($id, $data);
+        }
         return rest_ensure_response($this->repository->get_event($id));
     }
 
     public function rest_delete_event($request) {
         $id = (int) $request['id'];
-        $this->repository->delete_event($id);
+        $apply = $request->get_param('apply_group');
+        if ($apply) {
+            $event = $this->repository->get_event($id);
+            if ($event && $event['group_id']) {
+                $this->repository->delete_events_by_group($event['group_id']);
+            } else {
+                $this->repository->delete_event($id);
+            }
+        } else {
+            $this->repository->delete_event($id);
+        }
         return new WP_REST_Response(null, 204);
     }
 
