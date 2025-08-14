@@ -1,7 +1,9 @@
 .dataTables_wrapper .dataTables_length select {
     padding: 0 19px !important;
 }
-
+.dataTables_wrapper .dataTables_filter input {
+    background: #f4f4f4 !important;
+}
 #rp-progress-overlay {
     display: none;
     position: fixed;
