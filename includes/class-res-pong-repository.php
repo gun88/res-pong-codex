@@ -71,4 +71,76 @@ class Res_Pong_Repository {
         dbDelta($sql);
     }
 
+    // ------------------------
+    // RP_USER methods
+    // ------------------------
+
+    public function get_users() {
+        return $this->wpdb->get_results("SELECT * FROM {$this->table_user}", ARRAY_A);
+    }
+
+    public function get_user($id) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_user} WHERE id = %s", $id), ARRAY_A);
+    }
+
+    public function insert_user($data) {
+        return $this->wpdb->insert($this->table_user, $data);
+    }
+
+    public function update_user($id, $data) {
+        return $this->wpdb->update($this->table_user, $data, ['id' => $id]);
+    }
+
+    public function delete_user($id) {
+        return $this->wpdb->delete($this->table_user, ['id' => $id]);
+    }
+
+    // ------------------------
+    // RP_EVENT methods
+    // ------------------------
+
+    public function get_events() {
+        return $this->wpdb->get_results("SELECT * FROM {$this->table_event}", ARRAY_A);
+    }
+
+    public function get_event($id) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_event} WHERE id = %d", $id), ARRAY_A);
+    }
+
+    public function insert_event($data) {
+        return $this->wpdb->insert($this->table_event, $data);
+    }
+
+    public function update_event($id, $data) {
+        return $this->wpdb->update($this->table_event, $data, ['id' => $id]);
+    }
+
+    public function delete_event($id) {
+        return $this->wpdb->delete($this->table_event, ['id' => $id]);
+    }
+
+    // ------------------------
+    // RP_RESERVATION methods
+    // ------------------------
+
+    public function get_reservations() {
+        return $this->wpdb->get_results("SELECT * FROM {$this->table_reservation}", ARRAY_A);
+    }
+
+    public function get_reservation($id) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_reservation} WHERE id = %d", $id), ARRAY_A);
+    }
+
+    public function insert_reservation($data) {
+        return $this->wpdb->insert($this->table_reservation, $data);
+    }
+
+    public function update_reservation($id, $data) {
+        return $this->wpdb->update($this->table_reservation, $data, ['id' => $id]);
+    }
+
+    public function delete_reservation($id) {
+        return $this->wpdb->delete($this->table_reservation, ['id' => $id]);
+    }
+
 }
