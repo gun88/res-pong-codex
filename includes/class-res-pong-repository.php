@@ -99,8 +99,13 @@ class Res_Pong_Repository {
     // RP_EVENT methods
     // ------------------------
 
-    public function get_events() {
-        $sql = "SELECT e.*, COUNT(r.id) AS players_count FROM {$this->table_event} e LEFT JOIN {$this->table_reservation} r ON e.id = r.event_id GROUP BY e.id";
+    public function get_events($open_only = true) {
+        $where = '';
+        if ($open_only) {
+            $now = current_time('mysql');
+            $where = $this->wpdb->prepare('WHERE e.start_datetime > %s', $now);
+        }
+        $sql = "SELECT e.*, COUNT(r.id) AS players_count FROM {$this->table_event} e LEFT JOIN {$this->table_reservation} r ON e.id = r.event_id {$where} GROUP BY e.id";
         return $this->wpdb->get_results($sql, ARRAY_A);
     }
 
@@ -124,7 +129,7 @@ class Res_Pong_Repository {
     // RP_RESERVATION methods
     // ------------------------
 
-    public function get_reservations($user_id = null, $event_id = null) {
+    public function get_reservations($user_id = null, $event_id = null, $active_only = true) {
         $where = [];
         $params = [];
         if ($user_id !== null) {
@@ -134,6 +139,10 @@ class Res_Pong_Repository {
         if ($event_id !== null) {
             $where[] = 'r.event_id = %d';
             $params[] = $event_id;
+        }
+        if ($active_only) {
+            $where[] = 'e.start_datetime > %s';
+            $params[] = current_time('mysql');
         }
         $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
         $sql = "SELECT r.*, u.username, e.name AS event_name, e.start_datetime AS event_start_datetime FROM {$this->table_reservation} r JOIN {$this->table_user} u ON r.user_id = u.id JOIN {$this->table_event} e ON r.event_id = e.id {$where_sql} ORDER BY r.created_at DESC";
