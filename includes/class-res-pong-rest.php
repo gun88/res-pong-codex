@@ -184,6 +184,7 @@ class Res_Pong_Rest {
 
     public function rest_create_event($request) {
         $data = $request->get_json_params();
+        unset($data['id']);
         $group_id = isset($data['group_id']) && $data['group_id'] !== '' ? (int) $data['group_id'] : null;
         $recurrence = isset($data['recurrence']) ? $data['recurrence'] : 'none';
         $recurrence_end = isset($data['recurrence_end']) ? $data['recurrence_end'] : null;
@@ -214,6 +215,7 @@ class Res_Pong_Rest {
                     $end->add($interval);
                     if ($start > $limit) { break; }
                     $e = $data;
+                    unset($e['id']);
                     $e['start_datetime'] = $start->format('Y-m-d H:i:s');
                     $e['end_datetime'] = $end->format('Y-m-d H:i:s');
                     $e['group_id'] = $id;
