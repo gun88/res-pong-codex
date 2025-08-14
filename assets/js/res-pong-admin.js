@@ -22,6 +22,11 @@
     function hideOverlay(){
         $('#rp-progress-overlay').hide();
     }
+    function showNotice(type, text){
+        var wrap = $('.wrap').first();
+        wrap.find('.notice').remove();
+        $('<div class="notice notice-' + type + ' is-dismissible"><p>' + text + '</p></div>').prependTo(wrap);
+    }
     function restUrl(path, params){
         var url = rp_admin.rest_url + path;
         if(params){
@@ -29,9 +34,10 @@
         }
         return url;
     }
+    }
     function actionButtons(entity, data){
         var edit = '<button class="button rp-edit" data-id="' + data.id + '">Modifica</button>';
-        var del = '<button class="button rp-delete" data-id="' + data.id + '">Cancella</button>';
+        var del = '<button class="button rp-delete rp-button-danger" data-id="' + data.id + '">Cancella</button>';
         var toggleLabel, state;
         if(entity === 'reservations'){
             state = parseInt(data.presence_confirmed);
@@ -279,8 +285,16 @@
                 data: JSON.stringify(data),
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
-                success: function(){
-                    window.location = rp_admin.admin_url + '?page=res-pong-' + entity;
+                success: function(resp){
+                    showNotice('success', 'Saved');
+                    if(!id && resp && resp.id){
+                        id = resp.id;
+                        form.attr('data-id', id);
+                        history.replaceState(null, '', rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + id);
+                    }
+                },
+                error: function(){
+                    showNotice('error', 'Error saving');
                 }
             });
         });
@@ -295,6 +309,9 @@
                 complete: function(){ hideOverlay(); },
                 success: function(){
                     window.location = rp_admin.admin_url + '?page=res-pong-' + entity;
+                },
+                error: function(){
+                    showNotice('error', 'Error deleting');
                 }
             });
         });

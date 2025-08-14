@@ -25,3 +25,15 @@
     text-align: center;
     border-radius: 4px;
 }
+
+.rp-button-danger {
+    background: #d63638;
+    border-color: #d63638;
+    color: #fff;
+}
+
+.rp-button-danger:hover {
+    background: #c72c2e;
+    border-color: #c72c2e;
+    color: #fff;
+}

@@ -84,8 +84,9 @@ class Res_Pong_Admin {
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
         if ($editing) {
-            echo ' <button type="button" class="button button-secondary" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
+            echo ' <button type="button" class="button rp-button-danger" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
         }
+        echo ' <a href="' . esc_url(admin_url('admin.php?page=res-pong-users')) . '" class="button button-secondary" id="res-pong-back">' . esc_html__('Back', 'res-pong') . '</a>';
         echo '</p></form>';
         echo '<h2>' . esc_html__('Password Reset', 'res-pong') . '</h2>';
         echo '<form id="res-pong-password-form" data-entity="users" data-id="' . esc_attr($id) . '">';
@@ -129,8 +130,9 @@ class Res_Pong_Admin {
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
         if ($editing) {
-            echo ' <button type="button" class="button button-secondary" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
+            echo ' <button type="button" class="button rp-button-danger" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
         }
+        echo ' <a href="' . esc_url(admin_url('admin.php?page=res-pong-events')) . '" class="button button-secondary" id="res-pong-back">' . esc_html__('Back', 'res-pong') . '</a>';
         echo '</p></form>';
         echo '<h2>' . esc_html__('Event Reservations', 'res-pong') . '</h2>';
         echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
@@ -152,8 +154,9 @@ class Res_Pong_Admin {
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
         if ($editing) {
-            echo ' <button type="button" class="button button-secondary" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
+            echo ' <button type="button" class="button rp-button-danger" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
         }
+        echo ' <a href="' . esc_url(admin_url('admin.php?page=res-pong-reservations')) . '" class="button button-secondary" id="res-pong-back">' . esc_html__('Back', 'res-pong') . '</a>';
         echo '</p></form>';
         $this->render_progress_overlay();
         echo '</div>';
