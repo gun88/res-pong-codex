@@ -100,7 +100,8 @@ class Res_Pong_Repository {
     // ------------------------
 
     public function get_events() {
-        return $this->wpdb->get_results("SELECT * FROM {$this->table_event}", ARRAY_A);
+        $sql = "SELECT e.*, COUNT(r.id) AS players_count FROM {$this->table_event} e LEFT JOIN {$this->table_reservation} r ON e.id = r.event_id GROUP BY e.id";
+        return $this->wpdb->get_results($sql, ARRAY_A);
     }
 
     public function get_event($id) {
@@ -123,8 +124,23 @@ class Res_Pong_Repository {
     // RP_RESERVATION methods
     // ------------------------
 
-    public function get_reservations() {
-        return $this->wpdb->get_results("SELECT * FROM {$this->table_reservation}", ARRAY_A);
+    public function get_reservations($user_id = null, $event_id = null) {
+        $where = [];
+        $params = [];
+        if ($user_id !== null) {
+            $where[] = 'r.user_id = %s';
+            $params[] = $user_id;
+        }
+        if ($event_id !== null) {
+            $where[] = 'r.event_id = %d';
+            $params[] = $event_id;
+        }
+        $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+        $sql = "SELECT r.*, u.username, e.name AS event_name, e.start_datetime AS event_start_datetime FROM {$this->table_reservation} r JOIN {$this->table_user} u ON r.user_id = u.id JOIN {$this->table_event} e ON r.event_id = e.id {$where_sql} ORDER BY r.created_at DESC";
+        if ($params) {
+            $sql = $this->wpdb->prepare($sql, $params);
+        }
+        return $this->wpdb->get_results($sql, ARRAY_A);
     }
 
     public function get_reservation($id) {
