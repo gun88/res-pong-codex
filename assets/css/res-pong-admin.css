@@ -26,14 +26,16 @@
     border-radius: 4px;
 }
 
+button.rp-unsign,
 .rp-button-danger {
-    background: #d63638;
-    border-color: #d63638;
-    color: #fff;
+    background: #d63638 !important;
+    border-color: #d63638 !important;
+    color: #fff !important;
 }
 
+button.rp-unsign,
 .rp-button-danger:hover {
-    background: #c72c2e;
-    border-color: #c72c2e;
-    color: #fff;
+    background: #c72c2e !important;
+    border-color: #c72c2e !important;
+    color: #fff !important;
 }
