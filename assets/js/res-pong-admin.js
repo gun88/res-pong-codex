@@ -146,6 +146,15 @@
             },
             columns: columns[entity]
         });
+        dt.on('preXhr.dt', function(){
+            showOverlay(true);
+        });
+        dt.on('xhr.dt', function(){
+            hideOverlay();
+        });
+        dt.on('error.dt', function(){
+            hideOverlay();
+        });
         if(entity === 'events'){
             $('#rp-open-filter').on('change', function(){ dt.ajax.url(listUrl()).load(); });
         }else if(entity === 'reservations'){
