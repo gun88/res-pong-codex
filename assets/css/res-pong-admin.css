@@ -1,8 +1,10 @@
 .dataTables_wrapper .dataTables_length select {
     padding: 0 19px !important;
+    background-color: #fff !important;
 }
 .dataTables_wrapper .dataTables_filter input {
-    background: #fff !important;
+    background-color: #fff !important;
+    line-height: 1;
 }
 #rp-progress-overlay {
     display: none;

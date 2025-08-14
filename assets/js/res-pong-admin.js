@@ -166,11 +166,14 @@
             opt = '<option value="delete">Delete</option><option value="enable">Presente</option><option value="disable">Assente</option>';
         }
         bulk.find('select').append(opt);
-        toolbar.append(bulk);
+        var separator0 = $('<span>•</span>');
+        var separator1 = $('<span>•</span>');
+        var separator2 = $('<span>•</span>');
         var addBtn = $('<button class="button" id="res-pong-add">Aggiungi</button>');
         var importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
         var exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
-        toolbar.append(addBtn, importBtn, exportBtn);
+        toolbar.append(separator0, bulk);
+        toolbar.append(separator1, addBtn, separator2, importBtn, exportBtn);
         toolbar.append(filter);
         wrapper.prepend(toolbar);
 
