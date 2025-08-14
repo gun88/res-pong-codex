@@ -322,7 +322,13 @@ class Res_Pong_Rest {
         if (empty($files['file'])) {
             return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
         }
-        $this->repository->import_users_csv($files['file']['tmp_name']);
+        $result = $this->repository->import_users_csv($files['file']['tmp_name']);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+        if (!$result) {
+            return new WP_Error('import_failed', 'Failed to import users', [ 'status' => 500 ]);
+        }
         return new WP_REST_Response(null, 200);
     }
 
@@ -340,7 +346,13 @@ class Res_Pong_Rest {
         if (empty($files['file'])) {
             return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
         }
-        $this->repository->import_events_csv($files['file']['tmp_name']);
+        $result = $this->repository->import_events_csv($files['file']['tmp_name']);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+        if (!$result) {
+            return new WP_Error('import_failed', 'Failed to import events', [ 'status' => 500 ]);
+        }
         return new WP_REST_Response(null, 200);
     }
 
@@ -358,7 +370,13 @@ class Res_Pong_Rest {
         if (empty($files['file'])) {
             return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
         }
-        $this->repository->import_reservations_csv($files['file']['tmp_name']);
+        $result = $this->repository->import_reservations_csv($files['file']['tmp_name']);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+        if (!$result) {
+            return new WP_Error('import_failed', 'Failed to import reservations', [ 'status' => 500 ]);
+        }
         return new WP_REST_Response(null, 200);
     }
 }
