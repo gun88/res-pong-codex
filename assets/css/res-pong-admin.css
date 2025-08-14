@@ -75,3 +75,12 @@ button.rp-unsign,
     border-color: #8e0000 !important;
     background: #fff !important;
 }
+.rp-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+.rp-toolbar .dataTables_filter {
+    margin-left: auto;
+}

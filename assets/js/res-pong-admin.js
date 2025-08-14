@@ -42,7 +42,7 @@
         var toggleLabel, state, toggleClass;
         if(entity === 'reservations'){
             state = parseInt(data.presence_confirmed);
-            toggleLabel = state ? 'Disabilita' : 'Abilita';
+            toggleLabel = state ? 'Assente' : 'Presente';
         }else{
             state = parseInt(data.enabled);
             toggleLabel = state ? 'Disabilita' : 'Abilita';
@@ -54,28 +54,28 @@
     var columns = {
         users: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
-            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.id + '">' + d + '</a>'; } },
+            { data: 'id', title: 'Tessera', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'email', title: 'Email' },
             { data: 'username', title: 'Username' },
-            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'category', title: 'Categoria' },
+            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
             { data: 'timeout', title: 'In timeout', className: 'rp-icon-col', render: function(d, type){ if(!d){ return type === 'display' ? '' : 0; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); var active = now < t; if(type === 'display'){ return active ? '<span class="dashicons dashicons-clock rp-icon-clock"></span>' : ''; } return active ? 1 : 0; } },
-            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('users', d); } }
         ],
         events: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
+            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'group_id', title: 'Gruppo' },
-            { data: 'category', title: 'Categoria' },
-            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'start_datetime', title: 'Inizio' },
             { data: 'end_datetime', title: 'Fine' },
-            { data: 'max_players', title: 'Giocatori max' },
+            { data: 'category', title: 'Categoria' },
             { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: null, title: 'Stato', render: function(d){ var now = new Date(); var start = new Date(d.start_datetime.replace(' ', 'T')); return now > start ? 'chiuso' : 'aperto'; } },
-            { data: null, title: 'Giocatori', render: function(d){ return d.max_players ? d.players_count + '/' + d.max_players : ''; } },
+            { data: 'players_count', title: 'Giocatori' },
+            { data: 'max_players', title: 'Giocatori max' },
             { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('events', d); } }
         ],
         reservations: [
@@ -128,40 +128,18 @@
             });
         });
     }
-    function initList(){
-        var table = $('#res-pong-list');
-        if(!table.length){ return; }
-        var entity = table.data('entity');
-        function listUrl(){
-            if(entity === 'events'){
-                return restUrl(entity, 'open_only=' + ($('#rp-open-filter').is(':checked') ? 1 : 0));
-            }else if(entity === 'reservations'){
-                return restUrl(entity, 'active_only=' + ($('#rp-active-filter').is(':checked') ? 1 : 0));
-            }
-            return restUrl(entity);
-        }
+    function initTable(table, entity, urlFunc){
         var dt = table.DataTable({
             ajax: {
-                url: listUrl(),
+                url: urlFunc(),
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
             columns: columns[entity]
         });
-        dt.on('preXhr.dt', function(){
-            showOverlay(true);
-        });
-        dt.on('xhr.dt', function(){
-            hideOverlay();
-        });
-        dt.on('error.dt', function(){
-            hideOverlay();
-        });
-        if(entity === 'events'){
-            $('#rp-open-filter').on('change', function(){ dt.ajax.url(listUrl()).load(); });
-        }else if(entity === 'reservations'){
-            $('#rp-active-filter').on('change', function(){ dt.ajax.url(listUrl()).load(); });
-        }
+        dt.on('preXhr.dt', function(){ showOverlay(true); });
+        dt.on('xhr.dt error.dt', function(){ hideOverlay(); });
+
         $(dt.column(0).header()).html('<input type="checkbox" id="rp-select-all">');
         table.on('change', '#rp-select-all', function(){
             var checked = $(this).is(':checked');
@@ -170,16 +148,41 @@
         table.on('change', '.rp-select', function(){
             if(!this.checked){ $('#rp-select-all').prop('checked', false); }
         });
+
         handleActions(table, entity);
-        $('#res-pong-add').on('click', function(e){
+
+        var wrapper = $(dt.table().container());
+        var toolbar = $('<div class="rp-toolbar"></div>');
+        var length = wrapper.find('div.dataTables_length');
+        var filter = wrapper.find('div.dataTables_filter');
+        toolbar.append(length);
+        var bulk = $('<div class="rp-bulk"><select id="rp-bulk-action"><option value="">Bulk Actions</option></select> <button class="button" id="rp-apply-bulk">Apply</button></div>');
+        var opt = '';
+        if(entity === 'users'){
+            opt = '<option value="delete">Delete</option><option value="enable">Enable</option><option value="disable">Disable</option><option value="timeout">Timeout</option>';
+        }else if(entity === 'events'){
+            opt = '<option value="delete">Delete</option><option value="enable">Enable</option><option value="disable">Disable</option>';
+        }else if(entity === 'reservations'){
+            opt = '<option value="delete">Delete</option><option value="enable">Presente</option><option value="disable">Assente</option>';
+        }
+        bulk.find('select').append(opt);
+        toolbar.append(bulk);
+        var addBtn = $('<button class="button" id="res-pong-add">Aggiungi</button>');
+        var importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
+        var exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
+        toolbar.append(addBtn, importBtn, exportBtn);
+        toolbar.append(filter);
+        wrapper.prepend(toolbar);
+
+        addBtn.on('click', function(e){
             e.preventDefault();
             window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail';
         });
-        $('#res-pong-export').on('click', function(e){
+        exportBtn.on('click', function(e){
             e.preventDefault();
             window.location = restUrl(entity + '/export', '_wpnonce=' + rp_admin.nonce);
         });
-        $('#res-pong-import').on('click', function(e){
+        importBtn.on('click', function(e){
             e.preventDefault();
             var input = $('<input type="file" accept=".csv" style="display:none">');
             $('body').append(input);
@@ -202,7 +205,7 @@
                 });
             }).trigger('click');
         });
-        $('#rp-apply-bulk').on('click', function(){
+        toolbar.find('#rp-apply-bulk').on('click', function(){
             var action = $('#rp-bulk-action').val();
             var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
             if(!action || ids.length === 0){ return; }
@@ -245,6 +248,7 @@
             }
             next();
         });
+        return dt;
     }
     function populateForm(entity, id, form){
         $.ajax({
@@ -414,87 +418,21 @@
             });
         }
     }
-    function isEventOpen(data){
-        var now = new Date();
-        var start = new Date(data.event_start_datetime.replace(' ', 'T'));
-        return now <= start;
-    }
-    function initUserReservations(){
-        var table = $('#res-pong-user-reservations');
-        if(!table.length){ return; }
-        var user = table.data('user');
-        if(!user){ return; }
-        var dt = table.DataTable({
-            ajax: {
-                url: restUrl('reservations', 'user_id=' + user + '&active_only=1'),
-                dataSrc: '',
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
-            },
-            columns: [
-                { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + '</a>'; } },
-                { data: 'name', title: 'Name', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
-                { data: 'created_at', title: 'Created At' },
-                { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
-                { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Unsubscribe</button>' : ''; } }
-            ]
-        });
-        table.on('click', '.rp-unsign', function(){
-            var id = $(this).data('id');
-            if(!confirm('Delete item?')){ return; }
-            showOverlay(true);
-            $.ajax({
-                url: rp_admin.rest_url + 'reservations/' + id,
-                method: 'DELETE',
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ hideOverlay(); },
-                success: function(){ dt.ajax.reload(); }
-            });
-        });
-    }
-    function initEventReservations(){
-        var table = $('#res-pong-event-reservations');
-        if(!table.length){ return; }
-        var event = table.data('event');
-        if(!event){ return; }
-        var dt = table.DataTable({
-            ajax: {
-                url: restUrl('reservations', 'event_id=' + event + '&active_only=1'),
-                dataSrc: '',
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
-            },
-            columns: [
-                { data: 'user_id', title: 'User ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
-                { data: 'name', title: 'Name', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
-                { data: 'username', title: 'Username' },
-                { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
-                { data: null, title: 'Azioni', orderable: false, render: function(d){
-                    var toggleLabel = parseInt(d.presence_confirmed) ? 'Disabilita' : 'Abilita';
-                    var buttons = '<button class="button rp-toggle" data-id="' + d.id + '">' + toggleLabel + '</button>';
-                    if(isEventOpen(d)){
-                        buttons += ' <button class="button rp-unsign" data-id="' + d.id + '">Disiscrivi</button>';
-                    }
-                    return buttons;
-                } }
-            ]
-        });
-        handleActions(table, 'reservations');
-        table.on('click', '.rp-unsign', function(){
-            var id = $(this).data('id');
-            if(!confirm('Delete item?')){ return; }
-            showOverlay(true);
-            $.ajax({
-                url: rp_admin.rest_url + 'reservations/' + id,
-                method: 'DELETE',
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ hideOverlay(); },
-                success: function(){ dt.ajax.reload(); }
-            });
-        });
-    }
     $(function(){
-        initList();
+        var list = $('#res-pong-list');
+        if(list.length){
+            initTable(list, list.data('entity'), function(){ return restUrl(list.data('entity')); });
+        }
+        var ur = $('#res-pong-user-reservations');
+        if(ur.length){
+            var uid = ur.data('user');
+            initTable(ur, 'reservations', function(){ return restUrl('reservations', 'user_id=' + uid + '&active_only=1'); });
+        }
+        var er = $('#res-pong-event-reservations');
+        if(er.length){
+            var eid = er.data('event');
+            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=1'); });
+        }
         initDetail();
-        initUserReservations();
-        initEventReservations();
     });
 })(jQuery);

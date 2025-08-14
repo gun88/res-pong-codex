@@ -41,8 +41,7 @@ class Res_Pong_Admin {
     // List pages
     public function render_users_page() {
         echo '<div class="wrap">';
-        echo '<h1>' . esc_html__('Users', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a> <a href="#" id="res-pong-import" class="page-title-action">' . esc_html__('Import CSV', 'res-pong') . '</a> <a href="#" id="res-pong-export" class="page-title-action">' . esc_html__('Export CSV', 'res-pong') . '</a></h1>';
-        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option><option value="timeout">' . esc_html__('Timeout', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
+        echo '<h1>' . esc_html__('Users', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="users"></table>';
         $this->render_progress_overlay();
         echo '</div>';
@@ -50,8 +49,7 @@ class Res_Pong_Admin {
 
     public function render_events_page() {
         echo '<div class="wrap">';
-        echo '<h1>' . esc_html__('Events', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a> <a href="#" id="res-pong-import" class="page-title-action">' . esc_html__('Import CSV', 'res-pong') . '</a> <a href="#" id="res-pong-export" class="page-title-action">' . esc_html__('Export CSV', 'res-pong') . '</a></h1>';
-        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button> <label><input type="checkbox" id="rp-open-filter" checked> ' . esc_html__('Open only', 'res-pong') . '</label></div></div>';
+        echo '<h1>' . esc_html__('Events', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="events"></table>';
         $this->render_progress_overlay();
         echo '</div>';
@@ -59,8 +57,7 @@ class Res_Pong_Admin {
 
     public function render_reservations_page() {
         echo '<div class="wrap">';
-        echo '<h1>' . esc_html__('Reservations', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a> <a href="#" id="res-pong-import" class="page-title-action">' . esc_html__('Import CSV', 'res-pong') . '</a> <a href="#" id="res-pong-export" class="page-title-action">' . esc_html__('Export CSV', 'res-pong') . '</a></h1>';
-        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button> <label><input type="checkbox" id="rp-active-filter" checked> ' . esc_html__('Active only', 'res-pong') . '</label></div></div>';
+        echo '<h1>' . esc_html__('Reservations', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="reservations"></table>';
         $this->render_progress_overlay();
         echo '</div>';
@@ -80,7 +77,7 @@ class Res_Pong_Admin {
         echo '<tr><th><label for="first_name">First Name</label></th><td><input name="first_name" id="first_name" type="text"></td></tr>';
         echo '<tr><th><label for="last_name">Last Name</label></th><td><input name="last_name" id="last_name" type="text"></td></tr>';
         echo '<tr><th><label for="category">Category</label></th><td><input name="category" id="category" type="text"></td></tr>';
-        echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"></td></tr>';
+        echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"' . ( $editing ? '' : ' checked' ) . '></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
         if ($editing) {
@@ -126,7 +123,7 @@ class Res_Pong_Admin {
         echo '<tr><th><label for="start_datetime">Start</label></th><td><input name="start_datetime" id="start_datetime" type="datetime-local" step="1"></td></tr>';
         echo '<tr><th><label for="end_datetime">End</label></th><td><input name="end_datetime" id="end_datetime" type="datetime-local" step="1"></td></tr>';
         echo '<tr><th><label for="max_players">Max Players</label></th><td><input name="max_players" id="max_players" type="number"></td></tr>';
-        echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"></td></tr>';
+        echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"' . ( $editing ? '' : ' checked' ) . '></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
         if ($editing) {
