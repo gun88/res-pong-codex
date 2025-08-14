@@ -22,6 +22,16 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_create_user' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
+        register_rest_route($namespace, '/users/export', [
+            'methods'  => 'GET',
+            'callback' => [ $this, 'rest_export_users' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/users/import', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_import_users' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)', [
             'methods'  => 'GET',
             'callback' => [ $this, 'rest_get_user' ],
@@ -47,16 +57,6 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_reset_password' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
-        register_rest_route($namespace, '/users/export', [
-            'methods'  => 'GET',
-            'callback' => [ $this, 'rest_export_users' ],
-            'permission_callback' => function () { return current_user_can('manage_options'); },
-        ]);
-        register_rest_route($namespace, '/users/import', [
-            'methods'  => 'POST',
-            'callback' => [ $this, 'rest_import_users' ],
-            'permission_callback' => function () { return current_user_can('manage_options'); },
-        ]);
 
         // Events
         register_rest_route($namespace, '/events', [
@@ -67,6 +67,16 @@ class Res_Pong_Rest {
         register_rest_route($namespace, '/events', [
             'methods'  => 'POST',
             'callback' => [ $this, 'rest_create_event' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/events/export', [
+            'methods'  => 'GET',
+            'callback' => [ $this, 'rest_export_events' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/events/import', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_import_events' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
         register_rest_route($namespace, '/events/(?P<id>\d+)', [
@@ -84,16 +94,6 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_delete_event' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
-        register_rest_route($namespace, '/events/export', [
-            'methods'  => 'GET',
-            'callback' => [ $this, 'rest_export_events' ],
-            'permission_callback' => function () { return current_user_can('manage_options'); },
-        ]);
-        register_rest_route($namespace, '/events/import', [
-            'methods'  => 'POST',
-            'callback' => [ $this, 'rest_import_events' ],
-            'permission_callback' => function () { return current_user_can('manage_options'); },
-        ]);
 
         // Reservations
         register_rest_route($namespace, '/reservations', [
@@ -104,6 +104,16 @@ class Res_Pong_Rest {
         register_rest_route($namespace, '/reservations', [
             'methods'  => 'POST',
             'callback' => [ $this, 'rest_create_reservation' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/reservations/export', [
+            'methods'  => 'GET',
+            'callback' => [ $this, 'rest_export_reservations' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/reservations/import', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_import_reservations' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
         register_rest_route($namespace, '/reservations/(?P<id>\d+)', [
@@ -119,16 +129,6 @@ class Res_Pong_Rest {
         register_rest_route($namespace, '/reservations/(?P<id>\d+)', [
             'methods'  => 'DELETE',
             'callback' => [ $this, 'rest_delete_reservation' ],
-            'permission_callback' => function () { return current_user_can('manage_options'); },
-        ]);
-        register_rest_route($namespace, '/reservations/export', [
-            'methods'  => 'GET',
-            'callback' => [ $this, 'rest_export_reservations' ],
-            'permission_callback' => function () { return current_user_can('manage_options'); },
-        ]);
-        register_rest_route($namespace, '/reservations/import', [
-            'methods'  => 'POST',
-            'callback' => [ $this, 'rest_import_reservations' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
     }

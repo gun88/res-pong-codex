@@ -195,6 +195,9 @@ class Res_Pong_Repository {
         $header = array_values(array_intersect($header, $columns));
 
         while (($data = fgetcsv($handle)) !== false) {
+            if (!array_filter($data, function ($v) { return trim($v) !== ''; })) {
+                continue;
+            }
             $data = array_slice($data, 0, count($header));
             $row = array_combine($header, $data);
             $row = array_intersect_key($row, $allowed);
