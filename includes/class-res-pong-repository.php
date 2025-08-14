@@ -221,6 +221,44 @@ class Res_Pong_Repository {
     }
 
     public function import_users_csv($file) {
+        $handle = fopen($file, 'r');
+        if (!$handle) {
+            return false;
+        }
+        $first = fgetcsv($handle, 0, ';');
+        if ($first && in_array('Cognome', $first) && in_array('Nome', $first) && in_array('Tessera', $first)) {
+            $map = array_flip($first);
+            while (($data = fgetcsv($handle, 0, ';')) !== false) {
+                if (!array_filter($data, function ($v) { return trim($v) !== ''; })) {
+                    continue;
+                }
+                $last = $this->normalize_name($data[$map['Cognome']] ?? '');
+                $first_name = $this->normalize_name($data[$map['Nome']] ?? '');
+                $email = strtolower(trim($data[$map['Email']] ?? ''));
+                $category = $data[$map['Categoria']] ?? '';
+                $id = trim($data[$map['Tessera']] ?? '');
+                if ($id === '' || $email === '') {
+                    continue;
+                }
+                $username = $this->generate_username($first_name, $last);
+                $row = [
+                    'id'          => $id,
+                    'email'       => $email,
+                    'username'    => $username,
+                    'last_name'   => $last,
+                    'first_name'  => $first_name,
+                    'category'    => $category,
+                    'password'    => null,
+                    'timeout'     => null,
+                    'reset_token' => null,
+                    'enabled'     => 1,
+                ];
+                $this->wpdb->replace($this->table_user, $row);
+            }
+            fclose($handle);
+            return true;
+        }
+        fclose($handle);
         return $this->import_csv($file, $this->table_user);
     }
 
@@ -239,6 +277,27 @@ class Res_Pong_Repository {
 
     public function import_reservations_csv($file) {
         return $this->import_csv($file, $this->table_reservation);
+    }
+
+    private function normalize_name($name) {
+        $name = strtolower(trim($name));
+        return mb_convert_case($name, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    private function generate_username($first_name, $last_name) {
+        $base = strtolower(substr($first_name, 0, 1) . preg_replace('/[^a-z0-9]/i', '', $last_name));
+        $username = $base;
+        $i = 2;
+        while ($this->username_exists($username)) {
+            $username = $base . $i;
+            $i++;
+        }
+        return $username;
+    }
+
+    private function username_exists($username) {
+        $sql = $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_user} WHERE username = %s", $username);
+        return (int) $this->wpdb->get_var($sql) > 0;
     }
 
 }

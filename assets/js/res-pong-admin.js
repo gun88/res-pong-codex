@@ -49,7 +49,11 @@
         }
         toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
         var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '">' + toggleLabel + '</button>';
-        return edit + ' ' + del + ' ' + toggle;
+        var extra = '';
+        if(entity === 'users' && !data.password){
+            extra = ' <button class="button rp-invite rp-action-btn" data-id="' + data.id + '">Invita</button>';
+        }
+        return edit + ' ' + del + ' ' + toggle + extra;
     }
     var columns = {
         users: [
@@ -142,16 +146,36 @@
                 success: function(){ table.DataTable().ajax.reload(); }
             });
         });
+        if(entity === 'users'){
+            table.on('click', '.rp-invite', function(){
+                var id = $(this).data('id');
+                showOverlay(true);
+                $.ajax({
+                    url: rp_admin.rest_url + 'users/' + id + '/invite',
+                    method: 'POST',
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){ showNotice('success', 'Invited'); }
+                });
+            });
+        }
     }
     function initTable(table, entity, urlFunc, opts){
         opts = opts || {};
+        var order = opts.order || [];
+        if(!order.length){
+            if(entity === 'users'){ order = [[1, 'asc']]; }
+            else if(entity === 'events'){ order = [[2, 'desc']]; }
+            else if(entity === 'reservations'){ order = [[6, 'desc']]; }
+        }
         var dt = table.DataTable({
             ajax: {
                 url: urlFunc(),
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
-            columns: columns[entity]
+            columns: columns[entity],
+            order: order
         });
         dt.on('preXhr.dt', function(){ showOverlay(true); });
         dt.on('xhr.dt error.dt', function(){ hideOverlay(); });
@@ -294,7 +318,9 @@
                     }
                 }
                 if(typeof data.password !== 'undefined'){
-                    $('#res-pong-invite').prop('disabled', !!data.password);
+                    var hasPassword = !!data.password;
+                    $('#res-pong-invite').prop('disabled', hasPassword);
+                    $('#res-pong-reset-password').prop('disabled', !hasPassword);
                 }
             }
         });
