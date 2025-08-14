@@ -3,7 +3,9 @@
         return '<input type="checkbox" class="rp-select" value="' + data.id + '">';
     }
     function renderBool(val){
-        return parseInt(val) === 1 ? '<span class="dashicons dashicons-yes"></span>' : '<span class="dashicons dashicons-no-alt"></span>';
+        return parseInt(val) === 1
+            ? '<span class="dashicons dashicons-yes rp-icon-yes"></span>'
+            : '<span class="dashicons dashicons-no-alt rp-icon-no"></span>';
     }
     function showOverlay(indeterminate){
         var overlay = $('#rp-progress-overlay');
@@ -35,9 +37,9 @@
         return url;
     }
     function actionButtons(entity, data){
-        var edit = '<button class="button rp-edit" data-id="' + data.id + '">Modifica</button>';
-        var del = '<button class="button rp-delete rp-button-danger" data-id="' + data.id + '">Cancella</button>';
-        var toggleLabel, state;
+        var edit = '<button class="button rp-edit rp-action-btn" data-id="' + data.id + '">Modifica</button>';
+        var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '">Cancella</button>';
+        var toggleLabel, state, toggleClass;
         if(entity === 'reservations'){
             state = parseInt(data.presence_confirmed);
             toggleLabel = state ? 'Disabilita' : 'Abilita';
@@ -45,7 +47,8 @@
             state = parseInt(data.enabled);
             toggleLabel = state ? 'Disabilita' : 'Abilita';
         }
-        var toggle = '<button class="button rp-toggle" data-id="' + data.id + '">' + toggleLabel + '</button>';
+        toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
+        var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '">' + toggleLabel + '</button>';
         return edit + ' ' + del + ' ' + toggle;
     }
     var columns = {
@@ -53,37 +56,37 @@
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'email', title: 'Email' },
-            { data: 'username', title: 'Username' },
-            { data: 'name', title: 'Name', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.id + '">' + d + '</a>'; } },
-            { data: 'category', title: 'Category' },
+            { data: 'username', title: 'Nome utente' },
+            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.id + '">' + d + '</a>'; } },
+            { data: 'category', title: 'Categoria' },
             { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
-            { data: 'timeout', title: 'In timeout', render: function(d, type){ if(!d){ return type === 'display' ? '' : 0; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); var active = now < t; if(type === 'display'){ return active ? '<span class="dashicons dashicons-clock"></span>' : ''; } return active ? 1 : 0; } },
-            { data: 'enabled', title: 'Enabled', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
+            { data: 'timeout', title: 'In timeout', className: 'rp-icon-col', render: function(d, type){ if(!d){ return type === 'display' ? '' : 0; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); var active = now < t; if(type === 'display'){ return active ? '<span class="dashicons dashicons-clock rp-icon-clock"></span>' : ''; } return active ? 1 : 0; } },
+            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('users', d); } }
         ],
         events: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'group_id', title: 'Group' },
-            { data: 'category', title: 'Category' },
-            { data: 'name', title: 'Name', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.id + '">' + d + '</a>'; } },
-            { data: 'start_datetime', title: 'Start' },
-            { data: 'end_datetime', title: 'End' },
-            { data: 'max_players', title: 'Max Players' },
-            { data: 'enabled', title: 'Enabled', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
-            { data: null, title: 'Status', render: function(d){ var now = new Date(); var start = new Date(d.start_datetime.replace(' ', 'T')); return now > start ? 'closed' : 'open'; } },
-            { data: null, title: 'Players', render: function(d){ return d.max_players ? d.players_count + '/' + d.max_players : ''; } },
+            { data: 'group_id', title: 'Gruppo' },
+            { data: 'category', title: 'Categoria' },
+            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.id + '">' + d + '</a>'; } },
+            { data: 'start_datetime', title: 'Inizio' },
+            { data: 'end_datetime', title: 'Fine' },
+            { data: 'max_players', title: 'Giocatori max' },
+            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
+            { data: null, title: 'Stato', render: function(d){ var now = new Date(); var start = new Date(d.start_datetime.replace(' ', 'T')); return now > start ? 'chiuso' : 'aperto'; } },
+            { data: null, title: 'Giocatori', render: function(d){ return d.max_players ? d.players_count + '/' + d.max_players : ''; } },
             { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('events', d); } }
         ],
         reservations: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'user_id', title: 'User ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'username', title: 'Username' },
-            { data: 'event_id', title: 'Event ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'event_name', title: 'Event' },
-            { data: 'created_at', title: 'Created At' },
-            { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
+            { data: 'user_id', title: 'ID utente', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'username', title: 'Nome utente' },
+            { data: 'event_id', title: 'ID evento', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'event_name', title: 'Evento' },
+            { data: 'created_at', title: 'Creato il' },
+            { data: 'presence_confirmed', title: 'Presenza', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('reservations', d); } }
         ]
     };
