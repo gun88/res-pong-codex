@@ -47,6 +47,16 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_reset_password' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
+        register_rest_route($namespace, '/users/export', [
+            'methods'  => 'GET',
+            'callback' => [ $this, 'rest_export_users' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/users/import', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_import_users' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
 
         // Events
         register_rest_route($namespace, '/events', [
@@ -74,6 +84,16 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_delete_event' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
+        register_rest_route($namespace, '/events/export', [
+            'methods'  => 'GET',
+            'callback' => [ $this, 'rest_export_events' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/events/import', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_import_events' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
 
         // Reservations
         register_rest_route($namespace, '/reservations', [
@@ -99,6 +119,16 @@ class Res_Pong_Rest {
         register_rest_route($namespace, '/reservations/(?P<id>\d+)', [
             'methods'  => 'DELETE',
             'callback' => [ $this, 'rest_delete_reservation' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/reservations/export', [
+            'methods'  => 'GET',
+            'callback' => [ $this, 'rest_export_reservations' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/reservations/import', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_import_reservations' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
     }
@@ -216,6 +246,57 @@ class Res_Pong_Rest {
         $id = (int) $request['id'];
         $this->repository->delete_reservation($id);
         return new WP_REST_Response(null, 204);
+    }
+
+    public function rest_export_users() {
+        $csv = $this->repository->export_users_csv();
+        $response = new WP_REST_Response($csv, 200);
+        $response->header('Content-Type', 'text/csv; charset=UTF-8');
+        $response->header('Content-Disposition', 'attachment; filename="users.csv"');
+        return $response;
+    }
+
+    public function rest_import_users($request) {
+        $files = $request->get_file_params();
+        if (empty($files['file'])) {
+            return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
+        }
+        $this->repository->import_users_csv($files['file']['tmp_name']);
+        return new WP_REST_Response(null, 200);
+    }
+
+    public function rest_export_events() {
+        $csv = $this->repository->export_events_csv();
+        $response = new WP_REST_Response($csv, 200);
+        $response->header('Content-Type', 'text/csv; charset=UTF-8');
+        $response->header('Content-Disposition', 'attachment; filename="events.csv"');
+        return $response;
+    }
+
+    public function rest_import_events($request) {
+        $files = $request->get_file_params();
+        if (empty($files['file'])) {
+            return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
+        }
+        $this->repository->import_events_csv($files['file']['tmp_name']);
+        return new WP_REST_Response(null, 200);
+    }
+
+    public function rest_export_reservations() {
+        $csv = $this->repository->export_reservations_csv();
+        $response = new WP_REST_Response($csv, 200);
+        $response->header('Content-Type', 'text/csv; charset=UTF-8');
+        $response->header('Content-Disposition', 'attachment; filename="reservations.csv"');
+        return $response;
+    }
+
+    public function rest_import_reservations($request) {
+        $files = $request->get_file_params();
+        if (empty($files['file'])) {
+            return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
+        }
+        $this->repository->import_reservations_csv($files['file']['tmp_name']);
+        return new WP_REST_Response(null, 200);
     }
 }
 
