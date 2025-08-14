@@ -56,7 +56,7 @@
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'email', title: 'Email' },
-            { data: 'username', title: 'Nome utente' },
+            { data: 'username', title: 'Username' },
             { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'category', title: 'Categoria' },
             { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
@@ -82,7 +82,7 @@
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'user_id', title: 'ID utente', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'username', title: 'Nome utente' },
+            { data: 'username', title: 'Username' },
             { data: 'event_id', title: 'ID evento', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'event_name', title: 'Evento' },
             { data: 'created_at', title: 'Creato il' },
@@ -254,7 +254,7 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             });
             var eReq = $.ajax({
-                url: rp_admin.rest_url + 'events?open_only=0',
+                url: rp_admin.rest_url + 'events&open_only=0',
                 method: 'GET',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             });
