@@ -189,7 +189,6 @@ class Res_Pong_Repository {
         if (!$handle) {
             return false;
         }
-
         $columns = $this->wpdb->get_col("DESCRIBE {$table}");
         $allowed = array_fill_keys($columns, true);
         $header = fgetcsv($handle);
@@ -201,7 +200,6 @@ class Res_Pong_Repository {
             $row = array_intersect_key($row, $allowed);
             $this->wpdb->replace($table, $row);
         }
-
         fclose($handle);
         return true;
     }
