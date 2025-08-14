@@ -39,19 +39,20 @@
     var columns = {
         users: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
-            { data: 'id', title: 'ID' },
+            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'email', title: 'Email' },
             { data: 'username', title: 'Username' },
             { data: 'first_name', title: 'First Name' },
             { data: 'last_name', title: 'Last Name' },
             { data: 'category', title: 'Category' },
-            { data: 'timeout', title: 'Timeout' },
+            { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
+            { data: 'timeout', title: 'In timeout', render: function(d, type){ if(!d){ return type === 'display' ? '' : 0; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); var active = now < t; if(type === 'display'){ return active ? '<span class="dashicons dashicons-clock"></span>' : ''; } return active ? 1 : 0; } },
             { data: 'enabled', title: 'Enabled', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('users', d); } }
         ],
         events: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
-            { data: 'id', title: 'ID' },
+            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'group_id', title: 'Group' },
             { data: 'category', title: 'Category' },
             { data: 'name', title: 'Name' },
@@ -65,10 +66,10 @@
         ],
         reservations: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
-            { data: 'id', title: 'ID' },
-            { data: 'user_id', title: 'User ID' },
+            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'user_id', title: 'User ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'username', title: 'Username' },
-            { data: 'event_id', title: 'Event ID' },
+            { data: 'event_id', title: 'Event ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'event_name', title: 'Event' },
             { data: 'created_at', title: 'Created At' },
             { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
@@ -157,6 +158,15 @@
             var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
             if(!action || ids.length === 0){ return; }
             if(action === 'delete' && !confirm('Delete selected items?')){ return; }
+            var timeoutDate = null;
+            if(action === 'timeout'){
+                var def = new Date();
+                def.setHours(0,0,0,0);
+                def.setDate(def.getDate() + 7);
+                var defStr = def.getFullYear() + '-' + ('0' + (def.getMonth()+1)).slice(-2) + '-' + ('0' + def.getDate()).slice(-2) + ' 00:00:00';
+                timeoutDate = prompt('Timeout date (YYYY-MM-DD HH:MM:SS)', defStr);
+                if(!timeoutDate){ return; }
+            }
             var overlay = showOverlay(false);
             var bar = overlay.bar;
             var text = overlay.text;
@@ -169,6 +179,7 @@
                 var data = null;
                 if(action === 'enable'){ data = entity === 'reservations' ? { presence_confirmed:1 } : { enabled:1 }; }
                 if(action === 'disable'){ data = entity === 'reservations' ? { presence_confirmed:0 } : { enabled:0 }; }
+                if(action === 'timeout'){ data = { timeout: timeoutDate }; }
                 $.ajax({
                     url: url,
                     method: method,
@@ -214,7 +225,38 @@
         if(!form.length){ return; }
         var entity = form.data('entity');
         var id = form.data('id');
-        if(id){ populateForm(entity, id, form); }
+        function loadReservationOptions(callback){
+            var uReq = $.ajax({
+                url: rp_admin.rest_url + 'users',
+                method: 'GET',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
+            });
+            var eReq = $.ajax({
+                url: rp_admin.rest_url + 'events?open_only=0',
+                method: 'GET',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
+            });
+            $.when(uReq, eReq).done(function(uRes, eRes){
+                var users = uRes[0];
+                var events = eRes[0];
+                var uSel = $('#user_id');
+                $.each(users, function(_, u){
+                    uSel.append('<option value="' + u.id + '">' + u.last_name + ' ' + u.first_name + ' (' + u.id + ')</option>');
+                });
+                var eSel = $('#event_id');
+                $.each(events, function(_, e){
+                    var dt = e.start_datetime.substring(0,16);
+                    eSel.append('<option value="' + e.id + '">' + e.name + ' - ' + dt + ' (' + e.id + ')</option>');
+                });
+                if(callback){ callback(); }
+            });
+        }
+        function initForm(){ if(id){ populateForm(entity, id, form); } }
+        if(entity === 'reservations'){
+            loadReservationOptions(initForm);
+        }else{
+            initForm();
+        }
         form.on('submit', function(e){
             e.preventDefault();
             var data = {};
@@ -292,6 +334,25 @@
                 });
             });
         }
+        var timeoutForm = $('#res-pong-timeout-form');
+        if(timeoutForm.length){
+            if(id){ populateForm('users', id, timeoutForm); }
+            timeoutForm.on('submit', function(e){
+                e.preventDefault();
+                var val = timeoutForm.find('[name=timeout]').val();
+                if(!val){ return; }
+                showOverlay(true);
+                $.ajax({
+                    url: rp_admin.rest_url + 'users/' + id,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ timeout: val.replace('T', ' ') }),
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){ alert('Timeout saved'); }
+                });
+            });
+        }
     }
     function isEventOpen(data){
         var now = new Date();
@@ -310,7 +371,7 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
             columns: [
-                { data: 'event_name', title: 'Evento' },
+                { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + '</a>'; } },
                 { data: 'created_at', title: 'Created At' },
                 { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
                 { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Disiscrivi</button>' : ''; } }
@@ -341,7 +402,7 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
             columns: [
-                { data: 'user_id', title: 'User ID' },
+                { data: 'user_id', title: 'User ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
                 { data: 'username', title: 'Username' },
                 { data: 'presence_confirmed', title: 'Presence', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
                 { data: null, title: 'Azioni', orderable: false, render: function(d){ return isEventOpen(d) ? '<button class="button rp-unsign" data-id="'+d.id+'">Disiscrivi</button>' : ''; } }
