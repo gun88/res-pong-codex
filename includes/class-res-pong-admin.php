@@ -42,7 +42,7 @@ class Res_Pong_Admin {
     public function render_users_page() {
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Users', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
-        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
+        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option><option value="timeout">' . esc_html__('Timeout', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="users"></table>';
         $this->render_progress_overlay();
         echo '</div>';
@@ -98,6 +98,14 @@ class Res_Pong_Admin {
         echo '<button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
         echo '<button type="button" class="button" id="res-pong-reset-password">' . esc_html__('Reset Password', 'res-pong') . '</button></p>';
         echo '</form>';
+        $default_timeout = date('Y-m-d\\T00:00:00', strtotime('+7 days'));
+        echo '<h2>' . esc_html__('Timeout', 'res-pong') . '</h2>';
+        echo '<form id="res-pong-timeout-form" data-entity="users" data-id="' . esc_attr($id) . '">';
+        echo '<table class="form-table">';
+        echo '<tr><th><label for="timeout">Timeout</label></th><td><input name="timeout" id="timeout" type="datetime-local" step="1" value="' . esc_attr($default_timeout) . '"></td></tr>';
+        echo '</table>';
+        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Timeout', 'res-pong') . '</button></p>';
+        echo '</form>';
         echo '<h2>' . esc_html__('User Reservations', 'res-pong') . '</h2>';
         echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';
         $this->render_progress_overlay();
@@ -139,8 +147,8 @@ class Res_Pong_Admin {
         echo '<h1>' . ($editing ? esc_html__('Edit Reservation', 'res-pong') : esc_html__('Add Reservation', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="reservations" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
-        echo '<tr><th><label for="user_id">User ID</label></th><td><input name="user_id" id="user_id" type="text"></td></tr>';
-        echo '<tr><th><label for="event_id">Event ID</label></th><td><input name="event_id" id="event_id" type="number"></td></tr>';
+        echo '<tr><th><label for="user_id">User ID</label></th><td><select name="user_id" id="user_id"></select></td></tr>';
+        echo '<tr><th><label for="event_id">Event ID</label></th><td><select name="event_id" id="event_id"></select></td></tr>';
         echo '<tr><th><label for="created_at">Created At</label></th><td><input name="created_at" id="created_at" type="datetime-local" step="1"></td></tr>';
         echo '<tr><th><label for="presence_confirmed">Presence Confirmed</label></th><td><input name="presence_confirmed" id="presence_confirmed" type="checkbox" value="1"></td></tr>';
         echo '</table>';
