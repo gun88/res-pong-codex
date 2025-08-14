@@ -47,5 +47,6 @@ register_deactivation_hook(__FILE__, function () {
 });
 
 
+new Res_Pong();
 
 
