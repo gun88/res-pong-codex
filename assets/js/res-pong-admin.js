@@ -24,11 +24,18 @@
     function hideOverlay(){
         $('#rp-progress-overlay').hide();
     }
+    function clearNotice(){
+        $('.wrap').first().find('.notice').remove();
+    }
     function showNotice(type, text){
         var wrap = $('.wrap').first();
-        wrap.find('.notice').remove();
-        $('<div class="notice notice-' + type + ' is-dismissible"><p>' + text + '</p></div>').prependTo(wrap);
+        clearNotice();
+        var notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + text + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>');
+        notice.prependTo(wrap);
     }
+    $(document).on('click', '.notice-dismiss', function(){
+        $(this).closest('.notice').remove();
+    });
     function restUrl(path, params){
         var url = rp_admin.rest_url + path;
         if(params){
@@ -113,13 +120,19 @@
                 if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
             if(!confirm('Delete item?')){ return; }
+            clearNotice();
             showOverlay(true);
             $.ajax({
                 url: url,
                 method: 'DELETE',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
-                success: function(){ table.DataTable().ajax.reload(); }
+                success: function(){ table.DataTable().ajax.reload(); },
+                error: function(xhr){
+                    var msg = 'Error deleting';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showNotice('error', msg);
+                }
             });
         });
         table.on('click', '.rp-toggle', function(){
@@ -135,6 +148,7 @@
             if(entity === 'events' && row.group_id){
                 if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
+            clearNotice();
             showOverlay(true);
             $.ajax({
                 url: url,
@@ -143,19 +157,30 @@
                 data: JSON.stringify(data),
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
-                success: function(){ table.DataTable().ajax.reload(); }
+                success: function(){ table.DataTable().ajax.reload(); },
+                error: function(xhr){
+                    var msg = 'Error updating';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showNotice('error', msg);
+                }
             });
         });
         if(entity === 'users'){
             table.on('click', '.rp-invite', function(){
                 var id = $(this).data('id');
+                clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id + '/invite',
                     method: 'POST',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ showNotice('success', 'Invited'); }
+                    success: function(){ showNotice('success', 'Invited'); },
+                    error: function(xhr){
+                        var msg = 'Invite failed';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
                 });
             });
         }
@@ -241,6 +266,7 @@
                 if(!file){ input.remove(); return; }
                 var formData = new FormData();
                 formData.append('file', file);
+                clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + entity + '/import',
@@ -251,7 +277,11 @@
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); input.remove(); },
                     success: function(){ dt.ajax.reload(); showNotice('success', 'Import completed'); },
-                    error: function(){ showNotice('error', 'Import failed'); }
+                    error: function(xhr){
+                        var msg = 'Import failed';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
                 });
             }).trigger('click');
         });
@@ -269,6 +299,7 @@
                 timeoutDate = prompt('Timeout date (YYYY-MM-DD HH:MM:SS)', defStr);
                 if(!timeoutDate){ return; }
             }
+            clearNotice();
             var overlay = showOverlay(false);
             var bar = overlay.bar;
             var text = overlay.text;
@@ -416,6 +447,7 @@
             if(entity === 'events' && id && $('#group_id').val()){
                 if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
+            clearNotice();
             showOverlay(true);
             $.ajax({
                 url: url,
@@ -435,8 +467,10 @@
                         }
                     }
                 },
-                error: function(){
-                    showNotice('error', 'Error saving');
+                error: function(xhr){
+                    var msg = 'Error saving';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showNotice('error', msg);
                 }
             });
         });
@@ -452,6 +486,7 @@
                 proceed = confirm('Delete item?');
             }
             if(!proceed){ return; }
+            clearNotice();
             showOverlay(true);
             $.ajax({
                 url: url,
@@ -461,8 +496,10 @@
                 success: function(){
                     window.location = rp_admin.admin_url + '?page=res-pong-' + entity;
                 },
-                error: function(){
-                    showNotice('error', 'Error deleting');
+                error: function(xhr){
+                    var msg = 'Error deleting';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showNotice('error', msg);
                 }
             });
         });
@@ -476,6 +513,7 @@
                     alert('Passwords must match and be at least 6 characters.');
                     return;
                 }
+                clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id + '/reset-password',
@@ -484,27 +522,44 @@
                     data: JSON.stringify({ password: pass }),
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Password saved'); }
+                    success: function(){ alert('Password saved'); },
+                    error: function(xhr){
+                        var msg = 'Error saving password';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
                 });
             });
             $('#res-pong-invite').on('click', function(){
+                clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id + '/invite',
                     method: 'POST',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Invited'); }
+                    success: function(){ alert('Invited'); },
+                    error: function(xhr){
+                        var msg = 'Invite failed';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
                 });
             });
             $('#res-pong-reset-password').on('click', function(){
+                clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id + '/reset-password',
                     method: 'POST',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Password reset'); }
+                    success: function(){ alert('Password reset'); },
+                    error: function(xhr){
+                        var msg = 'Reset failed';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
                 });
             });
         }
@@ -515,6 +570,7 @@
                 e.preventDefault();
                 var val = timeoutForm.find('[name=timeout]').val();
                 if(!val){ return; }
+                clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id,
@@ -523,7 +579,12 @@
                     data: JSON.stringify({ timeout: val.replace('T', ' ') }),
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Timeout saved'); }
+                    success: function(){ alert('Timeout saved'); },
+                    error: function(xhr){
+                        var msg = 'Error saving timeout';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
                 });
             });
         }
