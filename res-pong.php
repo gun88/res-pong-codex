@@ -1,0 +1,51 @@
+<?php
+/**
+ * Plugin Name: Res Pong
+ * Plugin URI: https://tennistavolomorelli.it
+ * Description: Prenotazioni per giornate di gioco libero in palestra.
+ * Version: 1.0.0
+ * Author: tpomante
+ * Author URI: https://tpomante.it
+ * License: GPL v2 or later
+ * License URI: https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain: res-pong
+ * Domain Path: /languages
+ */
+
+// Prevent direct access to this file
+defined('ABSPATH') || exit;
+
+// Define plugin constants
+define('RES_PONG_DEV', true);
+define('RES_PONG_VERSION', RES_PONG_DEV ? time() : '1.0.0');
+define('RES_PONG_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('RES_PONG_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('RS_FITET_MONITOR_ACTIVE', is_plugin_active('fitet-monitor/fitet-monitor.php'));
+define('RS_FITET_MONITOR_DIR', plugin_dir_path('fitet-monitor/fitet-monitor.php'));
+define('RES_PONG_COOKIE_NAME', 'respong_auth');
+define('RES_PONG_COOKIE_KEY', 'kJ#9mP$2vL&5nQ@8xC*4hF!7tR^3wS%6yD_1bN?0aM+9pE{4gU}2jZ'); // Strong random 64-char string
+
+date_default_timezone_set('Europe/Rome');
+
+
+require_once RES_PONG_PLUGIN_DIR . 'includes/class-res-pong.php';
+
+/**
+ * Plugin activation function
+ */
+register_activation_hook(__FILE__, function () {
+    $res_pong = new Res_Pong();
+    $res_pong->activate();
+});
+
+/**
+ * Plugin deactivation function
+ */
+register_deactivation_hook(__FILE__, function () {
+    $res_pong = new Res_Pong();
+    $res_pong->deactivate();
+});
+
+
+
+
