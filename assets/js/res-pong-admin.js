@@ -175,6 +175,33 @@
             e.preventDefault();
             window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail';
         });
+        $('#res-pong-export').on('click', function(e){
+            e.preventDefault();
+            window.location = restUrl(entity + '/export', '_wpnonce=' + rp_admin.nonce);
+        });
+        $('#res-pong-import').on('click', function(e){
+            e.preventDefault();
+            var input = $('<input type="file" accept=".csv" style="display:none">');
+            $('body').append(input);
+            input.on('change', function(){
+                var file = this.files[0];
+                if(!file){ input.remove(); return; }
+                var formData = new FormData();
+                formData.append('file', file);
+                showOverlay(true);
+                $.ajax({
+                    url: rp_admin.rest_url + entity + '/import',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); input.remove(); },
+                    success: function(){ dt.ajax.reload(); showNotice('success', 'Import completed'); },
+                    error: function(){ showNotice('error', 'Import failed'); }
+                });
+            }).trigger('click');
+        });
         $('#rp-apply-bulk').on('click', function(){
             var action = $('#rp-bulk-action').val();
             var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
