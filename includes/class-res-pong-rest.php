@@ -272,12 +272,12 @@ class Res_Pong_Rest {
 
     public function rest_invite_user($request) {
         error_log('Ciao, sono qui');
-        return new WP_REST_Response(null, 200);
+        return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_reset_password($request) {
         error_log('Ciao, sono qui');
-        return new WP_REST_Response(null, 200);
+        return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_get_reservation($request) {
@@ -329,7 +329,7 @@ class Res_Pong_Rest {
         if (!$result) {
             return new WP_Error('import_failed', 'Failed to import users', [ 'status' => 500 ]);
         }
-        return new WP_REST_Response(null, 200);
+        return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_export_events() {
@@ -353,7 +353,7 @@ class Res_Pong_Rest {
         if (!$result) {
             return new WP_Error('import_failed', 'Failed to import events', [ 'status' => 500 ]);
         }
-        return new WP_REST_Response(null, 200);
+        return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_export_reservations() {
@@ -377,7 +377,7 @@ class Res_Pong_Rest {
         if (!$result) {
             return new WP_Error('import_failed', 'Failed to import reservations', [ 'status' => 500 ]);
         }
-        return new WP_REST_Response(null, 200);
+        return new WP_REST_Response([ 'success' => true ], 200);
     }
 }
 
