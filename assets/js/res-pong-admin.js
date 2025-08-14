@@ -22,6 +22,13 @@
     function hideOverlay(){
         $('#rp-progress-overlay').hide();
     }
+    function restUrl(path, params){
+        var url = rp_admin.rest_url + path;
+        if(params){
+            url += (url.indexOf('?') === -1 ? '?' : '&') + params;
+        }
+        return url;
+    }
     function actionButtons(entity, data){
         var edit = '<button class="button rp-edit" data-id="' + data.id + '">Modifica</button>';
         var del = '<button class="button rp-delete" data-id="' + data.id + '">Cancella</button>';
@@ -118,13 +125,12 @@
         if(!table.length){ return; }
         var entity = table.data('entity');
         function listUrl(){
-            var url = rp_admin.rest_url + entity;
             if(entity === 'events'){
-                url += '?open_only=' + ($('#rp-open-filter').is(':checked') ? 1 : 0);
+                return restUrl(entity, 'open_only=' + ($('#rp-open-filter').is(':checked') ? 1 : 0));
             }else if(entity === 'reservations'){
-                url += '?active_only=' + ($('#rp-active-filter').is(':checked') ? 1 : 0);
+                return restUrl(entity, 'active_only=' + ($('#rp-active-filter').is(':checked') ? 1 : 0));
             }
-            return url;
+            return restUrl(entity);
         }
         var dt = table.DataTable({
             ajax: {
@@ -305,7 +311,7 @@
         if(!user){ return; }
         var dt = table.DataTable({
             ajax: {
-                url: rp_admin.rest_url + 'reservations?user_id=' + user + '&active_only=1',
+                url: restUrl('reservations', 'user_id=' + user + '&active_only=1'),
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
@@ -336,7 +342,7 @@
         if(!event){ return; }
         var dt = table.DataTable({
             ajax: {
-                url: rp_admin.rest_url + 'reservations?event_id=' + event + '&active_only=1',
+                url: restUrl('reservations', 'event_id=' + event + '&active_only=1'),
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
