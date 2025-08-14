@@ -55,7 +55,9 @@ button.rp-unsign,
     /*text-align: center;*/
 }
 .rp-action-btn {
-    width: 90px;
+    width: 80px;
+    font-size: 11px;
+    padding: 0 6px;
 }
 .rp-button-enable {
     color: #2e7d32 !important;

@@ -57,6 +57,12 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_reset_password' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
+        register_rest_route($namespace, '/users/(?P<id>[\w-]+)/impersonate', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_impersonate_user' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+
 
         // Events
         register_rest_route($namespace, '/events', [
@@ -307,6 +313,21 @@ class Res_Pong_Rest {
         wp_mail($user['email'], 'Reset password', 'Clicca sul link per reimpostare la tua password: ' . $url);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
+
+    public function rest_impersonate_user($request) {
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
+        }
+        $expires = time() + HOUR_IN_SECONDS;
+        $payload = $id . '|' . $expires;
+        $hash = hash_hmac('sha256', $payload, RES_PONG_COOKIE_KEY);
+        $token = $payload . '|' . $hash;
+        setcookie(RES_PONG_COOKIE_NAME, $token, $expires, '/', COOKIE_DOMAIN, is_ssl(), true);
+        return new WP_REST_Response([ 'url' => home_url('/') ], 200);
+    }
+
 
     public function rest_get_reservation($request) {
         $id = (int) $request['id'];
