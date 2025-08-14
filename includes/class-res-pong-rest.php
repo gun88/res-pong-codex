@@ -229,6 +229,7 @@ class Res_Pong_Rest {
 
     public function rest_update_event($request) {
         $id = (int) $request['id'];
+        unset($request['recurrence'], $request['recurrence_end']);
         $data = $request->get_json_params();
         $apply = $request->get_param('apply_group');
         if ($apply) {

@@ -49,7 +49,11 @@
         }
         toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
         var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '">' + toggleLabel + '</button>';
-        return edit + ' ' + del + ' ' + toggle;
+        var extra = '';
+        if(entity === 'users' && !data.password){
+            extra = ' <button class="button rp-invite rp-action-btn" data-id="' + data.id + '">Invita</button>';
+        }
+        return edit + ' ' + del + ' ' + toggle + extra;
     }
     var columns = {
         users: [
@@ -106,7 +110,7 @@
             var row = table.DataTable().row($(this).closest('tr')).data();
             var url = rp_admin.rest_url + entity + '/' + id;
             if(entity === 'events' && row.group_id){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
             if(!confirm('Delete item?')){ return; }
             showOverlay(true);
@@ -129,7 +133,7 @@
             }
             var url = rp_admin.rest_url + entity + '/' + id;
             if(entity === 'events' && row.group_id){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
             showOverlay(true);
             $.ajax({
@@ -142,16 +146,36 @@
                 success: function(){ table.DataTable().ajax.reload(); }
             });
         });
+        if(entity === 'users'){
+            table.on('click', '.rp-invite', function(){
+                var id = $(this).data('id');
+                showOverlay(true);
+                $.ajax({
+                    url: rp_admin.rest_url + 'users/' + id + '/invite',
+                    method: 'POST',
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){ showNotice('success', 'Invited'); }
+                });
+            });
+        }
     }
     function initTable(table, entity, urlFunc, opts){
         opts = opts || {};
+        var order = opts.order || [];
+        if(!order.length){
+            if(entity === 'users'){ order = [[1, 'asc']]; }
+            else if(entity === 'events'){ order = [[2, 'desc']]; }
+            else if(entity === 'reservations'){ order = [[6, 'desc']]; }
+        }
         var dt = table.DataTable({
             ajax: {
                 url: urlFunc(),
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
-            columns: columns[entity]
+            columns: columns[entity],
+            order: order
         });
         dt.on('preXhr.dt', function(){ showOverlay(true); });
         dt.on('xhr.dt error.dt', function(){ hideOverlay(); });
@@ -185,7 +209,7 @@
         var separator0 = $('<span>•</span>');
         var separator1 = $('<span>•</span>');
         var separator2 = $('<span>•</span>');
-        var addBtn = $('<button class="button rp-button-add" id="res-pong-add"><span class="dashicons dashicons-plus"></span> Aggiungi</button>');
+        var addBtn = $('<button class="button rp-button-add" id="res-pong-add"><span class="dashicons dashicons-plus"></span><span>Aggiungi</span></button>');
         var importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
         var exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
         toolbar.append(separator0, bulk);
@@ -294,7 +318,9 @@
                     }
                 }
                 if(typeof data.password !== 'undefined'){
-                    $('#res-pong-invite').prop('disabled', !!data.password);
+                    var hasPassword = !!data.password;
+                    $('#res-pong-invite').prop('disabled', hasPassword);
+                    $('#res-pong-reset-password').prop('disabled', !hasPassword);
                 }
             }
         });
@@ -388,7 +414,7 @@
             var method = id ? 'PUT' : 'POST';
             var url = rp_admin.rest_url + entity + (id ? '/' + id : '');
             if(entity === 'events' && id && $('#group_id').val()){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
             showOverlay(true);
             $.ajax({
@@ -420,7 +446,7 @@
             var url = rp_admin.rest_url + entity + '/' + id;
             var proceed = true;
             if(entity === 'events' && $('#group_id').val()){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '?apply_group=1'; }
+                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
                 proceed = confirm('Delete item?');
             }else{
                 proceed = confirm('Delete item?');

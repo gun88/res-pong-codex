@@ -83,6 +83,10 @@ button.rp-unsign,
     border-color: #2e7d32 !important;
     background: #fff !important;
 }
+.rp-button-add {
+    display: flex !important;
+    align-items: center !important;
+}
 
 .rp-button-add:hover {
     color: #1b5e20 !important;
