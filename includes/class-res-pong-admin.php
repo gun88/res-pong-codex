@@ -37,21 +37,27 @@ class Res_Pong_Admin {
     public function render_users_page() {
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Users', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
+        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="users"></table>';
+        echo '<div id="rp-progress" style="display:none;"><progress max="100" value="0"></progress><span id="rp-progress-text">0%</span></div>';
         echo '</div>';
     }
 
     public function render_events_page() {
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Events', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
+        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="events"></table>';
+        echo '<div id="rp-progress" style="display:none;"><progress max="100" value="0"></progress><span id="rp-progress-text">0%</span></div>';
         echo '</div>';
     }
 
     public function render_reservations_page() {
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Reservations', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
+        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="reservations"></table>';
+        echo '<div id="rp-progress" style="display:none;"><progress max="100" value="0"></progress><span id="rp-progress-text">0%</span></div>';
         echo '</div>';
     }
 
@@ -69,14 +75,25 @@ class Res_Pong_Admin {
         echo '<tr><th><label for="first_name">First Name</label></th><td><input name="first_name" id="first_name" type="text"></td></tr>';
         echo '<tr><th><label for="last_name">Last Name</label></th><td><input name="last_name" id="last_name" type="text"></td></tr>';
         echo '<tr><th><label for="category">Category</label></th><td><input name="category" id="category" type="text"></td></tr>';
-        echo '<tr><th><label for="password">Password</label></th><td><input name="password" id="password" type="password"></td></tr>';
         echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
         if ($editing) {
             echo ' <button type="button" class="button button-secondary" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
         }
-        echo '</p></form></div>';
+        echo '</p></form>';
+        echo '<h2>' . esc_html__('Password Reset', 'res-pong') . '</h2>';
+        echo '<form id="res-pong-password-form" data-entity="users" data-id="' . esc_attr($id) . '">';
+        echo '<table class="form-table">';
+        echo '<tr><th><label for="new_password">New Password</label></th><td><input name="new_password" id="new_password" type="password"></td></tr>';
+        echo '<tr><th><label for="confirm_password">Confirm Password</label></th><td><input name="confirm_password" id="confirm_password" type="password"></td></tr>';
+        echo '</table>';
+        echo '<p class="submit"><button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
+        echo '<button type="button" class="button" id="res-pong-reset-password">' . esc_html__('Reset Password', 'res-pong') . '</button></p>';
+        echo '</form>';
+        echo '<h2>' . esc_html__('User Reservations', 'res-pong') . '</h2>';
+        echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';
+        echo '</div>';
     }
 
     public function render_event_detail() {
@@ -90,8 +107,8 @@ class Res_Pong_Admin {
         echo '<tr><th><label for="category">Category</label></th><td><input name="category" id="category" type="text"></td></tr>';
         echo '<tr><th><label for="name">Name</label></th><td><input name="name" id="name" type="text"></td></tr>';
         echo '<tr><th><label for="note">Note</label></th><td><textarea name="note" id="note"></textarea></td></tr>';
-        echo '<tr><th><label for="start_datetime">Start</label></th><td><input name="start_datetime" id="start_datetime" type="text"></td></tr>';
-        echo '<tr><th><label for="end_datetime">End</label></th><td><input name="end_datetime" id="end_datetime" type="text"></td></tr>';
+        echo '<tr><th><label for="start_datetime">Start</label></th><td><input name="start_datetime" id="start_datetime" type="datetime-local" step="1"></td></tr>';
+        echo '<tr><th><label for="end_datetime">End</label></th><td><input name="end_datetime" id="end_datetime" type="datetime-local" step="1"></td></tr>';
         echo '<tr><th><label for="max_players">Max Players</label></th><td><input name="max_players" id="max_players" type="number"></td></tr>';
         echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"></td></tr>';
         echo '</table>';
@@ -99,7 +116,10 @@ class Res_Pong_Admin {
         if ($editing) {
             echo ' <button type="button" class="button button-secondary" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
         }
-        echo '</p></form></div>';
+        echo '</p></form>';
+        echo '<h2>' . esc_html__('Event Reservations', 'res-pong') . '</h2>';
+        echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
+        echo '</div>';
     }
 
     public function render_reservation_detail() {
@@ -111,7 +131,7 @@ class Res_Pong_Admin {
         echo '<table class="form-table">';
         echo '<tr><th><label for="user_id">User ID</label></th><td><input name="user_id" id="user_id" type="text"></td></tr>';
         echo '<tr><th><label for="event_id">Event ID</label></th><td><input name="event_id" id="event_id" type="number"></td></tr>';
-        echo '<tr><th><label for="created_at">Created At</label></th><td><input name="created_at" id="created_at" type="text"></td></tr>';
+        echo '<tr><th><label for="created_at">Created At</label></th><td><input name="created_at" id="created_at" type="datetime-local" step="1"></td></tr>';
         echo '<tr><th><label for="presence_confirmed">Presence Confirmed</label></th><td><input name="presence_confirmed" id="presence_confirmed" type="checkbox" value="1"></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';

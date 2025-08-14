@@ -160,8 +160,10 @@ class Res_Pong_Rest {
     }
 
     // Reservation handlers
-    public function rest_get_reservations() {
-        return rest_ensure_response($this->repository->get_reservations());
+    public function rest_get_reservations($request) {
+        $user_id = $request->get_param('user_id');
+        $event_id = $request->get_param('event_id');
+        return rest_ensure_response($this->repository->get_reservations($user_id, $event_id));
     }
 
     public function rest_get_reservation($request) {
