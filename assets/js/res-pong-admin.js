@@ -34,7 +34,6 @@
         }
         return url;
     }
-    }
     function actionButtons(entity, data){
         var edit = '<button class="button rp-edit" data-id="' + data.id + '">Modifica</button>';
         var del = '<button class="button rp-delete rp-button-danger" data-id="' + data.id + '">Cancella</button>';
