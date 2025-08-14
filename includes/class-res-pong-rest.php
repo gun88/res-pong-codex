@@ -37,6 +37,16 @@ class Res_Pong_Rest {
             'callback' => [ $this, 'rest_delete_user' ],
             'permission_callback' => function () { return current_user_can('manage_options'); },
         ]);
+        register_rest_route($namespace, '/users/(?P<id>[\w-]+)/invite', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_invite_user' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
+        register_rest_route($namespace, '/users/(?P<id>[\w-]+)/reset-password', [
+            'methods'  => 'POST',
+            'callback' => [ $this, 'rest_reset_password' ],
+            'permission_callback' => function () { return current_user_can('manage_options'); },
+        ]);
 
         // Events
         register_rest_route($namespace, '/events', [
@@ -127,8 +137,10 @@ class Res_Pong_Rest {
     }
 
     // Event handlers
-    public function rest_get_events() {
-        return rest_ensure_response($this->repository->get_events());
+    public function rest_get_events($request) {
+        $open_only = $request->get_param('open_only');
+        $open_only = is_null($open_only) ? true : (bool) intval($open_only);
+        return rest_ensure_response($this->repository->get_events($open_only));
     }
 
     public function rest_get_event($request) {
@@ -163,7 +175,19 @@ class Res_Pong_Rest {
     public function rest_get_reservations($request) {
         $user_id = $request->get_param('user_id');
         $event_id = $request->get_param('event_id');
-        return rest_ensure_response($this->repository->get_reservations($user_id, $event_id));
+        $active_only = $request->get_param('active_only');
+        $active_only = is_null($active_only) ? true : (bool) intval($active_only);
+        return rest_ensure_response($this->repository->get_reservations($user_id, $event_id, $active_only));
+    }
+
+    public function rest_invite_user($request) {
+        // TODO: implement invite logic
+        return new WP_REST_Response(null, 200);
+    }
+
+    public function rest_reset_password($request) {
+        // TODO: implement reset password logic
+        return new WP_REST_Response(null, 200);
     }
 
     public function rest_get_reservation($request) {

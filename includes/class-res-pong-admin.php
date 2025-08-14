@@ -9,6 +9,10 @@ class Res_Pong_Admin {
         add_action('admin_enqueue_scripts', [ $this, 'enqueue_assets' ]);
     }
 
+    private function render_progress_overlay() {
+        echo '<div id="rp-progress-overlay"><div class="rp-progress-dialog"><progress></progress><span id="rp-progress-text">0%</span></div></div>';
+    }
+
     public function register_menu() {
         add_menu_page('Res Pong', 'Res Pong', 'manage_options', 'res-pong-users', [ $this, 'render_users_page' ], 'dashicons-table-row-after');
         add_submenu_page('res-pong-users', 'Users', 'Users', 'manage_options', 'res-pong-users', [ $this, 'render_users_page' ]);
@@ -24,6 +28,7 @@ class Res_Pong_Admin {
             return;
         }
         wp_enqueue_style('res-pong-datatables', 'https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css');
+        wp_enqueue_style('res-pong-admin', RES_PONG_PLUGIN_URL . 'assets/css/res-pong-admin.css', [], RES_PONG_VERSION);
         wp_enqueue_script('res-pong-datatables', 'https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js', [ 'jquery' ], null, true);
         wp_enqueue_script('res-pong-admin', RES_PONG_PLUGIN_URL . 'assets/js/res-pong-admin.js', [ 'jquery', 'res-pong-datatables' ], RES_PONG_VERSION, true);
         wp_localize_script('res-pong-admin', 'rp_admin', [
@@ -39,25 +44,25 @@ class Res_Pong_Admin {
         echo '<h1>' . esc_html__('Users', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
         echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="users"></table>';
-        echo '<div id="rp-progress" style="display:none;"><progress max="100" value="0"></progress><span id="rp-progress-text">0%</span></div>';
+        $this->render_progress_overlay();
         echo '</div>';
     }
 
     public function render_events_page() {
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Events', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
-        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
+        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button> <label><input type="checkbox" id="rp-open-filter" checked> ' . esc_html__('Open only', 'res-pong') . '</label></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="events"></table>';
-        echo '<div id="rp-progress" style="display:none;"><progress max="100" value="0"></progress><span id="rp-progress-text">0%</span></div>';
+        $this->render_progress_overlay();
         echo '</div>';
     }
 
     public function render_reservations_page() {
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Reservations', 'res-pong') . ' <a href="#" id="res-pong-add" class="page-title-action">' . esc_html__('Add New', 'res-pong') . '</a></h1>';
-        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button></div></div>';
+        echo '<div class="tablenav top"><div class="alignleft actions"><select id="rp-bulk-action"><option value="">' . esc_html__('Bulk Actions', 'res-pong') . '</option><option value="delete">' . esc_html__('Delete', 'res-pong') . '</option><option value="enable">' . esc_html__('Enable', 'res-pong') . '</option><option value="disable">' . esc_html__('Disable', 'res-pong') . '</option></select> <button class="button" id="rp-apply-bulk">' . esc_html__('Apply', 'res-pong') . '</button> <label><input type="checkbox" id="rp-active-filter" checked> ' . esc_html__('Active only', 'res-pong') . '</label></div></div>';
         echo '<table id="res-pong-list" class="display" data-entity="reservations"></table>';
-        echo '<div id="rp-progress" style="display:none;"><progress max="100" value="0"></progress><span id="rp-progress-text">0%</span></div>';
+        $this->render_progress_overlay();
         echo '</div>';
     }
 
@@ -88,11 +93,13 @@ class Res_Pong_Admin {
         echo '<tr><th><label for="new_password">New Password</label></th><td><input name="new_password" id="new_password" type="password"></td></tr>';
         echo '<tr><th><label for="confirm_password">Confirm Password</label></th><td><input name="confirm_password" id="confirm_password" type="password"></td></tr>';
         echo '</table>';
-        echo '<p class="submit"><button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
+        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Password', 'res-pong') . '</button> ';
+        echo '<button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
         echo '<button type="button" class="button" id="res-pong-reset-password">' . esc_html__('Reset Password', 'res-pong') . '</button></p>';
         echo '</form>';
         echo '<h2>' . esc_html__('User Reservations', 'res-pong') . '</h2>';
         echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';
+        $this->render_progress_overlay();
         echo '</div>';
     }
 
@@ -119,6 +126,7 @@ class Res_Pong_Admin {
         echo '</p></form>';
         echo '<h2>' . esc_html__('Event Reservations', 'res-pong') . '</h2>';
         echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
+        $this->render_progress_overlay();
         echo '</div>';
     }
 
@@ -138,7 +146,9 @@ class Res_Pong_Admin {
         if ($editing) {
             echo ' <button type="button" class="button button-secondary" id="res-pong-delete">' . esc_html__('Delete', 'res-pong') . '</button>';
         }
-        echo '</p></form></div>';
+        echo '</p></form>';
+        $this->render_progress_overlay();
+        echo '</div>';
     }
 }
 
