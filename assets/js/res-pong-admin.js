@@ -185,7 +185,7 @@
         var separator0 = $('<span>•</span>');
         var separator1 = $('<span>•</span>');
         var separator2 = $('<span>•</span>');
-        var addBtn = $('<button class="button" id="res-pong-add">Aggiungi</button>');
+        var addBtn = $('<button class="button rp-button-add" id="res-pong-add"><span class="dashicons dashicons-plus"></span> Aggiungi</button>');
         var importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
         var exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
         toolbar.append(separator0, bulk);

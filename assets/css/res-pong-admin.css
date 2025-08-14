@@ -77,6 +77,22 @@ button.rp-unsign,
     border-color: #8e0000 !important;
     background: #fff !important;
 }
+
+.rp-button-add {
+    color: #2e7d32 !important;
+    border-color: #2e7d32 !important;
+    background: #fff !important;
+}
+
+.rp-button-add:hover {
+    color: #1b5e20 !important;
+    border-color: #1b5e20 !important;
+    background: #fff !important;
+}
+
+.rp-button-add .dashicons {
+    margin-right: 2px;
+}
 .rp-toolbar {
     display: flex;
     align-items: center;
