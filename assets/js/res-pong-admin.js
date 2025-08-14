@@ -56,11 +56,14 @@
         }
         toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
         var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '">' + toggleLabel + '</button>';
-        var extra = '';
-        if(entity === 'users' && !data.password){
-            extra = ' <button class="button rp-invite rp-action-btn" data-id="' + data.id + '">Invita</button>';
+        var buttons = edit + ' ' + del + ' ' + toggle;
+        if(entity === 'users'){
+            buttons += ' <button class="button rp-impersonate rp-action-btn" data-id="' + data.id + '">Impersona</button>';
+            if(!data.password){
+                buttons += ' <button class="button rp-invite rp-action-btn" data-id="' + data.id + '">Invita</button>';
+            }
         }
-        return edit + ' ' + del + ' ' + toggle + extra;
+        return buttons;
     }
     var columns = {
         users: [
@@ -178,6 +181,23 @@
                     success: function(){ showNotice('success', 'Invited'); },
                     error: function(xhr){
                         var msg = 'Invite failed';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
+                });
+            });
+            table.on('click', '.rp-impersonate', function(){
+                var id = $(this).data('id');
+                clearNotice();
+                showOverlay(true);
+                $.ajax({
+                    url: rp_admin.rest_url + 'users/' + id + '/impersonate',
+                    method: 'POST',
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(resp){ if(resp && resp.url){ window.open(resp.url, '_blank'); } },
+                    error: function(xhr){
+                        var msg = 'Impersonation failed';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                         showNotice('error', msg);
                     }
@@ -498,6 +518,23 @@
                 },
                 error: function(xhr){
                     var msg = 'Error deleting';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showNotice('error', msg);
+                }
+            });
+        });
+        $('#res-pong-impersonate').on('click', function(){
+            if(!id){ return; }
+            clearNotice();
+            showOverlay(true);
+            $.ajax({
+                url: rp_admin.rest_url + 'users/' + id + '/impersonate',
+                method: 'POST',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                complete: function(){ hideOverlay(); },
+                success: function(resp){ if(resp && resp.url){ window.open(resp.url, '_blank'); } },
+                error: function(xhr){
+                    var msg = 'Impersonation failed';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                     showNotice('error', msg);
                 }
