@@ -250,10 +250,11 @@ class Res_Pong_Rest {
 
     public function rest_export_users() {
         $csv = $this->repository->export_users_csv();
-        $response = new WP_REST_Response($csv, 200);
-        $response->header('Content-Type', 'text/csv; charset=UTF-8');
-        $response->header('Content-Disposition', 'attachment; filename="users.csv"');
-        return $response;
+        nocache_headers();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="users.csv"');
+        echo $csv;
+        exit;
     }
 
     public function rest_import_users($request) {
@@ -267,10 +268,11 @@ class Res_Pong_Rest {
 
     public function rest_export_events() {
         $csv = $this->repository->export_events_csv();
-        $response = new WP_REST_Response($csv, 200);
-        $response->header('Content-Type', 'text/csv; charset=UTF-8');
-        $response->header('Content-Disposition', 'attachment; filename="events.csv"');
-        return $response;
+        nocache_headers();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="events.csv"');
+        echo $csv;
+        exit;
     }
 
     public function rest_import_events($request) {
@@ -284,10 +286,11 @@ class Res_Pong_Rest {
 
     public function rest_export_reservations() {
         $csv = $this->repository->export_reservations_csv();
-        $response = new WP_REST_Response($csv, 200);
-        $response->header('Content-Type', 'text/csv; charset=UTF-8');
-        $response->header('Content-Disposition', 'attachment; filename="reservations.csv"');
-        return $response;
+        nocache_headers();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="reservations.csv"');
+        echo $csv;
+        exit;
     }
 
     public function rest_import_reservations($request) {
