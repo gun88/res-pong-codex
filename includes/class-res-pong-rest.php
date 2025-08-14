@@ -290,6 +290,16 @@ class Res_Pong_Rest {
         if (!$user) {
             return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
+        $params = $request->get_json_params();
+        $password = isset($params['password']) ? $params['password'] : '';
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                return new WP_Error('invalid_password', 'Password must be at least 6 characters', [ 'status' => 400 ]);
+            }
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $this->repository->update_user($id, [ 'password' => $hashed, 'reset_token' => null ]);
+            return new WP_REST_Response([ 'success' => true ], 200);
+        }
         $token = $this->generate_reset_token();
         $this->repository->update_user($id, [ 'reset_token' => $token ]);
         $config = new Res_Pong_Configuration();

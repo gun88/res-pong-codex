@@ -125,10 +125,11 @@ class Res_Pong_Admin {
         echo '<tr><th><label for="new_password">New Password</label></th><td><input name="new_password" id="new_password" type="password"></td></tr>';
         echo '<tr><th><label for="confirm_password">Confirm Password</label></th><td><input name="confirm_password" id="confirm_password" type="password"></td></tr>';
         echo '</table>';
-        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Password', 'res-pong') . '</button> ';
-        echo '<button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
-        echo '<button type="button" class="button" id="res-pong-reset-password">' . esc_html__('Reset Password', 'res-pong') . '</button></p>';
+        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Password', 'res-pong') . '</button></p>';
         echo '</form>';
+        echo '<h2>' . esc_html__('Password Email Operation', 'res-pong') . '</h2>';
+        echo '<p><button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
+        echo '<button type="button" class="button" id="res-pong-reset-password">' . esc_html__('Reset Password', 'res-pong') . '</button></p>';
         $default_timeout = date('Y-m-d\\T00:00:00', strtotime('+7 days'));
         echo '<h2>' . esc_html__('Timeout', 'res-pong') . '</h2>';
         echo '<form id="res-pong-timeout-form" data-entity="users" data-id="' . esc_attr($id) . '">';
