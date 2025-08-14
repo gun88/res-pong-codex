@@ -71,7 +71,7 @@ class Res_Pong_Admin {
         echo '<h1>' . ($editing ? esc_html__('Edit User', 'res-pong') : esc_html__('Add User', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="users" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
-        echo '<tr><th><label for="id">ID</label></th><td><input name="id" id="id" type="text"></td></tr>';
+        echo '<tr><th><label for="id">ID</label></th><td><input name="id" id="id" type="text"' . ( $editing ? ' readonly' : '' ) . '></td></tr>';
         echo '<tr><th><label for="email">Email</label></th><td><input name="email" id="email" type="email"></td></tr>';
         echo '<tr><th><label for="username">Username</label></th><td><input name="username" id="username" type="text"></td></tr>';
         echo '<tr><th><label for="first_name">First Name</label></th><td><input name="first_name" id="first_name" type="text"></td></tr>';
@@ -112,16 +112,20 @@ class Res_Pong_Admin {
     public function render_event_detail() {
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         $editing = !empty($id);
+        $default_start = date('Y-m-d\\T21:30:00');
+        $default_end = date('Y-m-d\\T23:00:00');
         echo '<div class="wrap">';
         echo '<h1>' . ($editing ? esc_html__('Edit Event', 'res-pong') : esc_html__('Add Event', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="events" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
-        echo '<tr><th><label for="group_id">Group ID</label></th><td><input name="group_id" id="group_id" type="number"></td></tr>';
+        echo '<tr><th><label for="group_id">Group ID</label></th><td><select name="group_id" id="group_id"></select></td></tr>';
+        echo '<tr id="recurrence_row"><th><label for="recurrence">Ricorrenza</label></th><td><select name="recurrence" id="recurrence"><option value="none">Mai</option><option value="daily">Giornaliera</option><option value="weekly">Settimanale</option><option value="monthly">Mensile</option></select></td></tr>';
+        echo '<tr id="recurrence_end_row"><th><label for="recurrence_end">Termine ricorrenza</label></th><td><input name="recurrence_end" id="recurrence_end" type="date" disabled></td></tr>';
         echo '<tr><th><label for="category">Category</label></th><td><input name="category" id="category" type="text"></td></tr>';
         echo '<tr><th><label for="name">Name</label></th><td><input name="name" id="name" type="text"></td></tr>';
         echo '<tr><th><label for="note">Note</label></th><td><textarea name="note" id="note"></textarea></td></tr>';
-        echo '<tr><th><label for="start_datetime">Start</label></th><td><input name="start_datetime" id="start_datetime" type="datetime-local" step="1"></td></tr>';
-        echo '<tr><th><label for="end_datetime">End</label></th><td><input name="end_datetime" id="end_datetime" type="datetime-local" step="1"></td></tr>';
+        echo '<tr><th><label for="start_datetime">Start</label></th><td><input name="start_datetime" id="start_datetime" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_start) . '"' ) . '></td></tr>';
+        echo '<tr><th><label for="end_datetime">End</label></th><td><input name="end_datetime" id="end_datetime" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_end) . '"' ) . '></td></tr>';
         echo '<tr><th><label for="max_players">Max Players</label></th><td><input name="max_players" id="max_players" type="number"></td></tr>';
         echo '<tr><th><label for="enabled">Enabled</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"' . ( $editing ? '' : ' checked' ) . '></td></tr>';
         echo '</table>';
@@ -140,13 +144,14 @@ class Res_Pong_Admin {
     public function render_reservation_detail() {
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         $editing = !empty($id);
+        $default_created = date('Y-m-d\\TH:i:s');
         echo '<div class="wrap">';
         echo '<h1>' . ($editing ? esc_html__('Edit Reservation', 'res-pong') : esc_html__('Add Reservation', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="reservations" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
         echo '<tr><th><label for="user_id">User ID</label></th><td><select name="user_id" id="user_id"></select></td></tr>';
         echo '<tr><th><label for="event_id">Event ID</label></th><td><select name="event_id" id="event_id"></select></td></tr>';
-        echo '<tr><th><label for="created_at">Created At</label></th><td><input name="created_at" id="created_at" type="datetime-local" step="1"></td></tr>';
+        echo '<tr><th><label for="created_at">Created At</label></th><td><input name="created_at" id="created_at" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_created) . '"' ) . '></td></tr>';
         echo '<tr><th><label for="presence_confirmed">Presence Confirmed</label></th><td><input name="presence_confirmed" id="presence_confirmed" type="checkbox" value="1"></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button>';
