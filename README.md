@@ -22,7 +22,7 @@ L'interfaccia pubblica per gli utenti non è ancora stata implementata.
 4. Accedi alla voce **Res Pong** del menu di amministrazione per configurare il sistema.
 
 ## API
-Il plugin espone un endpoint REST con prefisso `/wp-json/res-pong/v1/` utilizzato dall'interfaccia di amministrazione.
+Il plugin espone un endpoint REST con prefisso `/wp-json/res-pong-admin/v1/` utilizzato dall'interfaccia di amministrazione.
 
 ## Roadmap
 - implementazione dell'area pubblica per i tesserati

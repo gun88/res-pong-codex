@@ -12,7 +12,7 @@ class Res_Pong_Admin_Controller {
     }
 
     public function register_routes() {
-        $namespace = 'res-pong/v1';
+        $namespace = 'res-pong-admin/v1';
 
         // Users
         register_rest_route($namespace, '/users', [
