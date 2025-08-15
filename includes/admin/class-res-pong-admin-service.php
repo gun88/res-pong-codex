@@ -154,8 +154,15 @@ class Res_Pong_Admin_Service {
         }
         $token = $this->generate_reset_token();
         $this->repository->update_user($id, [ 'reset_token' => $token ]);
-        $url = $this->repository->get_configuration('first_access_page_url') . '?token=' . $this->base64url_encode($token);
-        wp_mail($user['email'], 'Portale Prenotazioni - Effettua il tuo primo accesso', 'Clicca sul link per effettuare il primo accesso: ' . $url);
+        $url = $this->configuration->get('first_access_page_url') . '?token=' . $this->base64url_encode($token);
+        $params = $request->get_json_params();
+        $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('invitation_text');
+        $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
+        $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
+        $text = str_replace($placeholders, $replacements, $text);
+        $message = $text . "\n" . $url;
+        $subject = $this->configuration->get('invitation_subject');
+        wp_mail($user['email'], $subject, $message);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
 
@@ -166,7 +173,7 @@ class Res_Pong_Admin_Service {
             return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
         $params = $request->get_json_params();
-        $password = isset($params['password']) ? $params['password'] : '';
+        $password = (is_array($params) && isset($params['password'])) ? $params['password'] : '';
         if (!empty($password)) {
             if (strlen($password) < 6) {
                 return new WP_Error('invalid_password', 'Password must be at least 6 characters', [ 'status' => 400 ]);
@@ -177,8 +184,14 @@ class Res_Pong_Admin_Service {
         }
         $token = $this->generate_reset_token();
         $this->repository->update_user($id, [ 'reset_token' => $token ]);
-        $url = $this->repository->get_configuration('password_update_page_url') . '?token=' . $this->base64url_encode($token);
-        wp_mail($user['email'], 'Portale Prenotazioni - Reset password', 'Clicca sul link per reimpostare la tua password: ' . $url);
+        $url = $this->configuration->get('password_update_page_url') . '?token=' . $this->base64url_encode($token);
+        $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('reset_password_text');
+        $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
+        $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
+        $text = str_replace($placeholders, $replacements, $text);
+        $message = $text . "\n" . $url;
+        $subject = $this->configuration->get('reset_password_subject');
+        wp_mail($user['email'], $subject, $message);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
 

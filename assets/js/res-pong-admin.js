@@ -371,8 +371,8 @@
                 }
                 if(typeof data.password !== 'undefined'){
                     var hasPassword = !!data.password;
-                    $('#res-pong-invite').prop('disabled', hasPassword);
-                    $('#res-pong-reset-password').prop('disabled', !hasPassword);
+                    $('#rp-invite-wrapper').toggle(!hasPassword);
+                    $('#rp-reset-wrapper').toggle(hasPassword);
                 }
             }
         });
@@ -568,12 +568,15 @@
                     }
                 });
             });
-            $('#res-pong-invite').on('click', function(){
+            $('#rp-send-invite').on('click', function(){
+                var text = $('#rp-invite-text').val();
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id + '/invite',
                     method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ text: text }),
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
                     success: function(){ alert('Invited'); },
@@ -584,12 +587,15 @@
                     }
                 });
             });
-            $('#res-pong-reset-password').on('click', function(){
+            $('#rp-send-reset').on('click', function(){
+                var text = $('#rp-reset-text').val();
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
                     url: rp_admin.rest_url + 'users/' + id + '/reset-password',
                     method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ text: text }),
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
                     success: function(){ alert('Password reset'); },

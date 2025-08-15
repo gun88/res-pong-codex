@@ -9,8 +9,10 @@ class Res_Pong_Configuration {
         'next_reservation_delay' => 300,
         'first_access_page_url' => 'https://localhost/#/first-access',
         'password_update_page_url' => 'https://localhost/#/password-update',
-        'invitation_text' => '',
-        'reset_password_text' => '',
+        'invitation_subject' => 'Portale Prenotazioni - Effettua il tuo primo accesso',
+        'invitation_text' => 'Clicca sul link per effettuare il primo accesso:',
+        'reset_password_subject' => 'Portale Prenotazioni - Reset password',
+        'reset_password_text' => 'Clicca sul link per reimpostare la tua password:',
     ];
 
     public function get_all() {
