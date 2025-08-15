@@ -4,9 +4,7 @@ import {ResPongService} from '../../service/res-pong.service';
 import {ActivatedRoute} from '@angular/router';
 import {catchError, tap} from 'rxjs';
 import {NgIf} from '@angular/common';
-import {ProgressBar} from 'primeng/progressbar';
 import {Skeleton} from 'primeng/skeleton';
-import {ToggleButton} from 'primeng/togglebutton';
 import {FormsModule} from '@angular/forms';
 
 @Component({
@@ -15,9 +13,7 @@ import {FormsModule} from '@angular/forms';
     PasswordFormComponent,
     PasswordFormComponent,
     NgIf,
-    ProgressBar,
     Skeleton,
-    ToggleButton,
     FormsModule
   ],
   templateUrl: './password-update.component.html'

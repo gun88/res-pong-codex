@@ -33,8 +33,6 @@ export class TimelineComponent {
 
   @Input()
   set monthPointer(monthPointer: number) {
-    console.log("monthPointer", monthPointer)
-
     this._monthPointer = monthPointer;
     this._events = {}
     this.days = []
@@ -46,7 +44,6 @@ export class TimelineComponent {
     setTimeout(() => {
       this.originalData = value;
       this.prepareData()
-      console.log("events this._events", this._events)
     })
   }
 
