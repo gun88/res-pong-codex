@@ -132,7 +132,7 @@ button.rp-unsign,
     background: #fff !important;
 }
 
-.rp-wrap .button {
+.rp-button-add {
     display: flex !important;
     align-items: center !important;
 }

@@ -97,7 +97,7 @@
             { data: null, title: 'Stato', render: function(d){ var now = new Date(); var start = new Date(d.start_datetime.replace(' ', 'T')); return now > start ? 'chiuso' : 'aperto'; } },
             { data: 'players_count', title: 'Giocatori' },
             { data: 'max_players', title: 'Giocatori max' },
-            { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('events', d); } }
+            { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('events', d); } }
         ],
         reservations: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
@@ -108,7 +108,7 @@
             { data: 'event_name', title: 'Evento' },
             { data: 'created_at', title: 'Creato il' },
             { data: 'presence_confirmed', title: 'Presenza', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
-            { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('reservations', d); } }
+            { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('reservations', d); } }
         ]
     };
     function handleActions(table, entity){
