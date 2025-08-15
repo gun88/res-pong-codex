@@ -74,11 +74,11 @@ class Res_Pong_Admin_Frontend {
     public function render_email_page() {
         echo '<div class="wrap rp-wrap">';
         echo '<h1>Email</h1>';
-        echo '<form id="rp-email-form">';
+        echo '<form id="rp-messenger-form">';
         echo '<table class="form-table">';
-        echo '<tr><th><label for="rp-email-to">Destinatari</label></th><td><input id="rp-email-to" type="text" class="large-text"></td></tr>';
-        echo '<tr><th><label for="rp-email-subject">Oggetto</label></th><td><input id="rp-email-subject" type="text" class="large-text"></td></tr>';
-        echo '<tr><th><label for="rp-email-text">Messaggio</label></th><td><textarea id="rp-email-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;"></textarea><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
+        echo '<tr><th><label for="rp-messenger-to">Destinatari</label></th><td><input id="rp-messenger-to" type="text" class="large-text"></td></tr>';
+        echo '<tr><th><label for="rp-messenger-subject">Oggetto</label></th><td><input id="rp-messenger-subject" type="text" class="large-text"></td></tr>';
+        echo '<tr><th><label for="rp-messenger-text">Messaggio</label></th><td><textarea id="rp-messenger-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;"></textarea><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
         echo '<tr><th></th><td><button type="submit" class="button button-primary">Invia</button></td></tr>';
         echo '</table>';
         echo '</form>';

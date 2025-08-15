@@ -739,9 +739,9 @@
     }
 
     function initEmailPage(){
-        var form = $('#rp-email-form');
+        var form = $('#rp-messenger-form');
         if(!form.length){ return; }
-        var toInput = $('#rp-email-to');
+        var toInput = $('#rp-messenger-to');
         var btn = form.find('button[type=submit]');
         $.ajax({
             url: rp_admin.rest_url + 'users',
@@ -792,8 +792,8 @@
             e.preventDefault();
             var recipients = toInput.val().split(',').map(function(s){ return s.trim(); }).filter(Boolean);
             var data = {
-                subject: $('#rp-email-subject').val(),
-                text: $('#rp-email-text').val(),
+                subject: $('#rp-messenger-subject').val(),
+                text: $('#rp-messenger-text').val(),
                 recipients: recipients
             };
             btn.prop('disabled', true);
