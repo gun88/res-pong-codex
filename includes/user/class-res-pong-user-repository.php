@@ -324,10 +324,6 @@ class Res_Pong_User_Repository {
         ));
     }
 
-    public function get_fitet_monitor_code($user_id) {
-        return "587290.jpg";
-    }
-
     public function delete_reservation_by_user_and_event($user_id, $event_id) {
         return $this->wpdb->query(
             $this->wpdb->prepare(

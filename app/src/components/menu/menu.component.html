@@ -18,9 +18,8 @@
         } @else if (user.monogram) {
           <p-avatar [label]="user.monogram" size="normal" shape="circle"/>
         } @else {
-          <p-avatar size="normal"
-                    image="https://tennistavolomorelli.it/wp-content/uploads/fitet-monitor/players/587290.jpg"
-                    shape="circle"/>
+          <p-avatar [label]="'...'" size="normal" shape="circle"/>
+
         }
 
       </p-button>

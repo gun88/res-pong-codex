@@ -383,7 +383,8 @@ class Res_Pong_User_Service {
     }
 
     private function add_avatar($user) {
-        $user->avatar = random_int(0, 1) ? "https://tennistavolomorelli.it/wp-content/uploads/fitet-monitor/players/587290.jpg" : null;
+        $user->avatar = null;
+        // $user->avatar = random_int(0, 1) ? "https://tennistavolomorelli.it/wp-content/uploads/fitet-monitor/players/587290.jpg" : null;
     }
 
     private function minutes_until($eventDate): int {

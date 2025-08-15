@@ -43,7 +43,7 @@ class Res_Pong {
     public function activate() {
         $this->admin_repository->create_tables();
         if (!RES_PONG_DEV) {
-            $this->copy_app_folder();
+            // $this->copy_app_folder();
         }
     }
 
@@ -59,10 +59,43 @@ class Res_Pong {
             return;
         }
 
-        if (!file_exists($dest)) {
-            mkdir($dest, 0755, true);
+        if (file_exists($dest)) {
+            $this->res_pong_recursive_delete($dest);
         }
 
-        res_pong_recursive_copy($src, $dest);
+        mkdir($dest, 0755, true);
+
+        $this->res_pong_recursive_copy($src, $dest);
+    }
+
+    private function res_pong_recursive_copy($src, $dest) {
+        $dir = opendir($src);
+        @mkdir($dest, 0755, true);
+        while (false !== ($file = readdir($dir))) {
+            if ($file != '.' && $file != '..') {
+                if (is_dir($src . '/' . $file)) {
+                    $this->res_pong_recursive_copy($src . '/' . $file, $dest . '/' . $file);
+                } else {
+                    copy($src . '/' . $file, $dest . '/' . $file);
+                }
+            }
+        }
+        closedir($dir);
+    }
+
+    private function res_pong_recursive_delete($dir) {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $files = array_diff(scandir($dir), ['.', '..']);
+        foreach ($files as $file) {
+            $path = "$dir/$file";
+            if (is_dir($path)) {
+                $this->res_pong_recursive_delete($path);
+            } else {
+                unlink($path);
+            }
+        }
+        rmdir($dir);
     }
 }
