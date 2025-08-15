@@ -44,9 +44,9 @@
         return url;
     }
     function actionButtons(entity, data){
-        var edit = '<button class="button rp-edit rp-action-btn" data-id="' + data.id + '">Modifica</button>';
-        var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '">Cancella</button>';
-        var toggleLabel, state, toggleClass;
+        var edit = '<button class="button rp-edit rp-action-btn" data-id="' + data.id + '" title="Modifica"><span class="dashicons dashicons-edit"></span></button>';
+        var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '" title="Cancella"><span class="dashicons dashicons-trash"></span></button>';
+        var toggleLabel, state, toggleClass, toggleIcon;
         if(entity === 'reservations'){
             state = parseInt(data.presence_confirmed);
             toggleLabel = state ? 'Assente' : 'Presente';
@@ -55,15 +55,16 @@
             toggleLabel = state ? 'Disabilita' : 'Abilita';
         }
         toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
-        var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '">' + toggleLabel + '</button>';
-        var buttons = edit + ' ' + del + ' ' + toggle;
+        toggleIcon = state ? 'dashicons-no-alt' : 'dashicons-yes';
+        var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '" title="' + toggleLabel + '"><span class="dashicons ' + toggleIcon + '"></span></button>';
+        var buttons = edit + del + toggle;
         if(entity === 'users'){
-            buttons += ' <button class="button rp-impersonate rp-action-btn" data-id="' + data.id + '">Impersona</button>';
+            buttons += '<button class="button rp-impersonate rp-action-btn" data-id="' + data.id + '" title="Impersona"><span class="dashicons dashicons-admin-users"></span></button>';
             if(!data.password){
-                buttons += ' <button class="button rp-invite rp-action-btn" data-id="' + data.id + '">Invita</button>';
+                buttons += '<button class="button rp-invite rp-action-btn" data-id="' + data.id + '" title="Invita"><span class="dashicons dashicons-email"></span></button>';
             }
         }
-        return buttons;
+        return '<div class="rp-action-group">' + buttons + '</div>';
     }
     var columns = {
         users: [
