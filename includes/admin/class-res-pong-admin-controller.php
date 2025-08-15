@@ -1,10 +1,13 @@
 <?php
 
-class Res_Pong_Rest {
-    private $repository;
+class Res_Pong_Admin_Controller {
+    private $service;
 
-    public function __construct($repository) {
-        $this->repository = $repository;
+    public function __construct(Res_Pong_Admin_Service $service) {
+        $this->service = $service;
+    }
+
+    public function init() {
         add_action('rest_api_init', [ $this, 'register_routes' ]);
     }
 
@@ -141,12 +144,12 @@ class Res_Pong_Rest {
 
     // User handlers
     public function rest_get_users() {
-        return rest_ensure_response($this->repository->get_users());
+        return rest_ensure_response($this->service->get_users());
     }
 
     public function rest_get_user($request) {
         $id = $request['id'];
-        $user = $this->repository->get_user($id);
+        $user = $this->service->get_user($id);
         if (!$user) {
             return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
@@ -155,20 +158,20 @@ class Res_Pong_Rest {
 
     public function rest_create_user($request) {
         $data = $request->get_json_params();
-        $this->repository->insert_user($data);
+        $this->service->insert_user($data);
         return new WP_REST_Response($data, 201);
     }
 
     public function rest_update_user($request) {
         $id = $request['id'];
         $data = $request->get_json_params();
-        $this->repository->update_user($id, $data);
-        return rest_ensure_response($this->repository->get_user($id));
+        $this->service->update_user($id, $data);
+        return rest_ensure_response($this->service->get_user($id));
     }
 
     public function rest_delete_user($request) {
         $id = $request['id'];
-        $this->repository->delete_user($id);
+        $this->service->delete_user($id);
         return new WP_REST_Response(null, 204);
     }
 
@@ -176,12 +179,12 @@ class Res_Pong_Rest {
     public function rest_get_events($request) {
         $open_only = $request->get_param('open_only');
         $open_only = is_null($open_only) ? true : (bool) intval($open_only);
-        return rest_ensure_response($this->repository->get_events($open_only));
+        return rest_ensure_response($this->service->get_events($open_only));
     }
 
     public function rest_get_event($request) {
         $id = (int) $request['id'];
-        $event = $this->repository->get_event($id);
+        $event = $this->service->get_event($id);
         if (!$event) {
             return new WP_Error('not_found', 'Event not found', [ 'status' => 404 ]);
         }
@@ -197,15 +200,15 @@ class Res_Pong_Rest {
         unset($data['recurrence'], $data['recurrence_end']);
         if ($group_id) {
             $data['group_id'] = $group_id;
-            $id = $this->repository->insert_event($data);
+            $id = $this->service->insert_event($data);
             $data['id'] = $id;
             return new WP_REST_Response($data, 201);
         }
         $data['group_id'] = null;
-        $id = $this->repository->insert_event($data);
+        $id = $this->service->insert_event($data);
         $data['id'] = $id;
         if ($recurrence !== 'none' && $recurrence_end) {
-            $this->repository->update_event($id, [ 'group_id' => $id ]);
+            $this->service->update_event($id, [ 'group_id' => $id ]);
             $start = new DateTime($data['start_datetime']);
             $end = new DateTime($data['end_datetime']);
             $limit = new DateTime($recurrence_end . ' 23:59:59');
@@ -225,7 +228,7 @@ class Res_Pong_Rest {
                     $e['start_datetime'] = $start->format('Y-m-d H:i:s');
                     $e['end_datetime'] = $end->format('Y-m-d H:i:s');
                     $e['group_id'] = $id;
-                    $this->repository->insert_event($e);
+                    $this->service->insert_event($e);
                 }
             }
             $data['group_id'] = $id;
@@ -239,30 +242,30 @@ class Res_Pong_Rest {
         $data = $request->get_json_params();
         $apply = $request->get_param('apply_group');
         if ($apply) {
-            $event = $this->repository->get_event($id);
+            $event = $this->service->get_event($id);
             if ($event && $event['group_id']) {
-                $this->repository->update_events_by_group($event['group_id'], $data);
+                $this->service->update_events_by_group($event['group_id'], $data);
             } else {
-                $this->repository->update_event($id, $data);
+                $this->service->update_event($id, $data);
             }
         } else {
-            $this->repository->update_event($id, $data);
+            $this->service->update_event($id, $data);
         }
-        return rest_ensure_response($this->repository->get_event($id));
+        return rest_ensure_response($this->service->get_event($id));
     }
 
     public function rest_delete_event($request) {
         $id = (int) $request['id'];
         $apply = $request->get_param('apply_group');
         if ($apply) {
-            $event = $this->repository->get_event($id);
+            $event = $this->service->get_event($id);
             if ($event && $event['group_id']) {
-                $this->repository->delete_events_by_group($event['group_id']);
+                $this->service->delete_events_by_group($event['group_id']);
             } else {
-                $this->repository->delete_event($id);
+                $this->service->delete_event($id);
             }
         } else {
-            $this->repository->delete_event($id);
+            $this->service->delete_event($id);
         }
         return new WP_REST_Response(null, 204);
     }
@@ -273,26 +276,25 @@ class Res_Pong_Rest {
         $event_id = $request->get_param('event_id');
         $active_only = $request->get_param('active_only');
         $active_only = is_null($active_only) ? true : (bool) intval($active_only);
-        return rest_ensure_response($this->repository->get_reservations($user_id, $event_id, $active_only));
+        return rest_ensure_response($this->service->get_reservations($user_id, $event_id, $active_only));
     }
 
     public function rest_invite_user($request) {
         $id = $request['id'];
-        $user = $this->repository->get_user($id);
+        $user = $this->service->get_user($id);
         if (!$user) {
             return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
         $token = $this->generate_reset_token();
-        $this->repository->update_user($id, [ 'reset_token' => $token ]);
-        $config = new Res_Pong_Configuration();
-        $url = $config->get('first_access_page_url') . '?token=' . $this->base64url_encode($token);
+        $this->service->update_user($id, [ 'reset_token' => $token ]);
+        $url = $this->service->get_configuration('first_access_page_url') . '?token=' . $this->base64url_encode($token);
         wp_mail($user['email'], 'Accedi al Portale Prenotazioni', 'Clicca sul link per effettuare il primo accesso: ' . $url);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_reset_password($request) {
         $id = $request['id'];
-        $user = $this->repository->get_user($id);
+        $user = $this->service->get_user($id);
         if (!$user) {
             return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
@@ -303,20 +305,19 @@ class Res_Pong_Rest {
                 return new WP_Error('invalid_password', 'Password must be at least 6 characters', [ 'status' => 400 ]);
             }
             $hashed = password_hash($password, PASSWORD_DEFAULT);
-            $this->repository->update_user($id, [ 'password' => $hashed, 'reset_token' => null ]);
+            $this->service->update_user($id, [ 'password' => $hashed, 'reset_token' => null ]);
             return new WP_REST_Response([ 'success' => true ], 200);
         }
         $token = $this->generate_reset_token();
-        $this->repository->update_user($id, [ 'reset_token' => $token ]);
-        $config = new Res_Pong_Configuration();
-        $url = $config->get('password_update_page_url') . '?token=' . $this->base64url_encode($token);
+        $this->service->update_user($id, [ 'reset_token' => $token ]);
+        $url = $this->service->get_configuration('password_update_page_url') . '?token=' . $this->base64url_encode($token);
         wp_mail($user['email'], 'Reset password', 'Clicca sul link per reimpostare la tua password: ' . $url);
         return new WP_REST_Response([ 'success' => true ], 200);
     }
 
     public function rest_impersonate_user($request) {
         $id = $request['id'];
-        $user = $this->repository->get_user($id);
+        $user = $this->service->get_user($id);
         if (!$user) {
             return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
@@ -331,7 +332,7 @@ class Res_Pong_Rest {
 
     public function rest_get_reservation($request) {
         $id = (int) $request['id'];
-        $reservation = $this->repository->get_reservation($id);
+        $reservation = $this->service->get_reservation($id);
         if (!$reservation) {
             return new WP_Error('not_found', 'Reservation not found', [ 'status' => 404 ]);
         }
@@ -340,25 +341,25 @@ class Res_Pong_Rest {
 
     public function rest_create_reservation($request) {
         $data = $request->get_json_params();
-        $this->repository->insert_reservation($data);
+        $this->service->insert_reservation($data);
         return new WP_REST_Response($data, 201);
     }
 
     public function rest_update_reservation($request) {
         $id = (int) $request['id'];
         $data = $request->get_json_params();
-        $this->repository->update_reservation($id, $data);
-        return rest_ensure_response($this->repository->get_reservation($id));
+        $this->service->update_reservation($id, $data);
+        return rest_ensure_response($this->service->get_reservation($id));
     }
 
     public function rest_delete_reservation($request) {
         $id = (int) $request['id'];
-        $this->repository->delete_reservation($id);
+        $this->service->delete_reservation($id);
         return new WP_REST_Response(null, 204);
     }
 
     public function rest_export_users() {
-        $csv = $this->repository->export_users_csv();
+        $csv = $this->service->export_users_csv();
         nocache_headers();
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="users.csv"');
@@ -371,7 +372,7 @@ class Res_Pong_Rest {
         if (empty($files['file'])) {
             return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
         }
-        $result = $this->repository->import_users_csv($files['file']['tmp_name']);
+        $result = $this->service->import_users_csv($files['file']['tmp_name']);
         if (is_wp_error($result)) {
             return $result;
         }
@@ -382,7 +383,7 @@ class Res_Pong_Rest {
     }
 
     public function rest_export_events() {
-        $csv = $this->repository->export_events_csv();
+        $csv = $this->service->export_events_csv();
         nocache_headers();
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="events.csv"');
@@ -395,7 +396,7 @@ class Res_Pong_Rest {
         if (empty($files['file'])) {
             return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
         }
-        $result = $this->repository->import_events_csv($files['file']['tmp_name']);
+        $result = $this->service->import_events_csv($files['file']['tmp_name']);
         if (is_wp_error($result)) {
             return $result;
         }
@@ -406,7 +407,7 @@ class Res_Pong_Rest {
     }
 
     public function rest_export_reservations() {
-        $csv = $this->repository->export_reservations_csv();
+        $csv = $this->service->export_reservations_csv();
         nocache_headers();
         header('Content-Type: text/csv; charset=UTF-8');
         header('Content-Disposition: attachment; filename="reservations.csv"');
@@ -419,7 +420,7 @@ class Res_Pong_Rest {
         if (empty($files['file'])) {
             return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
         }
-        $result = $this->repository->import_reservations_csv($files['file']['tmp_name']);
+        $result = $this->service->import_reservations_csv($files['file']['tmp_name']);
         if (is_wp_error($result)) {
             return $result;
         }

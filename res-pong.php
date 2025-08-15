@@ -30,23 +30,21 @@ date_default_timezone_set('Europe/Rome');
 
 require_once RES_PONG_PLUGIN_DIR . 'includes/class-res-pong.php';
 
+$res_pong = new Res_Pong();
+
 /**
  * Plugin activation function
  */
-register_activation_hook(__FILE__, function () {
-    $res_pong = new Res_Pong();
+register_activation_hook(__FILE__, function () use ($res_pong) {
     $res_pong->activate();
 });
 
 /**
  * Plugin deactivation function
  */
-register_deactivation_hook(__FILE__, function () {
-    $res_pong = new Res_Pong();
+register_deactivation_hook(__FILE__, function () use ($res_pong) {
     $res_pong->deactivate();
 });
 
-
-new Res_Pong();
 
 

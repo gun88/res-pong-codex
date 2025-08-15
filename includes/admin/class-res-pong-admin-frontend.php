@@ -1,12 +1,15 @@
 <?php
 
-class Res_Pong_Admin {
-    private $repository;
-    private $configuration;
+class Res_Pong_Admin_Frontend {
+    private $admin_service;
 
-    public function __construct($repository, $configuration) {
-        $this->repository = $repository;
-        $this->configuration = $configuration;
+    public function __construct(Res_Pong_Admin_Service $admin_service) {
+        $this->admin_service = $admin_service;
+        add_action('admin_menu', [ $this, 'register_menu' ]);
+        add_action('admin_enqueue_scripts', [ $this, 'enqueue_assets' ]);
+    }
+
+    public function init() {
         add_action('admin_menu', [ $this, 'register_menu' ]);
         add_action('admin_enqueue_scripts', [ $this, 'enqueue_assets' ]);
     }
@@ -76,10 +79,10 @@ class Res_Pong_Admin {
                 'first_access_page_url'    => isset($_POST['first_access_page_url']) ? esc_url_raw($_POST['first_access_page_url']) : '',
                 'password_update_page_url' => isset($_POST['password_update_page_url']) ? esc_url_raw($_POST['password_update_page_url']) : '',
             ];
-            $this->configuration->update($data);
+            $this->admin_service->update_configurations($data);
             echo '<div class="updated"><p>' . esc_html__('Settings saved', 'res-pong') . '</p></div>';
         }
-        $config = $this->configuration->get_all();
+        $config = $this->admin_service->get_all_configurations();
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Configurations', 'res-pong') . '</h1>';
         echo '<form method="post">';

@@ -1,13 +1,15 @@
 <?php
 
-class Res_Pong_Repository {
+class Res_Pong_Admin_Service {
 
     private $table_user;
     private $table_event;
     private $table_reservation;
     private $wpdb;
+    private $configuration;
 
-    public function __construct() {
+    public function __construct(Res_Pong_Configuration $configuration) {
+        $this->configuration = $configuration;
         global $wpdb;
         $this->wpdb = $wpdb;
         $prefix = $this->wpdb->prefix;
@@ -299,5 +301,18 @@ class Res_Pong_Repository {
         $sql = $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_user} WHERE username = %s", $username);
         return (int) $this->wpdb->get_var($sql) > 0;
     }
+
+    public function update_configurations(array $data) {
+        $this->configuration->update($data);
+    }
+
+    public function get_all_configurations() {
+        return $this->configuration->get_all();
+    }
+
+    public function get_configuration($key) {
+        return $this->configuration->get($key);
+    }
+
 
 }

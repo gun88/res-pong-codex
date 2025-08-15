@@ -2,28 +2,30 @@
 
 defined('ABSPATH') || exit;
 
-require_once RES_PONG_PLUGIN_DIR . 'includes/class-res-pong-repository.php';
-require_once RES_PONG_PLUGIN_DIR . 'includes/class-res-pong-configuration.php';
-require_once RES_PONG_PLUGIN_DIR . 'includes/class-res-pong-rest.php';
-require_once RES_PONG_PLUGIN_DIR . 'includes/class-res-pong-admin.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/common/class-res-pong-configuration.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-service.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-controller.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-frontend.php';
 
 class Res_Pong {
-    private $repository;
-    private $rest;
-    private $admin;
+    private $admin_service;
+    private $admin_controller;
+    private $admin_frontend;
     private $configuration;
 
     public function __construct() {
-        $this->repository = new Res_Pong_Repository();
         $this->configuration = new Res_Pong_Configuration();
-        $this->rest = new Res_Pong_Rest($this->repository);
+        $this->admin_service = new Res_Pong_Admin_Service($this->configuration);
+        $this->admin_controller = new Res_Pong_Admin_Controller($this->admin_service);
+        $this->admin_controller->init();
         if (is_admin()) {
-            $this->admin = new Res_Pong_Admin($this->repository, $this->configuration);
+            $this->admin_frontend = new Res_Pong_Admin_Frontend($this->admin_service);
+            $this->admin_frontend->init();
         }
     }
 
     public function activate() {
-        $this->repository->create_tables();
+        $this->admin_service->create_tables();
     }
 
     public function deactivate() {
