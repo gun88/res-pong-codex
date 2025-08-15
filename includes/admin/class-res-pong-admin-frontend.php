@@ -92,6 +92,7 @@ class Res_Pong_Admin_Frontend {
                 'almost_full_players'      => isset($_POST['almost_full_players']) ? intval($_POST['almost_full_players']) : 0,
                 'max_active_reservations'  => isset($_POST['max_active_reservations']) ? intval($_POST['max_active_reservations']) : 0,
                 'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
+                'default_email_address'    => isset($_POST['default_email_address']) ? sanitize_email($_POST['default_email_address']) : '',
                 'first_access_page_url'    => isset($_POST['first_access_page_url']) ? esc_url_raw($_POST['first_access_page_url']) : '',
                 'password_update_page_url' => isset($_POST['password_update_page_url']) ? esc_url_raw($_POST['password_update_page_url']) : '',
                 'invitation_subject'       => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
@@ -112,6 +113,7 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="almost_full_players">Giocatori quasi completi</label></th><td><input name="almost_full_players" id="almost_full_players" type="number" value="' . esc_attr($config['almost_full_players']) . '"></td></tr>';
         echo '<tr><th><label for="max_active_reservations">Max prenotazioni attive</label></th><td><input name="max_active_reservations" id="max_active_reservations" type="number" value="' . esc_attr($config['max_active_reservations']) . '"></td></tr>';
         echo '<tr><th><label for="next_reservation_delay">Ritardo prossima prenotazione</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
+        echo '<tr><th><label for="default_email_address">Email di default</label></th><td><input name="default_email_address" id="default_email_address" type="email" class="regular-text" value="' . esc_attr($config['default_email_address']) . '"></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail primo accesso</h2></th></tr>';
         echo '<tr><th><label for="first_access_page_url">URL pagina primo accesso</label></th><td><input name="first_access_page_url" id="first_access_page_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['first_access_page_url']) . '"></td></tr>';
         echo '<tr><th><label for="invitation_subject">Oggetto invito</label></th><td><input name="invitation_subject" id="invitation_subject" type="text" class="large-text" style="max-width:600px;" value="' . esc_attr($config['invitation_subject']) . '"></td></tr>';
@@ -179,7 +181,7 @@ class Res_Pong_Admin_Frontend {
             echo '<table class="form-table">';
             echo '<tr><th><label for="timeout">Timeout</label></th><td><input name="timeout" id="timeout" type="datetime-local" step="1" value="' . esc_attr($default_timeout) . '"></td></tr>';
             echo '</table>';
-            echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva timeout', 'res-pong') . '</button></p>';
+            echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva timeout', 'res-pong') . '</button> <button type="button" class="button" id="rp-remove-timeout">' . esc_html__('Rimuovi timeout', 'res-pong') . '</button></p>';
             echo '</form>';
             echo '<h2>' . esc_html__('Prenotazioni utente', 'res-pong') . '</h2>';
             echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';

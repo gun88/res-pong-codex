@@ -7,6 +7,7 @@ class Res_Pong_Configuration {
         'almost_full_players' => 4,
         'max_active_reservations' => 1,
         'next_reservation_delay' => 300,
+        'default_email_address' => '',
         'first_access_page_url' => 'https://localhost/#/first-access',
         'password_update_page_url' => 'https://localhost/#/password-update',
         'invitation_subject' => 'Portale Prenotazioni - Effettua il tuo primo accesso',
@@ -17,7 +18,11 @@ class Res_Pong_Configuration {
 
     public function get_all() {
         $config = get_option($this->option_name, []);
-        return wp_parse_args($config, $this->defaults);
+        $config = wp_parse_args($config, $this->defaults);
+        if ($config['default_email_address'] === '') {
+            $config['default_email_address'] = get_option('admin_email');
+        }
+        return $config;
     }
 
     public function get($key) {

@@ -72,6 +72,9 @@ class Res_Pong_Admin_Service {
 
     public function rest_create_event($request) {
         $data = $request->get_json_params();
+        if (!isset($data['name']) || trim($data['name']) === '') {
+            return new WP_Error('invalid_data', 'Il nome evento è obbligatorio', ['status' => 400]);
+        }
         unset($data['id']);
         $group_id = isset($data['group_id']) && $data['group_id'] !== '' ? (int)$data['group_id'] : null;
         $recurrence = isset($data['recurrence']) ? $data['recurrence'] : 'none';
@@ -257,18 +260,22 @@ class Res_Pong_Admin_Service {
             return new WP_Error('invalid_data', 'Oggetto, testo e destinatari sono obbligatori', ['status' => 400]);
         }
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
-        foreach ($recipients as $email) {
+        if (count($recipients) === 1) {
+            $email = $recipients[0];
             $user = $this->repository->find_user_by_email($email);
             $message = $text;
             if ($user) {
                 $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
                 $message = str_replace($placeholders, $replacements, $text);
-            }
-            if (count($recipients) === 1) {
-                wp_mail($email, $subject, $message);
             } else {
-                wp_mail(get_option('admin_email'), $subject, $message, [ 'Bcc: ' . $email ]);
+                $message = str_replace($placeholders, '', $text);
             }
+            wp_mail($email, $subject, $message);
+        } else {
+            $message = str_replace($placeholders, '', $text);
+            $headers = ['Bcc: ' . implode(',', $recipients)];
+            $to = $this->configuration->get('default_email_address');
+            wp_mail($to, $subject, $message, $headers);
         }
         return rest_ensure_response(['success' => true]);
     }

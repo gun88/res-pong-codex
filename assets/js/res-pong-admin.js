@@ -41,6 +41,19 @@
         var notice = $('<div class="notice notice-' + type + '"><p>' + text + '</p></div>');
         btn.after(notice);
     }
+    function rpConfirm(message){
+        return new Promise(function(resolve){
+            $('<div>').text(message).dialog({
+                modal: true,
+                title: 'Conferma',
+                buttons: {
+                    'Sì': function(){ $(this).dialog('close'); resolve(true); },
+                    'No': function(){ $(this).dialog('close'); resolve(false); }
+                },
+                close: function(){ $(this).remove(); }
+            });
+        });
+    }
     function restUrl(path, params){
         var url = rp_admin.rest_url + path;
         if(params){
@@ -127,24 +140,31 @@
             var id = $(this).data('id');
             var row = table.DataTable().row($(this).closest('tr')).data();
             var url = rp_admin.rest_url + entity + '/' + id;
+            var proceed = function(){
+                if(!confirm('Eliminare l\'elemento?')){ return; }
+                clearNotice();
+                showOverlay(true);
+                $.ajax({
+                    url: url,
+                    method: 'DELETE',
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){ table.DataTable().ajax.reload(); },
+                    error: function(xhr){
+                        var msg = 'Errore durante l\'eliminazione';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
+                });
+            };
             if(entity === 'events' && row.group_id){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
+                rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
+                    if(apply){ url += '&apply_group=1'; }
+                    proceed();
+                });
+            } else {
+                proceed();
             }
-            if(!confirm('Eliminare l\'elemento?')){ return; }
-            clearNotice();
-            showOverlay(true);
-            $.ajax({
-                url: url,
-                method: 'DELETE',
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ hideOverlay(); },
-                success: function(){ table.DataTable().ajax.reload(); },
-                error: function(xhr){
-                    var msg = 'Errore durante l\'eliminazione';
-                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    showNotice('error', msg);
-                }
-            });
         });
         table.on('click', '.rp-toggle', function(){
             var id = $(this).data('id');
@@ -156,25 +176,32 @@
                 data.enabled = row.enabled == 1 ? 0 : 1;
             }
             var url = rp_admin.rest_url + entity + '/' + id;
+            var send = function(){
+                clearNotice();
+                showOverlay(true);
+                $.ajax({
+                    url: url,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){ table.DataTable().ajax.reload(); },
+                    error: function(xhr){
+                        var msg = 'Errore durante l\'aggiornamento';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showNotice('error', msg);
+                    }
+                });
+            };
             if(entity === 'events' && row.group_id){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
+                rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
+                    if(apply){ url += '&apply_group=1'; }
+                    send();
+                });
+            } else {
+                send();
             }
-            clearNotice();
-            showOverlay(true);
-            $.ajax({
-                url: url,
-                method: 'PUT',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ hideOverlay(); },
-                success: function(){ table.DataTable().ajax.reload(); },
-                error: function(xhr){
-                    var msg = 'Errore durante l\'aggiornamento';
-                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    showNotice('error', msg);
-                }
-            });
         });
         if(entity === 'users'){
             table.on('click', '.rp-invite', function(){
@@ -494,68 +521,78 @@
             });
             var method = id ? 'PUT' : 'POST';
             var url = rp_admin.rest_url + entity + (id ? '/' + id : '');
-            if(entity === 'events' && id && $('#group_id').val()){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
-            }
-            clearNotice();
-            showOverlay(true);
-            $.ajax({
-                url: url,
-                method: method,
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ hideOverlay(); },
-                success: function(resp){
-                    showButtonMessage(form.find('button[type=submit]'), 'success', 'Salvato');
-                    if(!id && resp && resp.id){
-                        if(entity === 'users' || entity === 'events'){
-                            setTimeout(function(){
-                                window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + resp.id;
-                            }, 2000);
-                        }else{
-                            id = resp.id;
-                            form.attr('data-id', id);
-                            history.replaceState(null, '', rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + id);
+            var submit = function(){
+                clearNotice();
+                showOverlay(true);
+                $.ajax({
+                    url: url,
+                    method: method,
+                    contentType: 'application/json',
+                    data: JSON.stringify(data),
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(resp){
+                        showButtonMessage(form.find('button[type=submit]'), 'success', 'Salvato');
+                        if(!id && resp && resp.id){
+                            if(entity === 'users' || entity === 'events'){
+                                setTimeout(function(){
+                                    window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + resp.id;
+                                }, 2000);
+                            }else{
+                                id = resp.id;
+                                form.attr('data-id', id);
+                                history.replaceState(null, '', rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + id);
+                            }
                         }
+                    },
+                    error: function(xhr){
+                        var msg = 'Errore durante il salvataggio';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        var type = xhr.status === 409 ? 'warning' : 'error';
+                        showButtonMessage(form.find('button[type=submit]'), type, msg);
                     }
-                },
-                error: function(xhr){
-                    var msg = 'Errore durante il salvataggio';
-                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    var type = xhr.status === 409 ? 'warning' : 'error';
-                    showButtonMessage(form.find('button[type=submit]'), type, msg);
-                }
-            });
+                });
+            };
+            if(entity === 'events' && id && $('#group_id').val()){
+                rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
+                    if(apply){ url += '&apply_group=1'; }
+                    submit();
+                });
+            } else {
+                submit();
+            }
         });
         $('#res-pong-delete').on('click', function(e){
             e.preventDefault();
             if(!id){ return; }
             var url = rp_admin.rest_url + entity + '/' + id;
-            var proceed = true;
+            var executeDelete = function(){
+                if(!confirm('Eliminare l\'elemento?')){ return; }
+                clearNotice();
+                showOverlay(true);
+                $.ajax({
+                    url: url,
+                    method: 'DELETE',
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){
+                        window.location = rp_admin.admin_url + '?page=res-pong-' + entity;
+                    },
+                    error: function(xhr){
+                        var msg = 'Errore durante l\'eliminazione';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showButtonMessage($('#res-pong-delete'), 'error', msg);
+                    }
+                });
+            };
             if(entity === 'events' && $('#group_id').val()){
-                if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
-                proceed = confirm('Eliminare l\'elemento?');
-            }else{
-                proceed = confirm('Eliminare l\'elemento?');
+                rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
+                    if(apply){ url += '&apply_group=1'; }
+                    executeDelete();
+                });
+            } else {
+                executeDelete();
             }
-            if(!proceed){ return; }
-            clearNotice();
-            showOverlay(true);
-            $.ajax({
-                url: url,
-                method: 'DELETE',
-                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ hideOverlay(); },
-                success: function(){
-                    window.location = rp_admin.admin_url + '?page=res-pong-' + entity;
-                },
-                error: function(xhr){
-                    var msg = 'Errore durante l\'eliminazione';
-                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    showButtonMessage($('#res-pong-delete'), 'error', msg);
-                }
-            });
         });
         $('#res-pong-impersonate').on('click', function(){
             if(!id){ return; }
@@ -664,6 +701,27 @@
                     }
                 });
             });
+            $('#rp-remove-timeout').on('click', function(){
+                clearNotice();
+                showOverlay(true);
+                $.ajax({
+                    url: rp_admin.rest_url + 'users/' + id,
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ timeout: null }),
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    complete: function(){ hideOverlay(); },
+                    success: function(){
+                        timeoutForm.find('[name=timeout]').val('');
+                        showButtonMessage($('#rp-remove-timeout'), 'success', 'Timeout rimosso');
+                    },
+                    error: function(xhr){
+                        var msg = 'Errore durante la rimozione del timeout';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        showButtonMessage($('#rp-remove-timeout'), 'error', msg);
+                    }
+                });
+            });
         }
     }
 
@@ -677,9 +735,16 @@
             method: 'GET',
             beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
             success: function(users){
-                var emails = users.map(function(u){ return u.email; });
+                var items = users.map(function(u){
+                    var label = u.email + ' (' + u.last_name + ' ' + u.first_name + ')';
+                    var search = (u.email + ' ' + u.last_name + ' ' + u.first_name).toLowerCase();
+                    return { label: label, value: u.email, search: search };
+                });
                 toInput.autocomplete({
-                    source: emails,
+                    source: function(request, response){
+                        var term = request.term.toLowerCase();
+                        response(items.filter(function(it){ return it.search.indexOf(term) !== -1; }));
+                    },
                     minLength: 0,
                     focus: function(){ return false; },
                     select: function(event, ui){
