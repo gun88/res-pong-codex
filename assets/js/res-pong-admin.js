@@ -509,18 +509,22 @@
                 success: function(resp){
                     showButtonMessage(form.find('button[type=submit]'), 'success', 'Salvato');
                     if(!id && resp && resp.id){
-                        id = resp.id;
-                        form.attr('data-id', id);
-                        history.replaceState(null, '', rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + id);
-                        if(entity === 'events'){
-                            $('#recurrence_row, #recurrence_end_row').hide();
+                        if(entity === 'users' || entity === 'events'){
+                            setTimeout(function(){
+                                window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + resp.id;
+                            }, 2000);
+                        }else{
+                            id = resp.id;
+                            form.attr('data-id', id);
+                            history.replaceState(null, '', rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + id);
                         }
                     }
                 },
                 error: function(xhr){
                     var msg = 'Errore durante il salvataggio';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    showButtonMessage(form.find('button[type=submit]'), 'error', msg);
+                    var type = xhr.status === 409 ? 'warning' : 'error';
+                    showButtonMessage(form.find('button[type=submit]'), type, msg);
                 }
             });
         });

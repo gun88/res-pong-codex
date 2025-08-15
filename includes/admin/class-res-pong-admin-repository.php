@@ -174,6 +174,11 @@ class Res_Pong_Admin_Repository {
         return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_reservation} WHERE id = %d", $id), ARRAY_A);
     }
 
+    public function find_reservation($user_id, $event_id) {
+        $sql = "SELECT * FROM {$this->table_reservation} WHERE user_id = %s AND event_id = %d";
+        return $this->wpdb->get_row($this->wpdb->prepare($sql, $user_id, $event_id), ARRAY_A);
+    }
+
     public function insert_reservation($data) {
         return $this->wpdb->insert($this->table_reservation, $data);
     }

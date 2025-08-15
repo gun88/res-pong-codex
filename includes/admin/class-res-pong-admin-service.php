@@ -31,7 +31,13 @@ class Res_Pong_Admin_Service {
                 return new WP_Error('missing_field', 'Il campo ' . $field . ' è obbligatorio', ['status' => 400]);
             }
         }
-        $this->repository->insert_user($data);
+        if ($this->repository->get_user($data['id'])) {
+            return new WP_Error('user_exists', 'Utente già esistente', ['status' => 409]);
+        }
+        $inserted = $this->repository->insert_user($data);
+        if ($inserted === false) {
+            return new WP_Error('insert_failed', 'Creazione utente fallita', ['status' => 500]);
+        }
         return new WP_REST_Response($data, 201);
     }
 
@@ -279,7 +285,13 @@ class Res_Pong_Admin_Service {
 
     public function rest_create_reservation($request) {
         $data = $request->get_json_params();
-        $this->repository->insert_reservation($data);
+        if ($this->repository->find_reservation($data['user_id'], $data['event_id'])) {
+            return new WP_Error('reservation_exists', 'Prenotazione già esistente', ['status' => 409]);
+        }
+        $inserted = $this->repository->insert_reservation($data);
+        if ($inserted === false) {
+            return new WP_Error('insert_failed', 'Creazione prenotazione fallita', ['status' => 500]);
+        }
         return new WP_REST_Response($data, 201);
     }
 
