@@ -9,6 +9,8 @@ class Res_Pong_Configuration {
         'next_reservation_delay' => 300,
         'first_access_page_url' => 'https://localhost/#/first-access',
         'password_update_page_url' => 'https://localhost/#/password-update',
+        'invitation_text' => '',
+        'reset_password_text' => '',
     ];
 
     public function get_all() {

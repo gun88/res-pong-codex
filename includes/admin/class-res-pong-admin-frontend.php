@@ -78,6 +78,8 @@ class Res_Pong_Admin_Frontend {
                 'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
                 'first_access_page_url'    => isset($_POST['first_access_page_url']) ? esc_url_raw($_POST['first_access_page_url']) : '',
                 'password_update_page_url' => isset($_POST['password_update_page_url']) ? esc_url_raw($_POST['password_update_page_url']) : '',
+                'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
+                'reset_password_text'      => isset($_POST['reset_password_text']) ? sanitize_textarea_field($_POST['reset_password_text']) : '',
             ];
             $this->admin_service->update_configurations($data);
             echo '<div class="updated"><p>' . esc_html__('Settings saved', 'res-pong') . '</p></div>';
@@ -94,6 +96,8 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="next_reservation_delay">Next reservation delay</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
         echo '<tr><th><label for="first_access_page_url">First access page URL</label></th><td><input name="first_access_page_url" id="first_access_page_url" type="text" value="' . esc_attr($config['first_access_page_url']) . '"></td></tr>';
         echo '<tr><th><label for="password_update_page_url">Password update page URL</label></th><td><input name="password_update_page_url" id="password_update_page_url" type="text" value="' . esc_attr($config['password_update_page_url']) . '"></td></tr>';
+        echo '<tr><th><label for="invitation_text">Invitation Text</label></th><td><textarea name="invitation_text" id="invitation_text" rows="3" class="large-text">' . esc_textarea($config['invitation_text']) . '</textarea></td></tr>';
+        echo '<tr><th><label for="reset_password_text">Reset Password Text</label></th><td><textarea name="reset_password_text" id="reset_password_text" rows="3" class="large-text">' . esc_textarea($config['reset_password_text']) . '</textarea></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button></p>';
         echo '</form>';
