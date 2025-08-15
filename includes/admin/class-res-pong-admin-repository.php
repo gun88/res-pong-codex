@@ -86,6 +86,11 @@ class Res_Pong_Admin_Repository {
         return $this->wpdb->get_row($this->wpdb->prepare($sql, $id), ARRAY_A);
     }
 
+    public function find_user_by_email($email) {
+        $sql = "SELECT *, CONCAT(last_name, ' ', first_name) AS name FROM {$this->table_user} WHERE email = %s";
+        return $this->wpdb->get_row($this->wpdb->prepare($sql, $email), ARRAY_A);
+    }
+
     public function insert_user($data) {
         return $this->wpdb->insert($this->table_user, $data);
     }
@@ -158,7 +163,7 @@ class Res_Pong_Admin_Repository {
             $params[] = current_time('mysql');
         }
         $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-        $sql = "SELECT r.*, u.username, CONCAT(u.last_name, ' ', u.first_name) AS name, e.name AS event_name, e.start_datetime AS event_start_datetime FROM {$this->table_reservation} r JOIN {$this->table_user} u ON r.user_id = u.id JOIN {$this->table_event} e ON r.event_id = e.id {$where_sql} ORDER BY r.created_at DESC";
+        $sql = "SELECT r.*, u.username, u.email, CONCAT(u.last_name, ' ', u.first_name) AS name, e.name AS event_name, e.start_datetime AS event_start_datetime FROM {$this->table_reservation} r JOIN {$this->table_user} u ON r.user_id = u.id JOIN {$this->table_event} e ON r.event_id = e.id {$where_sql} ORDER BY r.created_at DESC";
         if ($params) {
             $sql = $this->wpdb->prepare($sql, $params);
         }

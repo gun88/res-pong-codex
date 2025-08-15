@@ -18,13 +18,19 @@ class Res_Pong_Admin_Service {
         $id = $request['id'];
         $user = $this->repository->get_user($id);
         if (!$user) {
-            return new WP_Error('not_found', 'User not found', ['status' => 404]);
+            return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
         return rest_ensure_response($user);
     }
 
     public function rest_create_user($request) {
         $data = $request->get_json_params();
+        $required = ['id', 'email', 'username', 'first_name', 'last_name'];
+        foreach ($required as $field) {
+            if (!isset($data[$field]) || trim($data[$field]) === '') {
+                return new WP_Error('missing_field', 'Il campo ' . $field . ' è obbligatorio', ['status' => 400]);
+            }
+        }
         $this->repository->insert_user($data);
         return new WP_REST_Response($data, 201);
     }
@@ -53,7 +59,7 @@ class Res_Pong_Admin_Service {
         $id = (int)$request['id'];
         $event = $this->repository->get_event($id);
         if (!$event) {
-            return new WP_Error('not_found', 'Event not found', ['status' => 404]);
+            return new WP_Error('not_found', 'Evento non trovato', ['status' => 404]);
         }
         return rest_ensure_response($event);
     }
@@ -176,7 +182,7 @@ class Res_Pong_Admin_Service {
         $id = $request['id'];
         $user = $this->repository->get_user($id);
         if (!$user) {
-            return new WP_Error('not_found', 'User not found', ['status' => 404]);
+            return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
         $token = $this->generate_reset_token();
         $this->repository->update_user($id, ['reset_token' => $token]);
@@ -197,7 +203,7 @@ class Res_Pong_Admin_Service {
         $id = $request['id'];
         $user = $this->repository->get_user($id);
         if (!$user) {
-            return new WP_Error('not_found', 'User not found', ['status' => 404]);
+            return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
         $params = $request->get_json_params();
         $password = (is_array($params) && isset($params['password'])) ? $params['password'] : '';
@@ -226,7 +232,7 @@ class Res_Pong_Admin_Service {
         $id = $request['id'];
         $user = $this->repository->get_user($id);
         if (!$user) {
-            return new WP_Error('not_found', 'User not found', ['status' => 404]);
+            return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
         $expires = time() + HOUR_IN_SECONDS;
         $payload = $id . '|' . $expires;
@@ -236,12 +242,37 @@ class Res_Pong_Admin_Service {
         return new WP_REST_Response(['url' => home_url('/')], 200);
     }
 
+    public function rest_send_email($request) {
+        $params = $request->get_json_params();
+        $subject = isset($params['subject']) ? sanitize_text_field($params['subject']) : '';
+        $text = isset($params['text']) ? sanitize_textarea_field($params['text']) : '';
+        $recipients = isset($params['recipients']) && is_array($params['recipients']) ? array_filter(array_map('sanitize_email', $params['recipients'])) : [];
+        if ($subject === '' || $text === '' || empty($recipients)) {
+            return new WP_Error('invalid_data', 'Oggetto, testo e destinatari sono obbligatori', ['status' => 400]);
+        }
+        $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
+        foreach ($recipients as $email) {
+            $user = $this->repository->find_user_by_email($email);
+            $message = $text;
+            if ($user) {
+                $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
+                $message = str_replace($placeholders, $replacements, $text);
+            }
+            if (count($recipients) === 1) {
+                wp_mail($email, $subject, $message);
+            } else {
+                wp_mail(get_option('admin_email'), $subject, $message, [ 'Bcc: ' . $email ]);
+            }
+        }
+        return rest_ensure_response(['success' => true]);
+    }
+
 
     public function rest_get_reservation($request) {
         $id = (int)$request['id'];
         $reservation = $this->repository->get_reservation($id);
         if (!$reservation) {
-            return new WP_Error('not_found', 'Reservation not found', ['status' => 404]);
+            return new WP_Error('not_found', 'Prenotazione non trovata', ['status' => 404]);
         }
         return rest_ensure_response($reservation);
     }
@@ -277,14 +308,14 @@ class Res_Pong_Admin_Service {
     public function rest_import_users($request) {
         $files = $request->get_file_params();
         if (empty($files['file'])) {
-            return new WP_Error('no_file', 'No file uploaded', ['status' => 400]);
+            return new WP_Error('no_file', 'Nessun file caricato', ['status' => 400]);
         }
         $result = $this->repository->import_users_csv($files['file']['tmp_name']);
         if (is_wp_error($result)) {
             return $result;
         }
         if (!$result) {
-            return new WP_Error('import_failed', 'Failed to import users', ['status' => 500]);
+            return new WP_Error('import_failed', 'Importazione utenti fallita', ['status' => 500]);
         }
         return new WP_REST_Response(['success' => true], 200);
     }
@@ -301,14 +332,14 @@ class Res_Pong_Admin_Service {
     public function rest_import_events($request) {
         $files = $request->get_file_params();
         if (empty($files['file'])) {
-            return new WP_Error('no_file', 'No file uploaded', ['status' => 400]);
+            return new WP_Error('no_file', 'Nessun file caricato', ['status' => 400]);
         }
         $result = $this->repository->import_events_csv($files['file']['tmp_name']);
         if (is_wp_error($result)) {
             return $result;
         }
         if (!$result) {
-            return new WP_Error('import_failed', 'Failed to import events', ['status' => 500]);
+            return new WP_Error('import_failed', 'Importazione eventi fallita', ['status' => 500]);
         }
         return new WP_REST_Response(['success' => true], 200);
     }
@@ -325,14 +356,14 @@ class Res_Pong_Admin_Service {
     public function rest_import_reservations($request) {
         $files = $request->get_file_params();
         if (empty($files['file'])) {
-            return new WP_Error('no_file', 'No file uploaded', ['status' => 400]);
+            return new WP_Error('no_file', 'Nessun file caricato', ['status' => 400]);
         }
         $result = $this->repository->import_reservations_csv($files['file']['tmp_name']);
         if (is_wp_error($result)) {
             return $result;
         }
         if (!$result) {
-            return new WP_Error('import_failed', 'Failed to import reservations', ['status' => 500]);
+            return new WP_Error('import_failed', 'Importazione prenotazioni fallita', ['status' => 500]);
         }
         return new WP_REST_Response(['success' => true], 200);
     }
