@@ -126,6 +126,7 @@ class Res_Pong_Admin_Repository {
     }
 
     public function delete_event($id) {
+        $this->wpdb->update($this->table_event, ['group_id' => null], ['group_id' => $id]);
         return $this->wpdb->delete($this->table_event, ['id' => $id]);
     }
 

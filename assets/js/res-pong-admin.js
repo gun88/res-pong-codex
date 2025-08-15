@@ -214,9 +214,10 @@
             else if(entity === 'events'){ order = [[2, 'desc']]; }
             else if(entity === 'reservations'){ order = [[6, 'desc']]; }
         }
+        var showAll = false;
         var dt = table.DataTable({
             ajax: {
-                url: urlFunc(),
+                url: urlFunc(showAll),
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
@@ -262,6 +263,12 @@
         toolbar.append(separator1, addBtn);
         if(!opts.noCsv){
             toolbar.append(separator2, importBtn, exportBtn);
+        }
+        var addFilter = opts.filterFuture || entity === 'events' || entity === 'reservations';
+        if(addFilter){
+            var separator3 = $('<span>•</span>');
+            var futureFilter = $('<label>Filtra <select class="rp-future-filter"><option value="0">Solo Futuro</option><option value="1">Mostra tutto</option></select></label>');
+            toolbar.append(separator3, futureFilter);
         }
         toolbar.append(filter);
         wrapper.prepend(toolbar);
@@ -350,6 +357,12 @@
             }
             next();
         });
+        if(addFilter){
+            toolbar.find('.rp-future-filter').on('change', function(){
+                showAll = $(this).val() === '1';
+                dt.ajax.url(urlFunc(showAll)).load();
+            });
+        }
         return dt;
     }
     function populateForm(entity, id, form){
@@ -462,7 +475,11 @@
             var data = {};
             form.serializeArray().forEach(function(item){ data[item.name] = item.value; });
             form.find('input[type=checkbox]').each(function(){ data[this.name] = $(this).is(':checked') ? 1 : 0; });
-            form.find('input[type=datetime-local]').each(function(){ data[this.name] = this.value.replace('T', ' '); });
+            form.find('input[type=datetime-local]').each(function(){
+                var val = this.value;
+                if(val && val.length === 16){ val += ':00'; }
+                data[this.name] = val.replace('T', ' ');
+            });
             var method = id ? 'PUT' : 'POST';
             var url = rp_admin.rest_url + entity + (id ? '/' + id : '');
             if(entity === 'events' && id && $('#group_id').val()){
@@ -636,17 +653,23 @@
     $(function(){
         var list = $('#res-pong-list');
         if(list.length){
-            initTable(list, list.data('entity'), function(){ return restUrl(list.data('entity')); });
+            var ent = list.data('entity');
+            initTable(list, ent, function(showAll){
+                var params = '';
+                if(ent === 'events'){ params = 'open_only=' + (showAll ? '0' : '1'); }
+                else if(ent === 'reservations'){ params = 'active_only=' + (showAll ? '0' : '1'); }
+                return restUrl(ent, params);
+            }, { filterFuture: ent === 'events' || ent === 'reservations' });
         }
         var ur = $('#res-pong-user-reservations');
         if(ur.length){
             var uid = ur.data('user');
-            initTable(ur, 'reservations', function(){ return restUrl('reservations', 'user_id=' + uid + '&active_only=1'); }, { addParams: 'user_id=' + uid, noCsv: true });
+            initTable(ur, 'reservations', function(showAll){ return restUrl('reservations', 'user_id=' + uid + '&active_only=' + (showAll ? '0' : '1')); }, { addParams: 'user_id=' + uid, noCsv: true, filterFuture: true });
         }
         var er = $('#res-pong-event-reservations');
         if(er.length){
             var eid = er.data('event');
-            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=1'); }, { addParams: 'event_id=' + eid, noCsv: true });
+            initTable(er, 'reservations', function(showAll){ return restUrl('reservations', 'event_id=' + eid + '&active_only=' + (showAll ? '0' : '1')); }, { addParams: 'event_id=' + eid, noCsv: true, filterFuture: true });
         }
         initDetail();
     });
