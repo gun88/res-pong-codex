@@ -53,7 +53,7 @@
     }
     function actionButtons(entity, data){
         var edit = '<button class="button rp-edit rp-action-btn" data-id="' + data.id + '" title="Modifica"><span class="dashicons dashicons-edit"></span></button>';
-        var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '" title="Cancella"><span class="dashicons dashicons-trash"></span></button>';
+        var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '" title="Elimina"><span class="dashicons dashicons-trash"></span></button>';
         var toggleLabel, state, toggleClass, toggleIcon;
         if(entity === 'reservations'){
             state = parseInt(data.presence_confirmed);
@@ -275,11 +275,11 @@
         var bulk = $('<div class="rp-bulk"><select id="rp-bulk-action"><option value="">Bulk Actions</option></select> <button class="button" id="rp-apply-bulk">Applica</button></div>');
         var opt = '';
         if(entity === 'users'){
-            opt = '<option value="delete">Cancella</option><option value="enable">Abilita</option><option value="disable">Disabilita</option><option value="timeout">Timeout</option>';
+            opt = '<option value="delete">Elimina</option><option value="enable">Abilita</option><option value="disable">Disabilita</option><option value="timeout">Timeout</option>';
         }else if(entity === 'events'){
-            opt = '<option value="delete">Cancella</option><option value="enable">Abilita</option><option value="disable">Disabilita</option>';
+            opt = '<option value="delete">Elimina</option><option value="enable">Abilita</option><option value="disable">Disabilita</option>';
         }else if(entity === 'reservations'){
-            opt = '<option value="delete">Cancella</option><option value="enable">Presente</option><option value="disable">Assente</option>';
+            opt = '<option value="delete">Elimina</option><option value="enable">Presente</option><option value="disable">Assente</option>';
         }
         bulk.find('select').append(opt);
         var separator0 = $('<span>•</span>');
@@ -360,7 +360,7 @@
             var action = $('#rp-bulk-action').val();
             var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
             if(!action || ids.length === 0){ return; }
-            if(action === 'delete' && !confirm('Cancella elementi selezionati?')){ return; }
+            if(action === 'delete' && !confirm('Elimina elementi selezionati?')){ return; }
             var timeoutDate = null;
             if(action === 'timeout'){
                 var def = new Date();
