@@ -30,12 +30,17 @@
     function showNotice(type, text){
         var wrap = $('.wrap').first();
         clearNotice();
-        var notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + text + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button></div>');
+        var notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + text + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
         notice.prependTo(wrap);
     }
     $(document).on('click', '.notice-dismiss', function(){
         $(this).closest('.notice').remove();
     });
+    function showButtonMessage(btn, type, text){
+        btn.siblings('.notice').remove();
+        var notice = $('<div class="notice notice-' + type + '"><p>' + text + '</p></div>');
+        btn.after(notice);
+    }
     function restUrl(path, params){
         var url = rp_admin.rest_url + path;
         if(params){
@@ -63,6 +68,8 @@
             if(!data.password){
                 buttons += '<button class="button rp-invite rp-action-btn" data-id="' + data.id + '" title="Invita"><span class="dashicons dashicons-email"></span></button>';
             }
+        }else if(entity === 'events'){
+            buttons += '<button class="button rp-contact rp-action-btn" data-id="' + data.id + '" title="Contatta"><span class="dashicons dashicons-email"></span></button>';
         }
         return '<div class="rp-action-group">' + buttons + '</div>';
     }
@@ -72,7 +79,7 @@
             { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'id', title: 'Tessera', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'email', title: 'Email' },
-            { data: 'username', title: 'Username' },
+            { data: 'username', title: 'Nome utente' },
             { data: 'category', title: 'Categoria' },
             { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
@@ -103,7 +110,7 @@
             { data: null, title: '', orderable: false, render: renderCheckbox },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'user_id', title: 'ID utente', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'username', title: 'Username' },
+            { data: 'username', title: 'Nome utente' },
             { data: 'event_id', title: 'ID evento', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'event_name', title: 'Evento' },
             { data: 'created_at', title: 'Creato il' },
@@ -123,7 +130,7 @@
             if(entity === 'events' && row.group_id){
                 if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
             }
-            if(!confirm('Delete item?')){ return; }
+            if(!confirm('Eliminare l\'elemento?')){ return; }
             clearNotice();
             showOverlay(true);
             $.ajax({
@@ -133,7 +140,7 @@
                 complete: function(){ hideOverlay(); },
                 success: function(){ table.DataTable().ajax.reload(); },
                 error: function(xhr){
-                    var msg = 'Error deleting';
+                    var msg = 'Errore durante l\'eliminazione';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                     showNotice('error', msg);
                 }
@@ -163,7 +170,7 @@
                 complete: function(){ hideOverlay(); },
                 success: function(){ table.DataTable().ajax.reload(); },
                 error: function(xhr){
-                    var msg = 'Error updating';
+                    var msg = 'Errore durante l\'aggiornamento';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                     showNotice('error', msg);
                 }
@@ -179,9 +186,9 @@
                     method: 'POST',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ showNotice('success', 'Invited'); },
+                    success: function(){ showNotice('success', 'Invito inviato'); },
                     error: function(xhr){
-                        var msg = 'Invite failed';
+                        var msg = 'Invito fallito';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                         showNotice('error', msg);
                     }
@@ -198,11 +205,16 @@
                     complete: function(){ hideOverlay(); },
                     success: function(resp){ if(resp && resp.url){ window.open(resp.url, '_blank'); } },
                     error: function(xhr){
-                        var msg = 'Impersonation failed';
+                        var msg = 'Impersonazione fallita';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                         showNotice('error', msg);
                     }
                 });
+            });
+        }else if(entity === 'events'){
+            table.on('click', '.rp-contact', function(){
+                var id = $(this).data('id');
+                window.location = rp_admin.admin_url + '?page=res-pong-email&event_id=' + id;
             });
         }
     }
@@ -495,7 +507,7 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
                 success: function(resp){
-                    showNotice('success', 'Saved');
+                    showButtonMessage(form.find('button[type=submit]'), 'success', 'Salvato');
                     if(!id && resp && resp.id){
                         id = resp.id;
                         form.attr('data-id', id);
@@ -506,9 +518,9 @@
                     }
                 },
                 error: function(xhr){
-                    var msg = 'Error saving';
+                    var msg = 'Errore durante il salvataggio';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    showNotice('error', msg);
+                    showButtonMessage(form.find('button[type=submit]'), 'error', msg);
                 }
             });
         });
@@ -519,9 +531,9 @@
             var proceed = true;
             if(entity === 'events' && $('#group_id').val()){
                 if(confirm('Applicare la modifica a tutta la serie di eventi?')){ url += '&apply_group=1'; }
-                proceed = confirm('Delete item?');
+                proceed = confirm('Eliminare l\'elemento?');
             }else{
-                proceed = confirm('Delete item?');
+                proceed = confirm('Eliminare l\'elemento?');
             }
             if(!proceed){ return; }
             clearNotice();
@@ -535,9 +547,9 @@
                     window.location = rp_admin.admin_url + '?page=res-pong-' + entity;
                 },
                 error: function(xhr){
-                    var msg = 'Error deleting';
+                    var msg = 'Errore durante l\'eliminazione';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                    showNotice('error', msg);
+                    showButtonMessage($('#res-pong-delete'), 'error', msg);
                 }
             });
         });
@@ -552,7 +564,7 @@
                 complete: function(){ hideOverlay(); },
                 success: function(resp){ if(resp && resp.url){ window.open(resp.url, '_blank'); } },
                 error: function(xhr){
-                    var msg = 'Impersonation failed';
+                    var msg = 'Impersonazione fallita';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                     showNotice('error', msg);
                 }
@@ -564,65 +576,65 @@
                 e.preventDefault();
                 var pass = $('#new_password').val();
                 var confirm = $('#confirm_password').val();
-                if(pass.length < 6 || pass !== confirm){
-                    alert('Passwords must match and be at least 6 characters.');
-                    return;
+            if(pass.length < 6 || pass !== confirm){
+                showButtonMessage(pwdForm.find('button[type=submit]'), 'error', 'Le password devono coincidere ed essere lunghe almeno 6 caratteri.');
+                return;
+            }
+            clearNotice();
+            showOverlay(true);
+            $.ajax({
+                url: rp_admin.rest_url + 'users/' + id + '/reset-password',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ password: pass }),
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                complete: function(){ hideOverlay(); },
+                success: function(){ showButtonMessage(pwdForm.find('button[type=submit]'), 'success', 'Password salvata'); },
+                error: function(xhr){
+                    var msg = 'Errore durante il salvataggio della password';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showButtonMessage(pwdForm.find('button[type=submit]'), 'error', msg);
                 }
-                clearNotice();
-                showOverlay(true);
-                $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id + '/reset-password',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ password: pass }),
-                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                    complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Password saved'); },
-                    error: function(xhr){
-                        var msg = 'Error saving password';
-                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                        showNotice('error', msg);
-                    }
-                });
             });
-            $('#rp-send-invite').on('click', function(){
-                var text = $('#rp-invite-text').val();
-                clearNotice();
-                showOverlay(true);
-                $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id + '/invite',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ text: text }),
-                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                    complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Invited'); },
-                    error: function(xhr){
-                        var msg = 'Invite failed';
-                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                        showNotice('error', msg);
-                    }
-                });
+        });
+        $('#rp-send-invite').on('click', function(){
+            var text = $('#rp-invite-text').val();
+            clearNotice();
+            showOverlay(true);
+            $.ajax({
+                url: rp_admin.rest_url + 'users/' + id + '/invite',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ text: text }),
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                complete: function(){ hideOverlay(); },
+                success: function(){ showButtonMessage($('#rp-send-invite'), 'success', 'Invito inviato'); },
+                error: function(xhr){
+                    var msg = 'Invito fallito';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showButtonMessage($('#rp-send-invite'), 'error', msg);
+                }
             });
-            $('#rp-send-reset').on('click', function(){
-                var text = $('#rp-reset-text').val();
-                clearNotice();
-                showOverlay(true);
-                $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id + '/reset-password',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ text: text }),
-                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                    complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Password reset'); },
-                    error: function(xhr){
-                        var msg = 'Reset failed';
-                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                        showNotice('error', msg);
-                    }
-                });
+        });
+        $('#rp-send-reset').on('click', function(){
+            var text = $('#rp-reset-text').val();
+            clearNotice();
+            showOverlay(true);
+            $.ajax({
+                url: rp_admin.rest_url + 'users/' + id + '/reset-password',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ text: text }),
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                complete: function(){ hideOverlay(); },
+                success: function(){ showButtonMessage($('#rp-send-reset'), 'success', 'Reset inviato'); },
+                error: function(xhr){
+                    var msg = 'Errore durante il reset';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showButtonMessage($('#rp-send-reset'), 'error', msg);
+                }
             });
+        });
         }
         var timeoutForm = $('#res-pong-timeout-form');
         if(timeoutForm.length){
@@ -640,15 +652,84 @@
                     data: JSON.stringify({ timeout: val.replace('T', ' ') }),
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(){ alert('Timeout saved'); },
+                    success: function(){ showButtonMessage(timeoutForm.find('button[type=submit]'), 'success', 'Timeout salvato'); },
                     error: function(xhr){
-                        var msg = 'Error saving timeout';
+                        var msg = 'Errore durante il salvataggio del timeout';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                        showNotice('error', msg);
+                        showButtonMessage(timeoutForm.find('button[type=submit]'), 'error', msg);
                     }
                 });
             });
         }
+    }
+
+    function initEmailPage(){
+        var form = $('#rp-email-form');
+        if(!form.length){ return; }
+        var toInput = $('#rp-email-to');
+        var btn = form.find('button[type=submit]');
+        $.ajax({
+            url: rp_admin.rest_url + 'users',
+            method: 'GET',
+            beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+            success: function(users){
+                var emails = users.map(function(u){ return u.email; });
+                toInput.autocomplete({
+                    source: emails,
+                    minLength: 0,
+                    focus: function(){ return false; },
+                    select: function(event, ui){
+                        var terms = toInput.val().split(/,\s*/);
+                        terms.pop();
+                        terms.push(ui.item.value);
+                        terms.push('');
+                        toInput.val(terms.join(', '));
+                        return false;
+                    }
+                }).on('keydown', function(event){
+                    if(event.keyCode === $.ui.keyCode.TAB && $(this).autocomplete('instance').menu.active){
+                        event.preventDefault();
+                    }
+                }).on('focus', function(){ $(this).autocomplete('search', ''); });
+            }
+        });
+        var params = new URLSearchParams(window.location.search);
+        var eventId = params.get('event_id');
+        if(eventId){
+            $.ajax({
+                url: rp_admin.rest_url + 'reservations?event_id=' + eventId + '&active_only=1',
+                method: 'GET',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                success: function(res){
+                    var emails = res.map(function(r){ return r.email; });
+                    toInput.val(emails.join(', '));
+                }
+            });
+        }
+        form.on('submit', function(e){
+            e.preventDefault();
+            var recipients = toInput.val().split(',').map(function(s){ return s.trim(); }).filter(Boolean);
+            var data = {
+                subject: $('#rp-email-subject').val(),
+                text: $('#rp-email-text').val(),
+                recipients: recipients
+            };
+            btn.prop('disabled', true);
+            $.ajax({
+                url: rp_admin.rest_url + 'email',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                complete: function(){ btn.prop('disabled', false); },
+                success: function(){ showButtonMessage(btn, 'success', 'Email inviata'); },
+                error: function(xhr){
+                    var msg = 'Errore invio email';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    showButtonMessage(btn, 'error', msg);
+                }
+            });
+        });
     }
     $(function(){
         var list = $('#res-pong-list');
@@ -672,5 +753,6 @@
             initTable(er, 'reservations', function(showAll){ return restUrl('reservations', 'event_id=' + eid + '&active_only=' + (showAll ? '0' : '1')); }, { addParams: 'event_id=' + eid, noCsv: true, filterFuture: true });
         }
         initDetail();
+        initEmailPage();
     });
 })(jQuery);

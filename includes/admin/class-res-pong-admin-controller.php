@@ -209,6 +209,14 @@ class Res_Pong_Admin_Controller {
             },
         ]);
 
+        register_rest_route($namespace, '/email', [
+            'methods' => 'POST',
+            'callback' => [$this->service, 'rest_send_email'],
+            'permission_callback' => function () {
+                return current_user_can('manage_options');
+            },
+        ]);
+
     }
 
 }
