@@ -183,7 +183,11 @@ class Res_Pong_Admin_Service {
         $user_id = $request->get_param('user_id');
         $event_id = $request->get_param('event_id');
         $active_only = $request->get_param('active_only');
-        $active_only = is_null($active_only) ? true : (bool)intval($active_only);
+        if (is_null($active_only)) {
+            $active_only = is_null($event_id) ? true : false;
+        } else {
+            $active_only = (bool)intval($active_only);
+        }
         return rest_ensure_response($this->repository->get_reservations($user_id, $event_id, $active_only));
     }
 
