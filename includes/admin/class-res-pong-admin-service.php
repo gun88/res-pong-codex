@@ -1,318 +1,307 @@
 <?php
 
 class Res_Pong_Admin_Service {
+    private $repository;
 
-    private $table_user;
-    private $table_event;
-    private $table_reservation;
-    private $wpdb;
-    private $configuration;
-
-    public function __construct(Res_Pong_Configuration $configuration) {
-        $this->configuration = $configuration;
-        global $wpdb;
-        $this->wpdb = $wpdb;
-        $prefix = $this->wpdb->prefix;
-        $this->table_user = $prefix . 'RP_USER';
-        $this->table_event = $prefix . 'RP_EVENT';
-        $this->table_reservation = $prefix . 'RP_RESERVATION';
+    public function __construct(Res_Pong_Admin_Repository $repository) {
+        $this->repository = $repository;
     }
 
-    // ------------------------
-    // CRUD: RP_USER
-    // ------------------------
-
-    public function create_tables() {
-
-        $charset_collate = $this->wpdb->get_charset_collate();
-
-        require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-
-        $sql = "
-        CREATE TABLE {$this->table_user} (
-            id VARCHAR(20) PRIMARY KEY,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            username VARCHAR(100) NOT NULL UNIQUE,
-            last_name VARCHAR(100) NOT NULL,
-            first_name VARCHAR(100) NOT NULL,
-            category VARCHAR(25),
-            password VARCHAR(255) NOT NULL,
-            timeout VARCHAR(25) DEFAULT NULL,
-            reset_token VARCHAR(255) DEFAULT NULL,
-            enabled TINYINT DEFAULT 1 NOT NULL
-        ) $charset_collate;
-
-        CREATE TABLE {$this->table_event} (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            group_id INT,
-            category VARCHAR(255),
-            name VARCHAR(255) NOT NULL,
-            note TEXT,
-            start_datetime VARCHAR(25) NOT NULL,
-            end_datetime VARCHAR(25) NOT NULL,
-            max_players INT,
-            enabled TINYINT DEFAULT 1 NOT NULL,
-            INDEX idx_start_datetime (start_datetime),
-            INDEX idx_group_id (group_id)
-        ) $charset_collate;
-
-        CREATE TABLE {$this->table_reservation} (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id VARCHAR(20),
-            event_id INT,
-            created_at VARCHAR(25) NOT NULL,
-            presence_confirmed TINYINT DEFAULT 0,
-            UNIQUE (user_id, event_id),
-            FOREIGN KEY (user_id) REFERENCES {$this->table_user}(id) ON DELETE CASCADE,
-            FOREIGN KEY (event_id) REFERENCES {$this->table_event}(id) ON DELETE CASCADE,
-            INDEX idx_event_id (event_id),
-            INDEX idx_user_id (user_id)
-        ) $charset_collate;
-        ";
-
-        dbDelta($sql);
+    // User handlers
+    public function rest_get_users() {
+        return rest_ensure_response($this->repository->get_users());
     }
 
-    // ------------------------
-    // RP_USER methods
-    // ------------------------
-
-    public function get_users() {
-        $sql = "SELECT *, CONCAT(last_name, ' ', first_name) AS name FROM {$this->table_user}";
-        return $this->wpdb->get_results($sql, ARRAY_A);
-    }
-
-    public function get_user($id) {
-        $sql = "SELECT *, CONCAT(last_name, ' ', first_name) AS name FROM {$this->table_user} WHERE id = %s";
-        return $this->wpdb->get_row($this->wpdb->prepare($sql, $id), ARRAY_A);
-    }
-
-    public function insert_user($data) {
-        return $this->wpdb->insert($this->table_user, $data);
-    }
-
-    public function update_user($id, $data) {
-        return $this->wpdb->update($this->table_user, $data, ['id' => $id]);
-    }
-
-    public function delete_user($id) {
-        return $this->wpdb->delete($this->table_user, ['id' => $id]);
-    }
-
-    // ------------------------
-    // RP_EVENT methods
-    // ------------------------
-
-    public function get_events($open_only = true) {
-        $where = '';
-        if ($open_only) {
-            $now = current_time('mysql');
-            $where = $this->wpdb->prepare('WHERE e.start_datetime > %s', $now);
+    public function rest_get_user($request) {
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
         }
-        $sql = "SELECT e.*, g.name AS group_name, COUNT(r.id) AS players_count FROM {$this->table_event} e LEFT JOIN {$this->table_event} g ON e.group_id = g.id LEFT JOIN {$this->table_reservation} r ON e.id = r.event_id {$where} GROUP BY e.id";
-        return $this->wpdb->get_results($sql, ARRAY_A);
+        return rest_ensure_response($user);
     }
 
-    public function get_event($id) {
-        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_event} WHERE id = %d", $id), ARRAY_A);
+    public function rest_create_user($request) {
+        $data = $request->get_json_params();
+        $this->repository->insert_user($data);
+        return new WP_REST_Response($data, 201);
     }
 
-    public function insert_event($data) {
-        $this->wpdb->insert($this->table_event, $data);
-        return $this->wpdb->insert_id;
+    public function rest_update_user($request) {
+        $id = $request['id'];
+        $data = $request->get_json_params();
+        $this->repository->update_user($id, $data);
+        return rest_ensure_response($this->repository->get_user($id));
     }
 
-    public function update_event($id, $data) {
-        return $this->wpdb->update($this->table_event, $data, ['id' => $id]);
+    public function rest_delete_user($request) {
+        $id = $request['id'];
+        $this->repository->delete_user($id);
+        return new WP_REST_Response(null, 204);
     }
 
-    public function delete_event($id) {
-        return $this->wpdb->delete($this->table_event, ['id' => $id]);
+    // Event handlers
+    public function rest_get_events($request) {
+        $open_only = $request->get_param('open_only');
+        $open_only = is_null($open_only) ? true : (bool) intval($open_only);
+        return rest_ensure_response($this->repository->get_events($open_only));
     }
 
-    public function update_events_by_group($group_id, $data) {
-        return $this->wpdb->update($this->table_event, $data, ['group_id' => $group_id]);
-    }
-
-    public function delete_events_by_group($group_id) {
-        return $this->wpdb->delete($this->table_event, ['group_id' => $group_id]);
-    }
-
-    // ------------------------
-    // RP_RESERVATION methods
-    // ------------------------
-
-    public function get_reservations($user_id = null, $event_id = null, $active_only = true) {
-        $where = [];
-        $params = [];
-        if ($user_id !== null) {
-            $where[] = 'r.user_id = %s';
-            $params[] = $user_id;
+    public function rest_get_event($request) {
+        $id = (int) $request['id'];
+        $event = $this->repository->get_event($id);
+        if (!$event) {
+            return new WP_Error('not_found', 'Event not found', [ 'status' => 404 ]);
         }
-        if ($event_id !== null) {
-            $where[] = 'r.event_id = %d';
-            $params[] = $event_id;
+        return rest_ensure_response($event);
+    }
+
+    public function rest_create_event($request) {
+        $data = $request->get_json_params();
+        unset($data['id']);
+        $group_id = isset($data['group_id']) && $data['group_id'] !== '' ? (int) $data['group_id'] : null;
+        $recurrence = isset($data['recurrence']) ? $data['recurrence'] : 'none';
+        $recurrence_end = isset($data['recurrence_end']) ? $data['recurrence_end'] : null;
+        unset($data['recurrence'], $data['recurrence_end']);
+        if ($group_id) {
+            $data['group_id'] = $group_id;
+            $id = $this->repository->insert_event($data);
+            $data['id'] = $id;
+            return new WP_REST_Response($data, 201);
         }
-        if ($active_only) {
-            $where[] = 'e.start_datetime > %s';
-            $params[] = current_time('mysql');
-        }
-        $where_sql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-        $sql = "SELECT r.*, u.username, CONCAT(u.last_name, ' ', u.first_name) AS name, e.name AS event_name, e.start_datetime AS event_start_datetime FROM {$this->table_reservation} r JOIN {$this->table_user} u ON r.user_id = u.id JOIN {$this->table_event} e ON r.event_id = e.id {$where_sql} ORDER BY r.created_at DESC";
-        if ($params) {
-            $sql = $this->wpdb->prepare($sql, $params);
-        }
-        return $this->wpdb->get_results($sql, ARRAY_A);
-    }
-
-    public function get_reservation($id) {
-        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_reservation} WHERE id = %d", $id), ARRAY_A);
-    }
-
-    public function insert_reservation($data) {
-        return $this->wpdb->insert($this->table_reservation, $data);
-    }
-
-    public function update_reservation($id, $data) {
-        return $this->wpdb->update($this->table_reservation, $data, ['id' => $id]);
-    }
-
-    public function delete_reservation($id) {
-        return $this->wpdb->delete($this->table_reservation, ['id' => $id]);
-    }
-
-    private function rows_to_csv($rows) {
-        $fh = fopen('php://temp', 'r+');
-        if (!empty($rows)) {
-            fputcsv($fh, array_keys($rows[0]));
-            foreach ($rows as $row) {
-                fputcsv($fh, $row);
+        $data['group_id'] = null;
+        $id = $this->repository->insert_event($data);
+        $data['id'] = $id;
+        if ($recurrence !== 'none' && $recurrence_end) {
+            $this->repository->update_event($id, [ 'group_id' => $id ]);
+            $start = new DateTime($data['start_datetime']);
+            $end = new DateTime($data['end_datetime']);
+            $limit = new DateTime($recurrence_end . ' 23:59:59');
+            switch ($recurrence) {
+                case 'daily': $interval = new DateInterval('P1D'); break;
+                case 'weekly': $interval = new DateInterval('P1W'); break;
+                case 'monthly': $interval = new DateInterval('P1M'); break;
+                default: $interval = null; break;
             }
-        }
-        rewind($fh);
-        $csv = stream_get_contents($fh);
-        fclose($fh);
-        return $csv;
-    }
-
-    private function import_csv($file, $table) {
-        $handle = fopen($file, 'r');
-        if (!$handle) {
-            return false;
-        }
-        $columns = $this->wpdb->get_col("DESCRIBE {$table}");
-        $allowed = array_fill_keys($columns, true);
-        $header = fgetcsv($handle);
-        $header = array_values(array_intersect($header, $columns));
-
-        while (($data = fgetcsv($handle)) !== false) {
-            if (!array_filter($data, function ($v) { return trim($v) !== ''; })) {
-                continue;
-            }
-            $data = array_slice($data, 0, count($header));
-            $row = array_combine($header, $data);
-            $row = array_intersect_key($row, $allowed);
-            $this->wpdb->replace($table, $row);
-        }
-        fclose($handle);
-        return true;
-    }
-
-    public function export_users_csv() {
-        return $this->rows_to_csv($this->get_users());
-    }
-
-    public function import_users_csv($file) {
-        $handle = fopen($file, 'r');
-        if (!$handle) {
-            return false;
-        }
-        $first = fgetcsv($handle, 0, ';');
-        if ($first && in_array('Cognome', $first) && in_array('Nome', $first) && in_array('Tessera', $first)) {
-            $map = array_flip($first);
-            while (($data = fgetcsv($handle, 0, ';')) !== false) {
-                if (!array_filter($data, function ($v) { return trim($v) !== ''; })) {
-                    continue;
+            if ($interval) {
+                while (true) {
+                    $start->add($interval);
+                    $end->add($interval);
+                    if ($start > $limit) { break; }
+                    $e = $data;
+                    unset($e['id']);
+                    $e['start_datetime'] = $start->format('Y-m-d H:i:s');
+                    $e['end_datetime'] = $end->format('Y-m-d H:i:s');
+                    $e['group_id'] = $id;
+                    $this->repository->insert_event($e);
                 }
-                $last = $this->normalize_name($data[$map['Cognome']] ?? '');
-                $first_name = $this->normalize_name($data[$map['Nome']] ?? '');
-                $email = strtolower(trim($data[$map['Email']] ?? ''));
-                $category = $data[$map['Categoria']] ?? '';
-                $id = trim($data[$map['Tessera']] ?? '');
-                if ($id === '' || $email === '') {
-                    continue;
-                }
-                $username = $this->generate_username($first_name, $last);
-                $row = [
-                    'id'          => $id,
-                    'email'       => $email,
-                    'username'    => $username,
-                    'last_name'   => $last,
-                    'first_name'  => $first_name,
-                    'category'    => $category,
-                    'password'    => '',
-                    'timeout'     => null,
-                    'reset_token' => null,
-                    'enabled'     => 1,
-                ];
-                $this->wpdb->replace($this->table_user, $row);
             }
-            fclose($handle);
-            return true;
+            $data['group_id'] = $id;
         }
-        fclose($handle);
-        return $this->import_csv($file, $this->table_user);
+        return new WP_REST_Response($data, 201);
     }
 
-    public function export_events_csv() {
-        $sql = "SELECT * FROM {$this->table_event}";
-        return $this->rows_to_csv($this->wpdb->get_results($sql, ARRAY_A));
-    }
-
-    public function import_events_csv($file) {
-        return $this->import_csv($file, $this->table_event);
-    }
-
-    public function export_reservations_csv() {
-        return $this->rows_to_csv($this->get_reservations(null, null, false));
-    }
-
-    public function import_reservations_csv($file) {
-        return $this->import_csv($file, $this->table_reservation);
-    }
-
-    private function normalize_name($name) {
-        $name = strtolower(trim($name));
-        return mb_convert_case($name, MB_CASE_TITLE, 'UTF-8');
-    }
-
-    private function generate_username($first_name, $last_name) {
-        $base = strtolower(substr($first_name, 0, 1) . preg_replace('/[^a-z0-9]/i', '', $last_name));
-        $username = $base;
-        $i = 2;
-        while ($this->username_exists($username)) {
-            $username = $base . $i;
-            $i++;
+    public function rest_update_event($request) {
+        $id = (int) $request['id'];
+        unset($request['recurrence'], $request['recurrence_end']);
+        $data = $request->get_json_params();
+        $apply = $request->get_param('apply_group');
+        if ($apply) {
+            $event = $this->repository->get_event($id);
+            if ($event && $event['group_id']) {
+                $this->repository->update_events_by_group($event['group_id'], $data);
+            } else {
+                $this->repository->update_event($id, $data);
+            }
+        } else {
+            $this->repository->update_event($id, $data);
         }
-        return $username;
+        return rest_ensure_response($this->repository->get_event($id));
     }
 
-    private function username_exists($username) {
-        $sql = $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_user} WHERE username = %s", $username);
-        return (int) $this->wpdb->get_var($sql) > 0;
+    public function rest_delete_event($request) {
+        $id = (int) $request['id'];
+        $apply = $request->get_param('apply_group');
+        if ($apply) {
+            $event = $this->repository->get_event($id);
+            if ($event && $event['group_id']) {
+                $this->repository->delete_events_by_group($event['group_id']);
+            } else {
+                $this->repository->delete_event($id);
+            }
+        } else {
+            $this->repository->delete_event($id);
+        }
+        return new WP_REST_Response(null, 204);
     }
 
-    public function update_configurations(array $data) {
-        $this->configuration->update($data);
+    // Reservation handlers
+    public function rest_get_reservations($request) {
+        $user_id = $request->get_param('user_id');
+        $event_id = $request->get_param('event_id');
+        $active_only = $request->get_param('active_only');
+        $active_only = is_null($active_only) ? true : (bool) intval($active_only);
+        return rest_ensure_response($this->repository->get_reservations($user_id, $event_id, $active_only));
     }
 
-    public function get_all_configurations() {
-        return $this->configuration->get_all();
+    public function rest_invite_user($request) {
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
+        }
+        $token = $this->generate_reset_token();
+        $this->repository->update_user($id, [ 'reset_token' => $token ]);
+        $url = $this->repository->get_configuration('first_access_page_url') . '?token=' . $this->base64url_encode($token);
+        wp_mail($user['email'], 'Portale Prenotazioni - Effettua il tuo primo accesso', 'Clicca sul link per effettuare il primo accesso: ' . $url);
+        return new WP_REST_Response([ 'success' => true ], 200);
     }
 
-    public function get_configuration($key) {
-        return $this->configuration->get($key);
+    public function rest_reset_password($request) {
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
+        }
+        $params = $request->get_json_params();
+        $password = isset($params['password']) ? $params['password'] : '';
+        if (!empty($password)) {
+            if (strlen($password) < 6) {
+                return new WP_Error('invalid_password', 'Password must be at least 6 characters', [ 'status' => 400 ]);
+            }
+            $hashed = password_hash($password, PASSWORD_DEFAULT);
+            $this->repository->update_user($id, [ 'password' => $hashed, 'reset_token' => null ]);
+            return new WP_REST_Response([ 'success' => true ], 200);
+        }
+        $token = $this->generate_reset_token();
+        $this->repository->update_user($id, [ 'reset_token' => $token ]);
+        $url = $this->repository->get_configuration('password_update_page_url') . '?token=' . $this->base64url_encode($token);
+        wp_mail($user['email'], 'Portale Prenotazioni - Reset password', 'Clicca sul link per reimpostare la tua password: ' . $url);
+        return new WP_REST_Response([ 'success' => true ], 200);
+    }
+
+    public function rest_impersonate_user($request) {
+        $id = $request['id'];
+        $user = $this->repository->get_user($id);
+        if (!$user) {
+            return new WP_Error('not_found', 'User not found', [ 'status' => 404 ]);
+        }
+        $expires = time() + HOUR_IN_SECONDS;
+        $payload = $id . '|' . $expires;
+        $hash = hash_hmac('sha256', $payload, RES_PONG_COOKIE_KEY);
+        $token = $payload . '|' . $hash;
+        setcookie(RES_PONG_COOKIE_NAME, $token, $expires, '/', COOKIE_DOMAIN, is_ssl(), true);
+        return new WP_REST_Response([ 'url' => home_url('/') ], 200);
     }
 
 
+    public function rest_get_reservation($request) {
+        $id = (int) $request['id'];
+        $reservation = $this->repository->get_reservation($id);
+        if (!$reservation) {
+            return new WP_Error('not_found', 'Reservation not found', [ 'status' => 404 ]);
+        }
+        return rest_ensure_response($reservation);
+    }
+
+    public function rest_create_reservation($request) {
+        $data = $request->get_json_params();
+        $this->repository->insert_reservation($data);
+        return new WP_REST_Response($data, 201);
+    }
+
+    public function rest_update_reservation($request) {
+        $id = (int) $request['id'];
+        $data = $request->get_json_params();
+        $this->repository->update_reservation($id, $data);
+        return rest_ensure_response($this->repository->get_reservation($id));
+    }
+
+    public function rest_delete_reservation($request) {
+        $id = (int) $request['id'];
+        $this->repository->delete_reservation($id);
+        return new WP_REST_Response(null, 204);
+    }
+
+    public function rest_export_users() {
+        $csv = $this->repository->export_users_csv();
+        nocache_headers();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="users.csv"');
+        echo $csv;
+        exit;
+    }
+
+    public function rest_import_users($request) {
+        $files = $request->get_file_params();
+        if (empty($files['file'])) {
+            return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
+        }
+        $result = $this->repository->import_users_csv($files['file']['tmp_name']);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+        if (!$result) {
+            return new WP_Error('import_failed', 'Failed to import users', [ 'status' => 500 ]);
+        }
+        return new WP_REST_Response([ 'success' => true ], 200);
+    }
+
+    public function rest_export_events() {
+        $csv = $this->repository->export_events_csv();
+        nocache_headers();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="events.csv"');
+        echo $csv;
+        exit;
+    }
+
+    public function rest_import_events($request) {
+        $files = $request->get_file_params();
+        if (empty($files['file'])) {
+            return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
+        }
+        $result = $this->repository->import_events_csv($files['file']['tmp_name']);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+        if (!$result) {
+            return new WP_Error('import_failed', 'Failed to import events', [ 'status' => 500 ]);
+        }
+        return new WP_REST_Response([ 'success' => true ], 200);
+    }
+
+    public function rest_export_reservations() {
+        $csv = $this->repository->export_reservations_csv();
+        nocache_headers();
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="reservations.csv"');
+        echo $csv;
+        exit;
+    }
+
+    public function rest_import_reservations($request) {
+        $files = $request->get_file_params();
+        if (empty($files['file'])) {
+            return new WP_Error('no_file', 'No file uploaded', [ 'status' => 400 ]);
+        }
+        $result = $this->repository->import_reservations_csv($files['file']['tmp_name']);
+        if (is_wp_error($result)) {
+            return $result;
+        }
+        if (!$result) {
+            return new WP_Error('import_failed', 'Failed to import reservations', [ 'status' => 500 ]);
+        }
+        return new WP_REST_Response([ 'success' => true ], 200);
+    }
+
+    private function generate_reset_token() {
+        $expires = time() + 3600;
+        $random = bin2hex(random_bytes(16));
+        return $expires . '|' . $random;
+    }
+
+    private function base64url_encode($data) {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
 }

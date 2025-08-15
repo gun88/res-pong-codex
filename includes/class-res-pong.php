@@ -3,19 +3,22 @@
 defined('ABSPATH') || exit;
 
 require_once RES_PONG_PLUGIN_DIR . 'includes/common/class-res-pong-configuration.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-repository.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-service.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-controller.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-frontend.php';
 
 class Res_Pong {
+    private $configuration;
+    private $admin_repository;
     private $admin_service;
     private $admin_controller;
     private $admin_frontend;
-    private $configuration;
 
     public function __construct() {
         $this->configuration = new Res_Pong_Configuration();
-        $this->admin_service = new Res_Pong_Admin_Service($this->configuration);
+        $this->admin_repository = new Res_Pong_Admin_Repository($this->configuration);
+        $this->admin_service = new Res_Pong_Admin_Service($this->admin_repository);
         $this->admin_controller = new Res_Pong_Admin_Controller($this->admin_service);
         $this->admin_controller->init();
         if (is_admin()) {
@@ -25,7 +28,7 @@ class Res_Pong {
     }
 
     public function activate() {
-        $this->admin_service->create_tables();
+        $this->admin_repository->create_tables();
     }
 
     public function deactivate() {

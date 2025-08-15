@@ -2,10 +2,18 @@
     padding: 0 19px !important;
     background-color: #fff !important;
 }
+
 .dataTables_wrapper .dataTables_filter input {
     background-color: #fff !important;
     line-height: 1;
 }
+
+.rp-bulk {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 #rp-progress-overlay {
     display: none;
     position: fixed;
@@ -45,46 +53,56 @@ button.rp-unsign,
 .rp-icon-yes {
     color: #2e7d32;
 }
+
 .rp-icon-no {
     color: #c62828;
 }
+
 .rp-icon-clock {
     color: #e65100;
 }
+
 .rp-icon-col {
     /*text-align: center;*/
 }
+
 .rp-action-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 2px;
+    gap: 5px;
 }
+
 .rp-action-btn {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
+    width: 30px;
+    height: 30px;
+    display: flex !important;
+    align-items: center !important;
     justify-content: center;
-    padding: 0;
+    padding: 0 !important;
 }
+
 .rp-action-btn .dashicons {
     margin: 0;
 }
+
 .rp-button-enable {
     color: #2e7d32 !important;
     border-color: #2e7d32 !important;
     background: #fff !important;
 }
+
 .rp-button-enable:hover {
     color: #1b5e20 !important;
     border-color: #1b5e20 !important;
     background: #fff !important;
 }
+
 .rp-button-disable {
     color: #c62828 !important;
     border-color: #c62828 !important;
     background: #fff !important;
 }
+
 .rp-button-disable:hover {
     color: #8e0000 !important;
     border-color: #8e0000 !important;
@@ -96,7 +114,8 @@ button.rp-unsign,
     border-color: #2e7d32 !important;
     background: #fff !important;
 }
-.rp-button-add {
+
+#res-pong-list_wrapper .button {
     display: flex !important;
     align-items: center !important;
 }
@@ -110,12 +129,14 @@ button.rp-unsign,
 .rp-button-add .dashicons {
     margin-right: 2px;
 }
+
 .rp-toolbar {
     display: flex;
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
 }
+
 .rp-toolbar .dataTables_filter {
     margin-left: auto;
 }
