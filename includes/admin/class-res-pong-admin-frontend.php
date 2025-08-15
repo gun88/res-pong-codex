@@ -38,7 +38,7 @@ class Res_Pong_Admin_Frontend {
         wp_enqueue_script('res-pong-datatables', 'https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js', [ 'jquery' ], null, true);
         wp_enqueue_script('res-pong-admin', RES_PONG_PLUGIN_URL . 'assets/js/res-pong-admin.js', [ 'jquery', 'res-pong-datatables' ], RES_PONG_VERSION, true);
         wp_localize_script('res-pong-admin', 'rp_admin', [
-            'rest_url'  => esc_url_raw(rest_url('res-pong/v1/')),
+            'rest_url'  => esc_url_raw(rest_url('res-pong-admin/v1/')),
             'nonce'     => wp_create_nonce('wp_rest'),
             'admin_url' => admin_url('admin.php'),
         ]);
