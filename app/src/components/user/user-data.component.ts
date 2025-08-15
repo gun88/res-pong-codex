@@ -2,13 +2,15 @@ import {Component, Input} from '@angular/core';
 import {Avatar} from "primeng/avatar";
 import {Message} from 'primeng/message';
 import {NgIf} from '@angular/common';
+import {Skeleton} from 'primeng/skeleton';
 
 @Component({
   selector: 'res-pong-user-user-data',
   imports: [
     Avatar,
     Message,
-    NgIf
+    NgIf,
+    Skeleton
   ],
   templateUrl: './user-data.component.html',
   styleUrl: './user-data.component.scss'

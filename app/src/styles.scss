@@ -1,6 +1,11 @@
 body {
   padding: 0;
   margin: 0;
+  --p-blockui-border-radius: 0;
+  --p-progressspinner-color-one: var(--p-blue-500);
+  --p-progressspinner-color-two: var(--p-blue-700);
+  --p-progressspinner-color-three: var(--p-blue-500);
+  --p-progressspinner-color-four: var(--p-blue-700);
 }
 
 :root {

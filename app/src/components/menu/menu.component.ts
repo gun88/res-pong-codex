@@ -8,6 +8,8 @@ import {Observable} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {Button} from 'primeng/button';
 import {Router} from '@angular/router';
+import {BlockUI} from 'primeng/blockui';
+import {ProgressSpinner} from 'primeng/progressspinner';
 
 @Component({
   selector: 'res-pong-user-menu',
@@ -17,13 +19,17 @@ import {Router} from '@angular/router';
     MenuModule,
     AsyncPipe,
     NgIf,
-    Button
+    Button,
+    BlockUI,
+    ProgressSpinner
   ],
   templateUrl: './menu.component.html'
 })
 export class MenuComponent {
   private resPongService = inject(ResPongService);
   private router = inject(Router);
+
+  loggingOut = false;
 
   user$: Observable<any> = this.resPongService.user$;
   loggedIn$ = this.resPongService.loggedIn$;
@@ -62,11 +68,14 @@ export class MenuComponent {
           label: 'Log Out',
           icon: 'pi pi-sign-out',
           command: (event: MenuItemCommandEvent) => {
+            this.loggingOut = true;
             this.resPongService.logOut().subscribe(
               () => {
+                this.loggingOut = false;
                 this.router.navigate(['/login']);
               },
               error => {
+                this.loggingOut = false;
                 console.error(error);
                 alert("Errore durante la logout. Riprova!")
               }

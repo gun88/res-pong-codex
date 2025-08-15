@@ -5,9 +5,10 @@
   </div>
 
   <div class="user-field">
-    @if (user?.avatar) {
+    @if (loading) {
+      <p-skeleton shape="circle" size="4rem"/>
+    } @else if (user?.avatar) {
       <p-avatar [image]="user.avatar" styleClass="mr-2" size="xlarge" shape="circle"/>
-
     } @else if (user?.monogram) {
       <p-avatar [label]="user.monogram" styleClass="mr-2" size="xlarge" shape="circle"/>
     } @else {
@@ -16,22 +17,26 @@
   </div>
   <div class="user-field">
     <span class="label">Username</span>
-    <span class="value">{{ loading ? 'Caricamento...' : (user?.username || 'N/A') }}</span>
+    <p-skeleton *ngIf="loading" height="1rem" width="8rem"/>
+    <span *ngIf="!loading" class="value">{{ (user?.username || 'N/A') }}</span>
   </div>
 
   <div class="user-field">
     <span class="label">Email</span>
-    <span class="value">{{ loading ? 'Caricamento...' : (user?.email || 'N/A') }}</span>
+    <p-skeleton *ngIf="loading" height="1rem" width="8rem"/>
+    <span *ngIf="!loading" class="value">{{ (user?.email || 'N/A') }}</span>
   </div>
 
   <div class="user-field">
     <span class="label">Nome</span>
-    <span class="value">{{ loading ? 'Caricamento...' : (user?.first_name || 'N/A') }}</span>
+    <p-skeleton *ngIf="loading" height="1rem" width="8rem"/>
+    <span *ngIf="!loading" class="value">{{ (user?.first_name || 'N/A') }}</span>
   </div>
 
   <div class="user-field">
     <span class="label">Cognome</span>
-    <span class="value">{{ loading ? 'Caricamento...' : (user?.last_name || 'N/A') }}</span>
+    <p-skeleton *ngIf="loading" height="1rem" width="8rem"/>
+    <span *ngIf="!loading" class="value">{{ (user?.last_name || 'N/A') }}</span>
   </div>
   <div *ngIf="disclaimer" class="rp-note">
     {{ disclaimer }}
