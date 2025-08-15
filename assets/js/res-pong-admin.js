@@ -221,7 +221,8 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
             columns: columns[entity],
-            order: order
+            order: order,
+            responsive: true
         });
         dt.on('preXhr.dt', function(){ showOverlay(true); });
         dt.on('xhr.dt error.dt', function(){ hideOverlay(); });

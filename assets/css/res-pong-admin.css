@@ -137,8 +137,22 @@ button.rp-unsign,
     align-items: center;
     gap: 10px;
     margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .rp-toolbar .dataTables_filter {
     margin-left: auto;
+}
+
+@media (max-width: 600px) {
+    .rp-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .rp-toolbar .dataTables_filter,
+    .rp-toolbar .dataTables_length,
+    .rp-toolbar .rp-bulk {
+        width: 100%;
+        margin-left: 0;
+    }
 }

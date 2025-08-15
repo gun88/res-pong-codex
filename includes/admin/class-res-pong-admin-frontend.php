@@ -34,9 +34,11 @@ class Res_Pong_Admin_Frontend {
             return;
         }
         wp_enqueue_style('res-pong-datatables', 'https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css');
+        wp_enqueue_style('res-pong-datatables-responsive', 'https://cdn.datatables.net/responsive/2.4.1/css/responsive.dataTables.min.css');
         wp_enqueue_style('res-pong-admin', RES_PONG_PLUGIN_URL . 'assets/css/res-pong-admin.css', [], RES_PONG_VERSION);
         wp_enqueue_script('res-pong-datatables', 'https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js', [ 'jquery' ], null, true);
-        wp_enqueue_script('res-pong-admin', RES_PONG_PLUGIN_URL . 'assets/js/res-pong-admin.js', [ 'jquery', 'res-pong-datatables' ], RES_PONG_VERSION, true);
+        wp_enqueue_script('res-pong-datatables-responsive', 'https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js', [ 'res-pong-datatables' ], null, true);
+        wp_enqueue_script('res-pong-admin', RES_PONG_PLUGIN_URL . 'assets/js/res-pong-admin.js', [ 'jquery', 'res-pong-datatables', 'res-pong-datatables-responsive' ], RES_PONG_VERSION, true);
         wp_localize_script('res-pong-admin', 'rp_admin', [
             'rest_url'  => esc_url_raw(rest_url('res-pong-admin/v1/')),
             'nonce'     => wp_create_nonce('wp_rest'),
