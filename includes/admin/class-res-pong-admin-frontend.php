@@ -78,7 +78,9 @@ class Res_Pong_Admin_Frontend {
                 'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
                 'first_access_page_url'    => isset($_POST['first_access_page_url']) ? esc_url_raw($_POST['first_access_page_url']) : '',
                 'password_update_page_url' => isset($_POST['password_update_page_url']) ? esc_url_raw($_POST['password_update_page_url']) : '',
+                'invitation_subject'       => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
                 'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
+                'reset_password_subject'   => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
                 'reset_password_text'      => isset($_POST['reset_password_text']) ? sanitize_textarea_field($_POST['reset_password_text']) : '',
             ];
             $this->configuration->update($data);
@@ -96,8 +98,10 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="next_reservation_delay">Next reservation delay</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
         echo '<tr><th><label for="first_access_page_url">First access page URL</label></th><td><input name="first_access_page_url" id="first_access_page_url" type="text" value="' . esc_attr($config['first_access_page_url']) . '"></td></tr>';
         echo '<tr><th><label for="password_update_page_url">Password update page URL</label></th><td><input name="password_update_page_url" id="password_update_page_url" type="text" value="' . esc_attr($config['password_update_page_url']) . '"></td></tr>';
-        echo '<tr><th><label for="invitation_text">Invitation Text</label></th><td><textarea name="invitation_text" id="invitation_text" rows="3" class="large-text">' . esc_textarea($config['invitation_text']) . '</textarea></td></tr>';
-        echo '<tr><th><label for="reset_password_text">Reset Password Text</label></th><td><textarea name="reset_password_text" id="reset_password_text" rows="3" class="large-text">' . esc_textarea($config['reset_password_text']) . '</textarea></td></tr>';
+        echo '<tr><th><label for="invitation_subject">Invitation Subject</label></th><td><input name="invitation_subject" id="invitation_subject" type="text" class="large-text" value="' . esc_attr($config['invitation_subject']) . '"></td></tr>';
+        echo '<tr><th><label for="invitation_text">Invitation Text</label></th><td><textarea name="invitation_text" id="invitation_text" rows="3" class="large-text" style="max-width:600px;">' . esc_textarea($config['invitation_text']) . '</textarea></td></tr>';
+        echo '<tr><th><label for="reset_password_subject">Reset Password Subject</label></th><td><input name="reset_password_subject" id="reset_password_subject" type="text" class="large-text" value="' . esc_attr($config['reset_password_subject']) . '"></td></tr>';
+        echo '<tr><th><label for="reset_password_text">Reset Password Text</label></th><td><textarea name="reset_password_text" id="reset_password_text" rows="3" class="large-text" style="max-width:600px;">' . esc_textarea($config['reset_password_text']) . '</textarea></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save', 'res-pong') . '</button></p>';
         echo '</form>';
@@ -108,6 +112,7 @@ class Res_Pong_Admin_Frontend {
     public function render_user_detail() {
         $id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
         $editing = !empty($id);
+        $config = $this->configuration->get_all();
         echo '<div class="wrap">';
         echo '<h1>' . ($editing ? esc_html__('Edit User', 'res-pong') : esc_html__('Add User', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="users" data-id="' . esc_attr($id) . '">';
@@ -135,9 +140,20 @@ class Res_Pong_Admin_Frontend {
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Password', 'res-pong') . '</button></p>';
         echo '</form>';
-        echo '<h2>' . esc_html__('Password Email Operation', 'res-pong') . '</h2>';
-        echo '<p><button type="button" class="button" id="res-pong-invite">' . esc_html__('Invita', 'res-pong') . '</button> ';
-        echo '<button type="button" class="button" id="res-pong-reset-password">' . esc_html__('Reset Password', 'res-pong') . '</button></p>';
+        echo '<div id="rp-invite-wrapper" style="display:none;">';
+        echo '<h2>' . esc_html__('Send Invitation Link', 'res-pong') . '</h2>';
+        echo '<p><input type="text" readonly class="large-text" id="rp-invite-subject" value="' . esc_attr($config['invitation_subject']) . '"></p>';
+        echo '<p><textarea id="rp-invite-text" rows="5" class="large-text" style="max-width:600px;">' . esc_textarea($config['invitation_text']) . '</textarea></p>';
+        echo '<p style="font-size:12px;color:#555;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
+        echo '<p><button type="button" class="button button-primary" id="rp-send-invite">' . esc_html__('Invia', 'res-pong') . '</button></p>';
+        echo '</div>';
+        echo '<div id="rp-reset-wrapper" style="display:none;">';
+        echo '<h2>' . esc_html__('Send Password Reset Link', 'res-pong') . '</h2>';
+        echo '<p><input type="text" readonly class="large-text" id="rp-reset-subject" value="' . esc_attr($config['reset_password_subject']) . '"></p>';
+        echo '<p><textarea id="rp-reset-text" rows="5" class="large-text" style="max-width:600px;">' . esc_textarea($config['reset_password_text']) . '</textarea></p>';
+        echo '<p style="font-size:12px;color:#555;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
+        echo '<p><button type="button" class="button button-primary" id="rp-send-reset">' . esc_html__('Invia', 'res-pong') . '</button></p>';
+        echo '</div>';
         $default_timeout = date('Y-m-d\\T00:00:00', strtotime('+7 days'));
         echo '<h2>' . esc_html__('Timeout', 'res-pong') . '</h2>';
         echo '<form id="res-pong-timeout-form" data-entity="users" data-id="' . esc_attr($id) . '">';
