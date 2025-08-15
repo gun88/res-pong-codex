@@ -12,9 +12,8 @@
     white-space: nowrap;
 }
 
-.rp-wrap {
-    overflow-x: auto;
-
+.rp-wrap table.dataTable {
+    max-width: 100%;
 }
 
 .rp-wrap .dataTables_wrapper th,
@@ -23,7 +22,8 @@
 }
 
 .rp-wrap .dataTables_wrapper {
-    max-width: 98%;
+    overflow-x: auto;
+
 }
 
 .rp-bulk {
