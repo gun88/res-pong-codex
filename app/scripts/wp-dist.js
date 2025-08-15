@@ -41,7 +41,14 @@ function pad(n) {
     copy(path.join(rootDir, 'includes'), path.join(tempDir, 'includes'));
 
     ['README.md', 'res-pong.php', 'uninstall.php'].forEach(file => {
-      fs.copyFileSync(path.join(rootDir, file), path.join(tempDir, file));
+      const src = path.join(rootDir, file);
+      const dest = path.join(tempDir, file);
+      fs.copyFileSync(src, dest);
+      if (file === 'res-pong.php') {
+        let releaseContent = fs.readFileSync(dest, 'utf8');
+        releaseContent = releaseContent.replace('define(\'RES_PONG_DEV\', true);', 'define(\'RES_PONG_DEV\', false);');
+        fs.writeFileSync(dest, releaseContent);
+      }
     });
 
     const distDir = path.join(appDir, 'dist', 'browser');
