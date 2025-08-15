@@ -64,6 +64,22 @@ class Res_Pong_Admin_Service {
         $group_id = isset($data['group_id']) && $data['group_id'] !== '' ? (int)$data['group_id'] : null;
         $recurrence = isset($data['recurrence']) ? $data['recurrence'] : 'none';
         $recurrence_end = isset($data['recurrence_end']) ? $data['recurrence_end'] : null;
+        if (isset($data['start_datetime'])) {
+            $start_dt = new DateTime($data['start_datetime']);
+            $data['start_datetime'] = $start_dt->format('Y-m-d H:i:s');
+        }
+        if (isset($data['end_datetime'])) {
+            $end_dt = new DateTime($data['end_datetime']);
+            $data['end_datetime'] = $end_dt->format('Y-m-d H:i:s');
+        }
+        if ($recurrence !== 'none' && $recurrence_end) {
+            $limit = new DateTime();
+            $limit->add(new DateInterval('P1Y1D'));
+            $recurrence_end_dt = new DateTime($recurrence_end);
+            if ($recurrence_end_dt > $limit) {
+                return new WP_Error('invalid_recurrence_end', 'Il termine di ricorrenza non può superare un anno e un giorno da adesso', ['status' => 400]);
+            }
+        }
         unset($data['recurrence'], $data['recurrence_end']);
         if ($group_id) {
             $data['group_id'] = $group_id;
