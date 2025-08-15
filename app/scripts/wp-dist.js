@@ -2,6 +2,7 @@
 const {execSync} = require('child_process');
 const fs = require('fs');
 const path = require('path');
+const archiver = require('archiver');
 
 function titleCase(str){
     return str.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -11,48 +12,64 @@ function pad(n){
     return String(n).padStart(2, '0');
 }
 
-(function(){
-    const appDir = path.resolve(__dirname, '..');
-    const rootDir = path.resolve(appDir, '..');
-    const pkg = require(path.join(appDir, 'package.json'));
-    const name = pkg.name;
-    const version = pkg.version;
-    const pluginName = titleCase(name);
+(async function(){
+    try {
+        const appDir = path.resolve(__dirname, '..');
+        const rootDir = path.resolve(appDir, '..');
+        const pkg = require(path.join(appDir, 'package.json'));
+        const name = pkg.name;
+        const version = pkg.version;
+        const pluginName = titleCase(name);
 
-    execSync('npx ng build --configuration production', {cwd: appDir, stdio: 'inherit'});
+        execSync('npx ng build --configuration production', {cwd: appDir, stdio: 'inherit'});
 
-    const pluginFile = path.join(rootDir, 'res-pong.php');
-    let content = fs.readFileSync(pluginFile, 'utf8');
-    content = content.replace(/(\* Plugin Name:\s*).*/, `$1${pluginName}`);
-    content = content.replace(/(\* Version:\s*).*/, `$1${version}`);
-    content = content.replace(/(define\('RES_PONG_VERSION',\s*RES_PONG_DEV \? time\(\) : ')[^']+('\);)/, `$1${version}$2`);
-    fs.writeFileSync(pluginFile, content);
+        const pluginFile = path.join(rootDir, 'res-pong.php');
+        let content = fs.readFileSync(pluginFile, 'utf8');
+        content = content.replace(/(\* Plugin Name:\s*).*/, `$1${pluginName}`);
+        content = content.replace(/(\* Version:\s*).*/, `$1${version}`);
+        content = content.replace(/(define\('RES_PONG_VERSION',\s*RES_PONG_DEV \? time\(\) : ')[^']+('\);)/, `$1${version}$2`);
+        fs.writeFileSync(pluginFile, content);
 
-    const releaseDir = path.join(rootDir, 'release');
-    const tempDir = path.join(releaseDir, 'temp');
-    fs.mkdirSync(releaseDir, {recursive: true});
-    fs.rmSync(tempDir, {recursive: true, force: true});
-    fs.mkdirSync(tempDir);
+        const releaseDir = path.join(rootDir, 'release');
+        const tempDir = path.join(releaseDir, 'temp');
+        fs.mkdirSync(releaseDir, {recursive: true});
+        fs.rmSync(tempDir, {recursive: true, force: true});
+        fs.mkdirSync(tempDir);
 
-    const copy = (src, dest) => fs.cpSync(src, dest, {recursive: true});
-    copy(path.join(rootDir, 'assets'), path.join(tempDir, 'assets'));
-    copy(path.join(rootDir, 'includes'), path.join(tempDir, 'includes'));
+        const copy = (src, dest) => fs.cpSync(src, dest, {recursive: true});
+        copy(path.join(rootDir, 'assets'), path.join(tempDir, 'assets'));
+        copy(path.join(rootDir, 'includes'), path.join(tempDir, 'includes'));
 
-    ['README.md', 'res-pong.php', 'uninstall.php'].forEach(file => {
-        fs.copyFileSync(path.join(rootDir, file), path.join(tempDir, file));
-    });
+        ['README.md', 'res-pong.php', 'uninstall.php'].forEach(file => {
+            fs.copyFileSync(path.join(rootDir, file), path.join(tempDir, file));
+        });
 
-    const distDir = path.join(appDir, 'dist', 'browser');
-    const destAppDir = path.join(tempDir, 'app');
-    fs.mkdirSync(destAppDir);
-    copy(distDir, destAppDir);
+        const distDir = path.join(appDir, 'dist', 'browser');
+        const destAppDir = path.join(tempDir, 'app');
+        fs.mkdirSync(destAppDir);
+        copy(distDir, destAppDir);
 
-    const finalDir = path.join(releaseDir, 'res-pong');
-    fs.rmSync(finalDir, {recursive: true, force: true});
-    fs.renameSync(tempDir, finalDir);
+        const finalDir = path.join(releaseDir, 'res-pong');
+        fs.rmSync(finalDir, {recursive: true, force: true});
+        fs.renameSync(tempDir, finalDir);
 
-    const now = new Date();
-    const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
-    const zipName = `${name}-${version}-${dateStr}.zip`;
-    execSync(`zip -r ${zipName} res-pong`, {cwd: releaseDir, stdio: 'inherit'});
+        const now = new Date();
+        const dateStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}_${pad(now.getHours())}-${pad(now.getMinutes())}`;
+        const zipName = `${name}-${version}-${dateStr}.zip`;
+        const zipPath = path.join(releaseDir, zipName);
+
+        await new Promise((resolve, reject) => {
+            const output = fs.createWriteStream(zipPath);
+            const archive = archiver('zip', {zlib: {level: 9}});
+            output.on('close', resolve);
+            output.on('error', reject);
+            archive.on('error', reject);
+            archive.directory(finalDir, 'res-pong');
+            archive.pipe(output);
+            archive.finalize();
+        });
+    } catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
 })();
