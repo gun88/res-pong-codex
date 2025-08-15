@@ -1,11 +1,29 @@
-.dataTables_wrapper .dataTables_length select {
+.rp-wrap .dataTables_wrapper .dataTables_length select {
     padding: 0 19px !important;
     background-color: #fff !important;
 }
 
-.dataTables_wrapper .dataTables_filter input {
+.rp-wrap .dataTables_wrapper .dataTables_filter input {
     background-color: #fff !important;
     line-height: 1;
+}
+
+.rp-wrap .dataTables_wrapper .dataTables_length label {
+    white-space: nowrap;
+}
+
+.rp-wrap {
+    overflow-x: auto;
+
+}
+
+.rp-wrap .dataTables_wrapper th,
+.rp-wrap .dataTables_wrapper td {
+    white-space: nowrap;
+}
+
+.rp-wrap .dataTables_wrapper {
+    max-width: 98%;
 }
 
 .rp-bulk {
@@ -62,13 +80,12 @@ button.rp-unsign,
     color: #e65100;
 }
 
-.rp-icon-col {
-    /*text-align: center;*/
+.rp-action-group-col {
+    padding: 0 !important;
 }
 
 .rp-action-group {
     display: flex;
-    flex-wrap: wrap;
     gap: 5px;
 }
 
@@ -115,9 +132,7 @@ button.rp-unsign,
     background: #fff !important;
 }
 
-#res-pong-event-reservations_wrapper .button,
-#res-pong-user-reservations_wrapper .button,
-#res-pong-list_wrapper .button {
+.rp-wrap .button {
     display: flex !important;
     align-items: center !important;
 }
@@ -141,4 +156,6 @@ button.rp-unsign,
 
 .rp-toolbar .dataTables_filter {
     margin-left: auto;
+    white-space: nowrap;
+    margin-top: 0;
 }

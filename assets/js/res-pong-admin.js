@@ -77,7 +77,7 @@
             { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
             { data: 'timeout', title: 'In timeout', className: 'rp-icon-col', render: function(d, type){ if(!d){ return type === 'display' ? '' : 0; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); var active = now < t; if(type === 'display'){ return active ? '<span class="dashicons dashicons-clock rp-icon-clock"></span>' : ''; } return active ? 1 : 0; } },
-            { data: null, title: 'Azioni', orderable: false, render: function(d){ return actionButtons('users', d); } }
+            { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('users', d); } }
         ],
         events: [
             { data: null, title: '', orderable: false, render: renderCheckbox },

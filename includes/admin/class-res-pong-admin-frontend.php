@@ -46,7 +46,7 @@ class Res_Pong_Admin_Frontend {
 
     // List pages
     public function render_users_page() {
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . esc_html__('Users', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="users"></table>';
         $this->render_progress_overlay();
@@ -54,7 +54,7 @@ class Res_Pong_Admin_Frontend {
     }
 
     public function render_events_page() {
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . esc_html__('Events', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="events"></table>';
         $this->render_progress_overlay();
@@ -62,7 +62,7 @@ class Res_Pong_Admin_Frontend {
     }
 
     public function render_reservations_page() {
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . esc_html__('Reservations', 'res-pong') . '</h1>';
         echo '<table id="res-pong-list" class="display" data-entity="reservations"></table>';
         $this->render_progress_overlay();
@@ -87,7 +87,7 @@ class Res_Pong_Admin_Frontend {
             echo '<div class="updated"><p>' . esc_html__('Settings saved', 'res-pong') . '</p></div>';
         }
         $config = $this->configuration->get_all();
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . esc_html__('Configurations', 'res-pong') . '</h1>';
         echo '<form method="post">';
         wp_nonce_field('rp_save_configurations', 'rp_configurations_nonce');
@@ -115,7 +115,7 @@ class Res_Pong_Admin_Frontend {
         $id = isset($_GET['id']) ? sanitize_text_field($_GET['id']) : '';
         $editing = !empty($id);
         $config = $this->configuration->get_all();
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . ($editing ? esc_html__('Edit User', 'res-pong') : esc_html__('Add User', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="users" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
@@ -175,7 +175,7 @@ class Res_Pong_Admin_Frontend {
         $editing = !empty($id);
         $default_start = date('Y-m-d\\T21:30:00');
         $default_end = date('Y-m-d\\T23:00:00');
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . ($editing ? esc_html__('Edit Event', 'res-pong') : esc_html__('Add Event', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="events" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
@@ -206,7 +206,7 @@ class Res_Pong_Admin_Frontend {
         $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
         $editing = !empty($id);
         $default_created = date('Y-m-d\\TH:i:s');
-        echo '<div class="wrap">';
+        echo '<div class="wrap rp-wrap">';
         echo '<h1>' . ($editing ? esc_html__('Edit Reservation', 'res-pong') : esc_html__('Add Reservation', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="reservations" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
