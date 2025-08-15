@@ -82,6 +82,7 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th></th><td><button type="submit" class="button button-primary">Invia</button></td></tr>';
         echo '</table>';
         echo '</form>';
+        $this->render_progress_overlay();
         echo '</div>';
     }
 

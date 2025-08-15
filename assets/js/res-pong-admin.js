@@ -755,7 +755,7 @@
                 });
                 toInput.autocomplete({
                     source: function(request, response){
-                        var term = request.term.toLowerCase();
+                        var term = request.term.toLowerCase().split(/,\s*/).pop();
                         response(items.filter(function(it){ return it.search.indexOf(term) !== -1; }));
                     },
                     minLength: 0,

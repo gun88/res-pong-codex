@@ -87,8 +87,8 @@ class Res_Pong_Admin_Repository {
     }
 
     public function find_user_by_email($email) {
-        $sql = "SELECT *, CONCAT(last_name, ' ', first_name) AS name FROM {$this->table_user} WHERE email = %s";
-        return $this->wpdb->get_row($this->wpdb->prepare($sql, $email), ARRAY_A);
+        $sql = "SELECT *, CONCAT(last_name, ' ', first_name) AS name FROM {$this->table_user} WHERE LOWER(email) = %s";
+        return $this->wpdb->get_row($this->wpdb->prepare($sql, strtolower($email)), ARRAY_A);
     }
 
     public function insert_user($data) {
@@ -250,13 +250,19 @@ class Res_Pong_Admin_Repository {
                 $email = strtolower(trim($data[$map['Email']] ?? ''));
                 $category = $data[$map['Categoria']] ?? '';
                 $id = trim($data[$map['Tessera']] ?? '');
+                $username = $this->generate_username($first_name, $last);
                 $reasons = [];
                 if ($id === '' || $email === '' || $last === '' || $first_name === '') {
                     $reasons[] = 'dati obbligatori mancanti';
                 }
-                $existing = $this->find_user_by_email($email);
-                if ($existing && $existing['id'] !== $id) {
+                if ($this->get_user($id)) {
+                    $reasons[] = 'tessera già esistente';
+                }
+                if ($this->find_user_by_email($email)) {
                     $reasons[] = 'email già esistente';
+                }
+                if ($this->username_exists($username)) {
+                    $reasons[] = 'username già esistente';
                 }
                 if ($reasons) {
                     $skipped[] = [
@@ -266,7 +272,6 @@ class Res_Pong_Admin_Repository {
                     ];
                     continue;
                 }
-                $username = $this->generate_username($first_name, $last);
                 $row = [
                     'id'          => $id,
                     'email'       => $email,
@@ -279,7 +284,7 @@ class Res_Pong_Admin_Repository {
                     'reset_token' => null,
                     'enabled'     => 1,
                 ];
-                $this->wpdb->replace($this->table_user, $row);
+                $this->wpdb->insert($this->table_user, $row);
             }
             fclose($handle);
             return $skipped;
@@ -311,18 +316,11 @@ class Res_Pong_Admin_Repository {
     }
 
     private function generate_username($first_name, $last_name) {
-        $base = strtolower(substr($first_name, 0, 1) . preg_replace('/[^a-z0-9]/i', '', $last_name));
-        $username = $base;
-        $i = 2;
-        while ($this->username_exists($username)) {
-            $username = $base . $i;
-            $i++;
-        }
-        return $username;
+        return strtolower(substr($first_name, 0, 1) . preg_replace('/[^a-z0-9]/i', '', $last_name));
     }
 
     private function username_exists($username) {
-        $sql = $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_user} WHERE username = %s", $username);
+        $sql = $this->wpdb->prepare("SELECT COUNT(*) FROM {$this->table_user} WHERE LOWER(username) = %s", strtolower($username));
         return (int) $this->wpdb->get_var($sql) > 0;
     }
 
