@@ -115,6 +115,8 @@ button.rp-unsign,
     background: #fff !important;
 }
 
+#res-pong-event-reservations_wrapper .button,
+#res-pong-user-reservations_wrapper .button,
 #res-pong-list_wrapper .button {
     display: flex !important;
     align-items: center !important;

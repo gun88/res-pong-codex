@@ -8,7 +8,7 @@ class Res_Pong_Admin_Controller {
     }
 
     public function init() {
-        add_action('rest_api_init', [$this->service, 'register_routes']);
+        add_action('rest_api_init', [$this, 'register_routes']);
     }
 
     public function register_routes() {
@@ -22,6 +22,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_create_user'],
@@ -29,6 +30,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/export', [
             'methods' => 'GET',
             'callback' => [$this->service, 'rest_export_users'],
@@ -36,6 +38,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/import', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_import_users'],
@@ -43,6 +46,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)', [
             'methods' => 'GET',
             'callback' => [$this->service, 'rest_get_user'],
@@ -50,6 +54,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)', [
             'methods' => 'PUT',
             'callback' => [$this->service, 'rest_update_user'],
@@ -57,6 +62,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)', [
             'methods' => 'DELETE',
             'callback' => [$this->service, 'rest_delete_user'],
@@ -64,6 +70,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)/invite', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_invite_user'],
@@ -71,6 +78,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)/reset-password', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_reset_password'],
@@ -78,6 +86,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/users/(?P<id>[\w-]+)/impersonate', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_impersonate_user'],
@@ -85,7 +94,6 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
-
 
         // Events
         register_rest_route($namespace, '/events', [
@@ -95,6 +103,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/events', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_create_event'],
@@ -102,6 +111,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/events/export', [
             'methods' => 'GET',
             'callback' => [$this->service, 'rest_export_events'],
@@ -109,6 +119,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/events/import', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_import_events'],
@@ -116,6 +127,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/events/(?P<id>\d+)', [
             'methods' => 'GET',
             'callback' => [$this->service, 'rest_get_event'],
@@ -123,6 +135,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/events/(?P<id>\d+)', [
             'methods' => 'PUT',
             'callback' => [$this->service, 'rest_update_event'],
@@ -130,6 +143,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/events/(?P<id>\d+)', [
             'methods' => 'DELETE',
             'callback' => [$this->service, 'rest_delete_event'],
@@ -146,6 +160,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/reservations', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_create_reservation'],
@@ -153,6 +168,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/reservations/export', [
             'methods' => 'GET',
             'callback' => [$this->service, 'rest_export_reservations'],
@@ -160,6 +176,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/reservations/import', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_import_reservations'],
@@ -167,6 +184,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/reservations/(?P<id>\d+)', [
             'methods' => 'GET',
             'callback' => [$this->service, 'rest_get_reservation'],
@@ -174,6 +192,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/reservations/(?P<id>\d+)', [
             'methods' => 'PUT',
             'callback' => [$this->service, 'rest_update_reservation'],
@@ -181,6 +200,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
         register_rest_route($namespace, '/reservations/(?P<id>\d+)', [
             'methods' => 'DELETE',
             'callback' => [$this->service, 'rest_delete_reservation'],
@@ -188,6 +208,7 @@ class Res_Pong_Admin_Controller {
                 return current_user_can('manage_options');
             },
         ]);
+
     }
 
 }

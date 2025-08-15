@@ -17,12 +17,12 @@ class Res_Pong {
 
     public function __construct() {
         $this->configuration = new Res_Pong_Configuration();
-        $this->admin_repository = new Res_Pong_Admin_Repository($this->configuration);
-        $this->admin_service = new Res_Pong_Admin_Service($this->admin_repository);
+        $this->admin_repository = new Res_Pong_Admin_Repository();
+        $this->admin_service = new Res_Pong_Admin_Service($this->admin_repository, $this->configuration);
         $this->admin_controller = new Res_Pong_Admin_Controller($this->admin_service);
         $this->admin_controller->init();
         if (is_admin()) {
-            $this->admin_frontend = new Res_Pong_Admin_Frontend($this->admin_service);
+            $this->admin_frontend = new Res_Pong_Admin_Frontend($this->configuration);
             $this->admin_frontend->init();
         }
     }

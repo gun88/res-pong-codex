@@ -1,10 +1,10 @@
 <?php
 
 class Res_Pong_Admin_Frontend {
-    private $admin_service;
+    private $configuration;
 
-    public function __construct(Res_Pong_Admin_Service $admin_service) {
-        $this->admin_service = $admin_service;
+    public function __construct(Res_Pong_Configuration $configuration) {
+        $this->configuration = $configuration;
         add_action('admin_menu', [ $this, 'register_menu' ]);
         add_action('admin_enqueue_scripts', [ $this, 'enqueue_assets' ]);
     }
@@ -81,10 +81,10 @@ class Res_Pong_Admin_Frontend {
                 'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
                 'reset_password_text'      => isset($_POST['reset_password_text']) ? sanitize_textarea_field($_POST['reset_password_text']) : '',
             ];
-            $this->admin_service->update_configurations($data);
+            $this->configuration->update($data);
             echo '<div class="updated"><p>' . esc_html__('Settings saved', 'res-pong') . '</p></div>';
         }
-        $config = $this->admin_service->get_all_configurations();
+        $config = $this->configuration->get_all();
         echo '<div class="wrap">';
         echo '<h1>' . esc_html__('Configurations', 'res-pong') . '</h1>';
         echo '<form method="post">';
