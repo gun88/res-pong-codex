@@ -282,14 +282,14 @@
         var length = wrapper.find('div.dataTables_length');
         var filter = wrapper.find('div.dataTables_filter');
         toolbar.append(length);
-        var bulk = $('<div class="rp-bulk"><select id="rp-bulk-action"><option value="">Bulk Actions</option></select> <button class="button" id="rp-apply-bulk">Apply</button></div>');
+        var bulk = $('<div class="rp-bulk"><select id="rp-bulk-action"><option value="">Bulk Actions</option></select> <button class="button" id="rp-apply-bulk">Applica</button></div>');
         var opt = '';
         if(entity === 'users'){
-            opt = '<option value="delete">Delete</option><option value="enable">Enable</option><option value="disable">Disable</option><option value="timeout">Timeout</option>';
+            opt = '<option value="delete">Cancella</option><option value="enable">Abilita</option><option value="disable">Disabilita</option><option value="timeout">Timeout</option>';
         }else if(entity === 'events'){
-            opt = '<option value="delete">Delete</option><option value="enable">Enable</option><option value="disable">Disable</option>';
+            opt = '<option value="delete">Cancella</option><option value="enable">Abilita</option><option value="disable">Disabilita</option>';
         }else if(entity === 'reservations'){
-            opt = '<option value="delete">Delete</option><option value="enable">Presente</option><option value="disable">Assente</option>';
+            opt = '<option value="delete">Cancella</option><option value="enable">Presente</option><option value="disable">Assente</option>';
         }
         bulk.find('select').append(opt);
         var separator0 = $('<span>•</span>');
@@ -343,9 +343,9 @@
                     contentType: false,
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); input.remove(); },
-                    success: function(){ dt.ajax.reload(); showNotice('success', 'Import completed'); },
+                    success: function(){ dt.ajax.reload(); showNotice('success', 'Importazione Completata'); },
                     error: function(xhr){
-                        var msg = 'Import failed';
+                        var msg = 'Importazione fallita';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                         showNotice('error', msg);
                     }
@@ -356,7 +356,7 @@
             var action = $('#rp-bulk-action').val();
             var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
             if(!action || ids.length === 0){ return; }
-            if(action === 'delete' && !confirm('Delete selected items?')){ return; }
+            if(action === 'delete' && !confirm('Cancella elementi selezionati?')){ return; }
             var timeoutDate = null;
             if(action === 'timeout'){
                 var def = new Date();
