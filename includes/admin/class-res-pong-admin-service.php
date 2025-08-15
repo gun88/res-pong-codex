@@ -333,10 +333,11 @@ class Res_Pong_Admin_Service {
         if (is_wp_error($result)) {
             return $result;
         }
-        if (!$result) {
+        if ($result === false) {
             return new WP_Error('import_failed', 'Importazione utenti fallita', ['status' => 500]);
         }
-        return new WP_REST_Response(['success' => true], 200);
+        $skipped = is_array($result) ? $result : [];
+        return new WP_REST_Response(['success' => true, 'skipped' => $skipped], 200);
     }
 
     public function rest_export_events() {

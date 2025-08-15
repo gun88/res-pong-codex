@@ -240,6 +240,7 @@ class Res_Pong_Admin_Repository {
         $first = fgetcsv($handle, 0, ';');
         if ($first && in_array('Cognome', $first) && in_array('Nome', $first) && in_array('Tessera', $first)) {
             $map = array_flip($first);
+            $skipped = [];
             while (($data = fgetcsv($handle, 0, ';')) !== false) {
                 if (!array_filter($data, function ($v) { return trim($v) !== ''; })) {
                     continue;
@@ -249,7 +250,20 @@ class Res_Pong_Admin_Repository {
                 $email = strtolower(trim($data[$map['Email']] ?? ''));
                 $category = $data[$map['Categoria']] ?? '';
                 $id = trim($data[$map['Tessera']] ?? '');
-                if ($id === '' || $email === '') {
+                $reasons = [];
+                if ($id === '' || $email === '' || $last === '' || $first_name === '') {
+                    $reasons[] = 'dati obbligatori mancanti';
+                }
+                $existing = $this->find_user_by_email($email);
+                if ($existing && $existing['id'] !== $id) {
+                    $reasons[] = 'email già esistente';
+                }
+                if ($reasons) {
+                    $skipped[] = [
+                        'id'      => $id,
+                        'email'   => $email,
+                        'reasons' => $reasons,
+                    ];
                     continue;
                 }
                 $username = $this->generate_username($first_name, $last);
@@ -268,7 +282,7 @@ class Res_Pong_Admin_Repository {
                 $this->wpdb->replace($this->table_user, $row);
             }
             fclose($handle);
-            return true;
+            return $skipped;
         }
         fclose($handle);
         return $this->import_csv($file, $this->table_user);
