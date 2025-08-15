@@ -1,0 +1,17 @@
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+
+  .user-field {
+    .label {
+      font-weight: bold;
+    }
+
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+  }
+
+
+}

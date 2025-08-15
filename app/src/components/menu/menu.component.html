@@ -1,0 +1,33 @@
+<p-menubar [model]="menu">
+  <ng-template #start>
+    <img src="favicon.jpg" alt="logo" style="width: 2rem;">
+  </ng-template>
+  <ng-template #end>
+    @if (loggedIn$ | async) {
+      <p-button (click)="menu.toggle($event)"
+                styleClass="rp-menu-profile-button"
+                severity="secondary"
+                [text]="true"
+                *ngIf="(user$ | async) as user">
+
+        <div class="hidden md:block">{{user.first_name}}</div>
+
+        @if (user.avatar) {
+          <p-avatar [image]="user.avatar" size="normal" shape="circle"/>
+
+        } @else if (user.monogram) {
+          <p-avatar [label]="user.monogram" size="normal" shape="circle"/>
+        } @else {
+          <p-avatar size="normal" image="https://tennistavolomorelli.it/wp-content/uploads/fitet-monitor/players/587290.jpg" shape="circle"/>
+        }
+
+      </p-button>
+
+    }
+    <p-menu #menu [model]="userMenu" [popup]="true" appendTo="body" >
+
+
+    </p-menu>
+
+  </ng-template>
+</p-menubar>

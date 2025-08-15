@@ -1,0 +1,70 @@
+<div class="rp-large-page">
+  <div class="flex items-center justify-between w-full align-items-center gap-3 flex-column-reverse sm:flex-row">
+    <div class="flex items-center justify-between gap-1">
+      <p-button icon="pi pi-angle-left" size="small" [rounded]="true" severity="secondary" [outlined]="true"
+                (onClick)="prev()"/>
+      <p-button label="Oggi" size="small" [rounded]="true" severity="secondary" [outlined]="true" (onClick)="today()"/>
+      <p-button icon="pi pi-angle-right" size="small" [rounded]="true" severity="secondary" [outlined]="true"
+                (onClick)="next()"/>
+
+    </div>
+    <div class="flex-1 text-center rp-reservations-title-box">
+      <h2 class="m-0">{{ title }}</h2>
+      <span class="rp-subtitle">({{ subTitle }})</span>
+    </div>
+    <div class="flex items-center justify-between gap-1">
+      <p-button label="Mese" size="small" [rounded]="true"
+                [severity]="mode === 'calendar' ? 'primary': 'secondary'"
+                [outlined]="true" (onClick)="month()"/>
+      <p-button label="Lista" size="small" [rounded]="true"
+                [severity]="mode === 'timeline' ? 'primary': 'secondary'"
+                [outlined]="true" (onClick)="list()"/>
+
+    </div>
+  </div>
+  <div class="my-3" [ngStyle]="{ visibility: loading ? 'visible' : 'hidden' }">
+    <p-progress-bar mode="indeterminate" [style]="{ height: '6px' }"/>
+  </div>
+
+
+  <div *ngIf="mode === 'calendar'">
+    <res-pong-user-calendar [events]="events" [currentDate]="currentDate"
+                            (onDaySelected)="onSelection($event)"></res-pong-user-calendar>
+  </div>
+  <div *ngIf="mode === 'timeline'">
+    <res-pong-user-timeline [events]="events" [loading]="loading"
+                            [monthPointer]="monthPointer"
+                            (onDaySelected)="onSelection($event)"></res-pong-user-timeline>
+  </div>
+
+  <div>
+    <h4>Leggenda disponibilità</h4>
+    <div class="rp-calendar-legend text-xs">
+      <div>
+        <div class="rp-legend-dot rp-calendar-label-closed"></div>
+        <div>Evento terminato</div>
+      </div>
+      <div>
+        <div class="rp-legend-dot rp-calendar-label-available"></div>
+        <div>Posti disponibili</div>
+      </div>
+      <div>
+        <div class="rp-legend-dot rp-calendar-label-almost-full"></div>
+        <div>Quasi al completo</div>
+      </div>
+      <div>
+        <div class="rp-legend-dot rp-calendar-label-full"></div>
+        <div>Evento al completo</div>
+      </div>
+      <div>
+        <div class="rp-legend-dot rp-calendar-label-booked"></div>
+        <div>Evento prenotato</div>
+      </div>
+      <div>
+        <div class="rp-legend-dot rp-calendar-label-disabled"></div>
+        <div>Evento disabilitato</div>
+      </div>
+    </div>
+  </div>
+</div>
+

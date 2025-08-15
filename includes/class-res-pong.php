@@ -3,10 +3,15 @@
 defined('ABSPATH') || exit;
 
 require_once RES_PONG_PLUGIN_DIR . 'includes/common/class-res-pong-configuration.php';
+
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-repository.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-service.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-controller.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-frontend.php';
+
+require_once RES_PONG_PLUGIN_DIR . 'includes/user/class-res-pong-user-repository.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/user/class-res-pong-user-service.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/user/class-res-pong-user-controller.php';
 
 class Res_Pong {
     private $configuration;
@@ -14,6 +19,9 @@ class Res_Pong {
     private $admin_service;
     private $admin_controller;
     private $admin_frontend;
+    private $user_repository;
+    private $user_service;
+    private $user_controller;
 
     public function __construct() {
         $this->configuration = new Res_Pong_Configuration();
@@ -25,6 +33,11 @@ class Res_Pong {
             $this->admin_frontend = new Res_Pong_Admin_Frontend($this->configuration);
             $this->admin_frontend->init();
         }
+
+        $this->user_repository = new Res_Pong_User_Repository();
+        $this->user_service = new Res_Pong_User_Service($this->user_repository, $this->configuration);
+        $this->user_controller = new Res_Pong_User_Controller($this->user_service);
+        $this->user_controller->init();
     }
 
     public function activate() {

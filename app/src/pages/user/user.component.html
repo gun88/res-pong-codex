@@ -1,0 +1,32 @@
+<div class="rp-double-form-page">
+
+  <div class="flex flex-column md:flex-row gap-3">
+    <div class="flex-1">
+      <res-pong-user-user-data
+        [user]="user"
+        [error]="error"
+        [loading]="loading"
+        title="Dati utente"
+        disclaimer="Se hai bisogno di modificare i tuoi dati, contatta un amministratore."
+      ></res-pong-user-user-data>
+      <p-divider></p-divider>
+      <button [disabled]="logoutLoading" (click)="logout()" pButton label="Log Out" [severity]="'warn'"
+              class="w-full mt-2"></button>
+      <p-divider styleClass="block md:hidden"></p-divider>
+
+    </div>
+    <div class="flex-1">
+
+      <res-pong-user-password-form
+        title="Aggiorna Password"
+        [username]="user.username"
+        [showLoginLink]="false"></res-pong-user-password-form>
+    </div>
+  </div>
+
+
+  <div>
+  </div>
+
+
+</div>

@@ -143,7 +143,7 @@ class Res_Pong_Admin_Frontend {
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Password', 'res-pong') . '</button></p>';
         echo '</form>';
         echo '<div id="rp-invite-wrapper" style="display:none;">';
-        echo '<h2>' . esc_html__('Send Invitation Link', 'res-pong') . '</h2>';
+        echo '<h2>' . esc_html__('Invia Messaggio di Invito', 'res-pong') . '</h2>';
         echo '<p><input type="text" readonly class="large-text" style="max-width: 600px;" id="rp-invite-subject" value="' . esc_attr($config['invitation_subject']) . '"></p>';
         echo '<p style=" margin-bottom: 0;"><textarea id="rp-invite-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;">' . esc_textarea($config['invitation_text']) . '</textarea></p>';
         echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';

@@ -1,0 +1,483 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+:root {
+  --font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+}
+
+html, body {
+  font-family: var(--font-family);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+p-menubar {
+  --p-menubar-border-radius: 0;
+}
+
+.rp-menu-profile-button {
+  --p-button-padding-x: 0;
+  --p-button-padding-y: 0;
+}
+
+.rp-content {
+  min-height: 80vh;
+}
+
+.rp-single-form-page {
+  display: block;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.rp-double-form-page {
+  display: block;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+.rp-stepper-page {
+  display: block;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.rp-large-page {
+  display: block;
+  max-width: 1400px;
+  padding: 1rem;
+  margin: 0 auto;
+}
+
+
+.rp-calendar {
+  --p-datepicker-panel-padding: 0;
+  --p-datepicker-date-padding: 0;
+  --p-datepicker-date-selected-background: var(--p-datepicker-date-background);
+  --p-datepicker-date-selected-color: var(--p-datepicker-date-color);
+  --p-datepicker-date-border-radius: 0;
+  --p-datepicker-today-background: none;
+  --p-datepicker-today-color: none;
+
+  .p-datepicker-day {
+    width: auto;
+    height: auto;
+    text-align: center;
+    display: block;
+  }
+
+  .p-datepicker-panel {
+    border: none;
+  }
+
+  .p-datepicker-day-view {
+    margin: 0;
+    table-layout: fixed;
+
+    td {
+      vertical-align: text-top;
+
+      .rp-calendar-day {
+        @media (max-width: 479px) {
+          .rp-calendar-events {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            flex-direction: row;
+
+            .rp-calendar-event {
+
+              .rp-calendar-label {
+                margin: 2px;
+                display: block;
+
+                .rp-calendar-label-badge {
+                  display: none;
+                  width: 1px;
+
+                }
+              }
+            }
+          }
+
+        }
+
+      }
+
+    }
+
+    td.p-datepicker-today {
+      .rp-calendar-day {
+        .rp-calendar-day-number {
+          font-weight: bold;
+
+        }
+      }
+    }
+
+  }
+
+  .p-datepicker-header {
+    display: none;
+  }
+}
+
+.rp-calendar-day {
+  padding-top: 1rem;
+  min-height: 4rem;
+  padding-bottom: 1rem;
+  //border: 1px solid #ccc;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .rp-calendar-events {
+    // background: red;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    .rp-calendar-event {
+      // background: yellow;
+      margin: 0;
+    }
+  }
+
+  .rp-calendar-label {
+    gap: .25rem;
+    font-size: .7rem;
+    border-radius: 5px;
+    padding: 4px;
+    margin: 0;
+    white-space: nowrap;
+    display: inline-flex;
+    max-width: calc(100%);
+
+
+    .rp-calendar-label-badge {
+      display: block; /* o inline-block se vuoi solo la larghezza del contenuto */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0; /* importante se sei in flex */
+      flex: 1;
+    }
+  }
+
+}
+
+
+.rp-calendar-day-dialog {
+
+  .rp-calendar-day {
+    .rp-calendar-events {
+      gap: .75rem;
+      align-items: center;
+
+      .rp-calendar-label {
+        gap: .5rem;
+        font-size: 1rem;
+        border-radius: 5px;
+        padding: 8px;
+        white-space: wrap;
+        display: inline-flex;
+        cursor: pointer;
+
+
+        .rp-calendar-label-badge {
+          white-space: wrap;
+        }
+      }
+    }
+  }
+
+
+}
+
+.rp-responsive-table {
+
+  th, td {
+    white-space: nowrap;
+  }
+
+  th div {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .rp-column-title {
+    display: none;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+
+  .rp-action-col {
+    margin: auto;
+    padding: 0;
+
+    > * {
+      margin: auto;
+    }
+
+    .rp-col-desktop {
+      display: block;
+    }
+
+    .rp-col-mobile {
+      margin-top: 1rem;
+      display: none;
+      width: 100%;
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    --p-datatable-body-cell-padding: .25rem 0;
+
+    .rp-presence-s {
+      display: none !important;
+    }
+
+    .rp-column-title {
+      display: block;
+    }
+
+    th, td {
+      padding: 0;
+      border: none !important;
+    }
+
+    .rp-action-col {
+      .rp-col-desktop {
+        display: none;
+      }
+
+      .rp-col-mobile {
+        display: block;
+      }
+    }
+
+    .p-datatable-tbody > tr {
+      display: flex;
+      flex-direction: column;
+      gap: .25rem;
+      // border-bottom: 1px solid #ccc;
+      border-top: 1px solid #ccc;
+      padding: 1.25rem 0;
+
+      > td {
+        display: flex;
+        flex-direction: column;
+        gap: .25rem;
+        align-items: start !important;
+
+        &.rp-presence-col {
+          flex-direction: row;
+          justify-content: unset !important;
+        }
+      }
+    }
+  }
+}
+
+
+.rp-note {
+  font-style: italic;
+  font-size: .8rem;
+  color: #666;
+}
+
+.rp-subtitle {
+  font-size: .9rem;
+  color: #666;
+}
+
+.rp-form-input-error {
+  position: relative;
+
+  > span {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    font-size: .7rem;
+    color: #d30000;
+  }
+}
+
+
+.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)).res-pong {
+  display: block;
+  margin: 0 !important;
+  max-width: unset;
+  width: 100%;
+}
+
+.res-pong {
+
+
+  .res-pong-spinner {
+    font-family: sans-serif;
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.2rem;
+    color: #444;
+  }
+
+  .p-datatable-table {
+    th, td {
+      white-space: nowrap;
+    }
+  }
+}
+
+.rp-legend-dot {
+  background: var(--p-gray-100);
+  color: var(--p-blue-900);
+  border: 1px solid var(--p-blue-800);
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  min-height: 15px;
+  max-width: 15px;
+  max-height: 15px;
+  display: block;
+  border-radius: 50%;
+}
+
+.rp-calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+
+  > div {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+    min-width: 8.5rem;
+
+    > div {
+      white-space: nowrap;
+
+    }
+  }
+
+
+}
+
+.rp-calendar-label {
+  background: var(--p-gray-100);
+  color: var(--p-blue-900);
+  border: 1px solid var(--p-blue-800);
+}
+
+.rp-calendar-label-full {
+  background: var(--p-red-400);
+  color: var(--p-red-900);
+  border-color: var(--p-red-600);
+}
+
+
+.rp-calendar-label-almost-full {
+  background: var(--p-orange-300);
+  color: var(--p-orange-900);
+  border-color: var(--p-orange-600);
+}
+
+.rp-calendar-label-available {
+  background: var(--p-blue-300);
+  color: var(--p-blue-900);
+  border-color: var(--p-blue-600);
+}
+
+.rp-calendar-label-booked {
+  background: var(--p-green-400);
+  color: var(--p-green-900);
+  border-color: var(--p-green-600);
+}
+
+.rp-calendar-label-closed {
+  background: var(--p-gray-300);
+  color: var(--p-gray-900);
+  border-color: var(--p-gray-900);
+}
+
+.rp-calendar-label-disabled {
+  background: var(--p-slate-950);
+  color: var(--p-gray-100);
+  border-color: var(--p-slate-950);
+}
+
+.rp-timeline {
+
+  &.p-timeline-vertical {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-rows: repeat(12, auto); /* 12 righe */
+    grid-auto-columns: 1fr;
+    width: fit-content;
+    margin: auto;
+  }
+
+  @media screen and (max-width: 768px) {
+    &.p-timeline-vertical {
+
+      grid-template-rows: repeat(16, auto); /* 12 righe */
+
+    }
+  }
+  @media screen and (max-width: 575px) {
+    &.p-timeline-vertical {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+    }
+  }
+
+  .p-timeline-event {
+    max-width: 30rem;
+  }
+
+  .p-timeline-event-opposite {
+    display: none;
+  }
+
+  .p-timeline-event-content {
+    /*    max-width: 50%;
+        min-width: 240px;*/
+  }
+}
+
+.rp-timeline-content-day {
+
+
+  .rp-calendar-events {
+    // background: red;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .rp-calendar-event {
+      // background: yellow;
+      margin: 0;
+    }
+  }
+
+
+  .rp-calendar-label {
+    gap: .5rem;
+    font-size: .9rem;
+    border-radius: 5px;
+    padding: 6px;
+    margin: 0;
+    white-space: wrap;
+    display: inline-flex;
+    max-width: calc(100%);
+    cursor: pointer;
+
+  }
+
+}

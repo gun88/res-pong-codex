@@ -1,0 +1,41 @@
+<div class="rp-calendar">
+  <p-date-picker #rpc styleClass="max-w-full w-full"
+                 [(ngModel)]="_currentDate"
+                 [firstDayOfWeek]="1"
+                 [inline]="true">
+    <ng-template #date let-date>
+      <div class="rp-calendar-day" (click)="onSelectDay(date)">
+        <div class="rp-calendar-day-number">{{ date.day }}</div>
+        <div *ngIf="dayMap[date.month] && dayMap[date.month][date.day]" class="rp-calendar-events">
+          <div *ngFor="let e of dayMap[date.month][date.day]; let i = index; " class="rp-calendar-event">
+            <div class="rp-calendar-label rp-calendar-label-{{e.status}} {{e.booked ? 'rp-calendar-label-booked' : ''}}">
+              <div class="rp-calendar-label-badge">
+                <span class="rp-calendar-label-time">{{ e.time }}&nbsp;-&nbsp;</span>
+                <span class="rp-calendar-label-name">{{ e.name }}</span>
+                <span *ngIf="e.count" class="rp-calendar-label-count">&nbsp;-&nbsp;{{ e.count }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </p-date-picker>
+</div>
+
+<p-dialog header="Seleziona" [modal]="true" [(visible)]="showDialog" styleClass="rp-calendar-day-dialog">
+  <div class="rp-calendar-day">
+    <div *ngIf="selectedDay" class="rp-calendar-events">
+      <div *ngFor="let e of selectedDay; let i = index; " class="rp-calendar-event">
+
+        <div (click)="onSelectEvent(e)"
+          class="rp-calendar-label rp-calendar-label-{{e.status}} {{e.booked ? 'rp-calendar-label-booked' : ''}}">
+          <div class="rp-calendar-label-badge">
+            <span class="rp-calendar-label-time">{{ e.time }}&nbsp;-&nbsp;</span>
+            <span class="rp-calendar-label-name">{{ e.name }}</span>
+            <span *ngIf="e.count" class="rp-calendar-label-count">&nbsp;-&nbsp;{{ e.count }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</p-dialog>

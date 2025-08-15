@@ -1,0 +1,40 @@
+<div class="user-info" role="group" aria-label="Dati utente">
+  <h2 *ngIf="title">{{ title }}</h2>
+  <div class="mb-2 mt-2" *ngIf="error">
+    <p-message size="small" icon="pi pi-exclamation-circle" severity="error">{{ error }}</p-message>
+  </div>
+
+  <div class="user-field">
+    @if (user?.avatar) {
+      <p-avatar [image]="user.avatar" styleClass="mr-2" size="xlarge" shape="circle"/>
+
+    } @else if (user?.monogram) {
+      <p-avatar [label]="user.monogram" styleClass="mr-2" size="xlarge" shape="circle"/>
+    } @else {
+      <p-avatar [label]="'...'" styleClass="mr-2" size="xlarge" shape="circle"/>
+    }
+  </div>
+  <div class="user-field">
+    <span class="label">Username</span>
+    <span class="value">{{ loading ? 'Caricamento...' : (user?.username || 'N/A') }}</span>
+  </div>
+
+  <div class="user-field">
+    <span class="label">Email</span>
+    <span class="value">{{ loading ? 'Caricamento...' : (user?.email || 'N/A') }}</span>
+  </div>
+
+  <div class="user-field">
+    <span class="label">Nome</span>
+    <span class="value">{{ loading ? 'Caricamento...' : (user?.first_name || 'N/A') }}</span>
+  </div>
+
+  <div class="user-field">
+    <span class="label">Cognome</span>
+    <span class="value">{{ loading ? 'Caricamento...' : (user?.last_name || 'N/A') }}</span>
+  </div>
+  <div *ngIf="disclaimer" class="rp-note">
+    {{ disclaimer }}
+  </div>
+</div>
+

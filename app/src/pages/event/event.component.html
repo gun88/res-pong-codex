@@ -1,0 +1,190 @@
+<div class="rp-event rp-large-page">
+
+  <div *ngIf="eventLoadingError">
+    <p-message icon="pi pi-times-circle" severity="error">{{ eventLoadingError }}</p-message>
+  </div>
+  <div *ngIf="!eventLoadingError" class="flex flex-column md:flex-row gap-6">
+    <!-- Left: Dettagli & Comandi -->
+
+    <div *ngIf="event" class="flex-1">
+      <div
+        class="flex flex-column sm:flex-row md:flex-column lg:flex-row align-items-start justify-content-between gap-3">
+        <div class="flex flex-column gap-1">
+          <div class="rp-event-title-block"
+               style="display: flex; gap: 1rem; justify-content: space-between; align-items: start;">
+            <h2 class="m-0 line-height-3">{{ event?.name }}</h2>
+
+            <div style="white-space: nowrap;display: flex; gap: 0.5rem; align-items: center;">
+              <p-button size="small" [routerLink]="['/events', event.other_events.prev_id]"
+                        [disabled]="!event.other_events.prev_id"
+                        icon="pi pi-chevron-left" [rounded]="true" severity="secondary" [outlined]="true"/>
+              <p-button size="small" [routerLink]="['/events', event.other_events.next_id]"
+                        [disabled]="!event.other_events.next_id"
+                        icon="pi pi-chevron-right" [rounded]="true" severity="secondary" [outlined]="true"/>
+            </div>
+
+          </div>
+
+          <div class="text-500 ">
+            {{ event?.date | date:'EEEE d MMMM y, HH:mm' }} • {{ event?.duration }}
+          </div>
+        </div>
+        <div class="flex flex-column align-items-end gap-2 w-full sm:w-auto md:w-full lg:w-auto">
+          <div class="flex flex-row align-items-end gap-2">
+            <p-tag *ngIf="event.category" [value]="event.category" severity="secondary"></p-tag>
+            <p-tag *ngIf="event.max_players"
+                   [value]="event.players_count + '/' + event?.max_players"
+                   [severity]="event.players_badge_color">
+            </p-tag>
+          </div>
+          <div class="w-12rem1 w-full block sm:w-12rem md:w-full lg:w-12rem">
+            <p-progress-bar
+              [color]="event.progress_bar_color"
+              [value]="(event.players_count / (event?.max_players || (event.players_count) + 10)) * 100"
+              [showValue]="false">
+            </p-progress-bar>
+          </div>
+        </div>
+      </div>
+      <div class="mt-3" *ngIf="event?.note"><strong>Note:</strong> {{ event?.note }}</div>
+
+      <p-divider/>
+      <div class="flex flex-wrap flex-column sm:flex-row md:flex-column lg:flex-row gap-2">
+        <button
+          pButton
+          type="button"
+          label="Prenota"
+          icon="pi pi-user-plus"
+          [disabled]="loading || !event.can_join"
+          (click)="onJoin()">
+        </button>
+
+        <button
+          pButton
+          type="button"
+          label="Cancella"
+          icon="pi pi-user-minus"
+          [disabled]="loading || !event.can_remove"
+          (click)="onRemove()"
+          class="p-button-secondary">
+        </button>
+      </div>
+
+      <div class="mb-2 mt-2" *ngIf="loading">
+        <p-progress-bar mode="indeterminate" [style]="{ height: '6px' }"/>
+      </div>
+
+      @if (!loading && event?.status_message) {
+        <p-divider/>
+        <div class="flex flex-column gap-2">
+          <p-message [severity]="event.status_message.type"
+                     [icon]="event.status_message.icon">{{ event.status_message.text }}
+          </p-message>
+        </div>
+
+      }
+    </div>
+
+    <!-- Right: Partecipanti -->
+    <div *ngIf="event" class="flex-1">
+      <h2 class="m-0 line-height-3">Partecipanti</h2>
+      <div class="flex align-items-center justify-content-between mb-3">
+        <div class="text-500">Totale</div>
+        <div class="flex align-items-center gap-2">
+          <p-badge [value]="event.players_count" [severity]="event.players_badge_color"></p-badge>
+          <span *ngIf="event?.max_players" class="text-500">/ {{ event?.max_players }}</span>
+        </div>
+      </div>
+      <p-divider/>
+
+      <ul class="list-none p-0 m-0">
+        <li
+          [ngStyle]="{ 'background': p.current_user ? 'var(--p-message-info-background)' : '' }"
+          *ngFor="let p of event.players; let i = index; "
+          class="flex align-items-center justify-content-between p-2 border-bottom-1 surface-border">
+
+          <div class="flex align-items-center gap-3">
+            <span class="text-500">{{ i + 1 }}.</span>
+
+            @if (p.avatar) {
+              <p-avatar
+                [image]="p.avatar"
+                shape="circle"
+                size="large"></p-avatar>
+            } @else {
+              <p-avatar
+                [label]="p.monogram"
+                shape="circle"
+                size="large"></p-avatar>
+            }
+
+            <div class="flex flex-column">
+              <span class="font-medium">{{ p.full_name }}</span>
+              <small class="text-500"
+                     *ngIf="p.reservation_date">{{ p.reservation_date | date:'d MMMM y, HH:mm' }}</small>
+            </div>
+          </div>
+
+        </li>
+      </ul>
+
+      <div *ngIf="!event.players?.length" class="text-500 mt-2">
+        Nessun partecipante ancora.
+      </div>
+    </div>
+
+    <div *ngIf="!event" class="flex-1">
+      <p-skeleton height="2rem" width="60%" styleClass="mb-2"/>
+      <p-skeleton styleClass="mb-2"/>
+      <p-skeleton width="50%" styleClass="mb-2"/>
+      <p-skeleton width="25%" styleClass="mb-2"/>
+      <p-skeleton height="2rem" styleClass="mb-2"/>
+      <p-skeleton width="50%" height="4rem"/>
+    </div>
+    <div *ngIf="!event" class="flex-1">
+      <p-skeleton height="2rem" width="60%" styleClass="mb-2"/>
+      <p-skeleton styleClass="mb-4"/>
+      <ul class="m-0 p-0 list-none">
+        <li class="mb-4">
+          <div class="flex">
+            <p-skeleton shape="circle" size="4rem" styleClass="mr-2"/>
+            <div class="self-center" style="flex: 1">
+              <p-skeleton width="100%" styleClass="mb-2"/>
+              <p-skeleton width="75%"/>
+            </div>
+          </div>
+        </li>
+        <li class="mb-4">
+          <div class="flex">
+            <p-skeleton shape="circle" size="4rem" styleClass="mr-2"/>
+            <div class="self-center" style="flex: 1">
+              <p-skeleton width="100%" styleClass="mb-2"/>
+              <p-skeleton width="75%"/>
+            </div>
+          </div>
+        </li>
+        <li class="mb-4">
+          <div class="flex">
+            <p-skeleton shape="circle" size="4rem" styleClass="mr-2"/>
+            <div class="self-center" style="flex: 1">
+              <p-skeleton width="100%" styleClass="mb-2"/>
+              <p-skeleton width="75%"/>
+            </div>
+          </div>
+        </li>
+        <li>
+          <div class="flex">
+            <p-skeleton shape="circle" size="4rem" styleClass="mr-2"/>
+            <div class="self-center" style="flex: 1">
+              <p-skeleton width="100%" styleClass="mb-2"/>
+              <p-skeleton width="75%"/>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+    </div>
+  </div>
+</div>
+
+<p-confirm-dialog/>

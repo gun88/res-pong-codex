@@ -1,0 +1,106 @@
+<div class="rp-large-page">
+  <h2>Storico Prenotazioni</h2>
+  <div class="mb-2 mt-2" *ngIf="error">
+    <p-message size="small" icon="pi pi-exclamation-circle" severity="error">{{ error }}</p-message>
+  </div>
+
+  <div>
+
+    <p-table
+      [value]="reservations"
+      [columns]="cols"
+      [loading]="loading"
+      showGridlines
+      responsiveLayout="stack"
+      breakpoint="768px"
+      [paginator]="true"
+      [rows]="10"
+      [rowsPerPageOptions]="[5,10,20]"
+      styleClass="rp-responsive-table">
+
+      <ng-template pTemplate="header" let-columns>
+        <tr>
+
+          <th pSortableColumn="name">
+            <div>
+              <span>Evento</span>
+              <p-sortIcon field="name"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="date">
+            <div>
+              <span>Data</span>
+              <p-sortIcon field="date"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="duration">
+            <div>
+              <span>Durata</span>
+              <p-sortIcon field="duration"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="creation_date">
+            <div>
+              <span>Prenotazione</span>
+              <p-sortIcon field="creation_date"></p-sortIcon>
+            </div>
+          </th>
+          <th pSortableColumn="presence_confirmed">
+            <div>
+              <span>Presenza</span>
+              <p-sortIcon field="presence_confirmed"></p-sortIcon>
+            </div>
+          </th>
+          <th>Azioni</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-row let-columns="columns">
+        <tr>
+          <td>
+            <span class="rp-column-title">Evento:</span>
+            <span>{{ row['name'] }}</span>
+          </td>
+          <td>
+            <span class="rp-column-title">Data:</span>
+
+            <span>{{ row['date'] | date:'EEEE d MMMM y, HH:mm' }}</span>
+          </td>
+          <td>
+            <span class="rp-column-title">Durata:</span>
+
+            <span>{{ row['duration'] }}</span>
+          </td>
+          <td>
+            <span class="rp-column-title">Prenotazione:</span>
+            <span>{{ row['creation_date'] | date:'EEEE d MMMM y, HH:mm' }}</span>
+          </td>
+          <td class="rp-presence-col rp-presence-s{{row['presence_confirmed']}} text-center">
+            <span *ngIf="row['presence_confirmed'] != 'future'" class="rp-column-title">Presenza:</span>
+            @if (row['presence_confirmed'] === 'future') {
+
+            } @else if (row['presence_confirmed'] == 1) {
+              <i class="pi pi-check-circle text-green-500"></i>
+            } @else {
+              <i class="pi pi-times-circle text-red-500"></i>
+            }
+          </td>
+          <td class="rp-action-col">
+            <div class="rp-col-desktop">
+              <p-button label="Apri" variant="text" size="small" icon="pi pi-search"
+                        routerLink="/events/{{ row.event_id }}" severity="primary" rounded/>
+            </div>
+            <div class="rp-col-mobile">
+              <p-button label="Apri" size="small" icon="pi pi-search" styleClass="w-full"
+                        routerLink="/events/{{ row.event_id }}" severity="primary"/>
+            </div>
+
+
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+
+  </div>
+</div>
+

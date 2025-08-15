@@ -1,0 +1,34 @@
+.rp-timeline-marker-day {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--p-surface-500);
+  border-radius: 50%;
+  padding: .7rem;
+  aspect-ratio: 1;
+  align-items: center;
+
+  .rp-timeline-marker-day-number {
+    font-size: .8rem;
+    color: var(--p-surface-700);
+
+
+  }
+
+  .rp-timeline-marker-day-name {
+    font-size: .6rem;
+    color: var(--p-red-800);
+    font-weight: 500;
+  }
+}
+
+.rp-timeline-content-day {
+  padding: .7rem 0;
+  max-width: 250px;
+  min-width: 240px;
+  .rp-timeline-content-day-no-event {
+    font-style: italic;
+    color: var(--p-surface-700);
+    font-size: .8rem;
+  }
+}

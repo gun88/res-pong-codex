@@ -1,0 +1,39 @@
+<p-timeline [value]="days" *ngIf="days?.length > 0"
+            align="left" styleClass="rp-timeline">
+  <ng-template #marker let-day>
+    <div class="rp-timeline-marker-day">
+      <div class="rp-timeline-marker-day-number">{{ day.day }}</div>
+      <div class="rp-timeline-marker-day-name">{{ day.dayName }}</div>
+    </div>
+
+  </ng-template>
+  <ng-template #content let-day>
+    <div class="rp-timeline-content-day">
+      <div *ngIf="!loading && _events[day.date]" class="rp-calendar-events">
+        <div *ngFor="let e of _events[day.date]; let i = index; " class="rp-calendar-event">
+          <div (click)="onSelectEvent(e)"
+               class="rp-calendar-label rp-calendar-label-{{e.status}} {{e.booked ? 'rp-calendar-label-booked' : ''}}">
+            <div class="rp-calendar-label-badge">
+              <span class="rp-calendar-label-time">{{ e.time }}&nbsp;-&nbsp;</span>
+              <span class="rp-calendar-label-name">{{ e.name }}</span>
+              <span *ngIf="e.count" class="rp-calendar-label-count">&nbsp;-&nbsp;{{ e.count }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="!loading && !_events[day.date]" class="rp-timeline-content-day-no-event">(Nessun evento)</div>
+      <div *ngIf="loading">
+        <p-skeleton height="2rem" styleClass="mb-2"/>
+      </div>
+    </div>
+  </ng-template>
+</p-timeline>
+<div *ngIf="!showAll && !loading && days.length == 0">
+  <p-message icon="pi pi-info-circle" severity="secondary" text="Nessun evento per questo mese"></p-message>
+</div>
+<div class="flex items-center justify-content-center gap-1 my-3 align-items-center">
+  <div>
+    <p-toggleswitch [(ngModel)]="showAll" (onChange)="showAllToggle()"/>
+  </div>
+  <div>Mostra tutto</div>
+</div>
