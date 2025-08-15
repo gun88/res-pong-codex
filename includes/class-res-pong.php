@@ -42,9 +42,27 @@ class Res_Pong {
 
     public function activate() {
         $this->admin_repository->create_tables();
+        if (!RES_PONG_DEV) {
+            $this->copy_app_folder();
+        }
     }
 
     public function deactivate() {
         error_log('deactivate res-pong');
+    }
+
+    private function copy_app_folder() {
+        $src = RES_PONG_PLUGIN_DIR . 'app';
+        $dest = ABSPATH . 'prenotazioni';
+
+        if (!file_exists($src)) {
+            return;
+        }
+
+        if (!file_exists($dest)) {
+            mkdir($dest, 0755, true);
+        }
+
+        res_pong_recursive_copy($src, $dest);
     }
 }
