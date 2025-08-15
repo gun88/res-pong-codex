@@ -784,13 +784,14 @@
                 recipients: recipients
             };
             btn.prop('disabled', true);
+            showOverlay(true);
             $.ajax({
                 url: rp_admin.rest_url + 'email',
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                complete: function(){ btn.prop('disabled', false); },
+                complete: function(){ btn.prop('disabled', false); hideOverlay(); },
                 success: function(){ showButtonMessage(btn, 'success', 'Email inviata'); },
                 error: function(xhr){
                     var msg = 'Errore invio email';
