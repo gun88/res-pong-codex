@@ -150,38 +150,40 @@ class Res_Pong_Admin_Frontend {
         echo ' <button type="button" class="button" id="res-pong-impersonate"' . ( $editing ? '' : ' disabled' ) . '>' . esc_html__('Impersona', 'res-pong') . '</button>';
         echo ' <a href="' . esc_url(admin_url('admin.php?page=res-pong-users')) . '" class="button button-secondary" id="res-pong-back">' . esc_html__('Indietro', 'res-pong') . '</a>';
         echo '</p></form>';
-        echo '<h2>' . esc_html__('Reset password', 'res-pong') . '</h2>';
-        echo '<form id="res-pong-password-form" data-entity="users" data-id="' . esc_attr($id) . '">';
-        echo '<table class="form-table">';
-        echo '<tr><th><label for="new_password">Nuova password</label></th><td><input name="new_password" id="new_password" type="password"></td></tr>';
-        echo '<tr><th><label for="confirm_password">Conferma password</label></th><td><input name="confirm_password" id="confirm_password" type="password"></td></tr>';
-        echo '</table>';
-        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva password', 'res-pong') . '</button></p>';
-        echo '</form>';
-        echo '<div id="rp-invite-wrapper" style="display:none;">';
-        echo '<h2>' . esc_html__('Invia Messaggio di Invito', 'res-pong') . '</h2>';
-        echo '<p><input type="text" readonly class="large-text" style="max-width: 600px;" id="rp-invite-subject" value="' . esc_attr($config['invitation_subject']) . '"></p>';
-        echo '<p style=" margin-bottom: 0;"><textarea id="rp-invite-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;">' . esc_textarea($config['invitation_text']) . '</textarea></p>';
-        echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
-        echo '<p><button type="button" class="button button-primary" id="rp-send-invite">' . esc_html__('Invia', 'res-pong') . '</button></p>';
-        echo '</div>';
-        echo '<div id="rp-reset-wrapper" style="display:none;">';
-        echo '<h2>' . esc_html__('Invia link di reset password', 'res-pong') . '</h2>';
-        echo '<p><input type="text" readonly class="large-text" style="max-width: 600px;" id="rp-reset-subject" value="' . esc_attr($config['reset_password_subject']) . '"></p>';
-        echo '<p style=" margin-bottom: 0;"><textarea id="rp-reset-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;">' . esc_textarea($config['reset_password_text']) . '</textarea></p>';
-        echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
-        echo '<p><button type="button" class="button button-primary" id="rp-send-reset">' . esc_html__('Invia', 'res-pong') . '</button></p>';
-        echo '</div>';
-        $default_timeout = date('Y-m-d\\T00:00:00', strtotime('+7 days'));
-        echo '<h2>' . esc_html__('Timeout', 'res-pong') . '</h2>';
-        echo '<form id="res-pong-timeout-form" data-entity="users" data-id="' . esc_attr($id) . '">';
-        echo '<table class="form-table">';
-        echo '<tr><th><label for="timeout">Timeout</label></th><td><input name="timeout" id="timeout" type="datetime-local" step="1" value="' . esc_attr($default_timeout) . '"></td></tr>';
-        echo '</table>';
-        echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva timeout', 'res-pong') . '</button></p>';
-        echo '</form>';
-        echo '<h2>' . esc_html__('Prenotazioni utente', 'res-pong') . '</h2>';
-        echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';
+        if ($editing) {
+            echo '<h2>' . esc_html__('Reset password', 'res-pong') . '</h2>';
+            echo '<form id="res-pong-password-form" data-entity="users" data-id="' . esc_attr($id) . '">';
+            echo '<table class="form-table">';
+            echo '<tr><th><label for="new_password">Nuova password</label></th><td><input name="new_password" id="new_password" type="password"></td></tr>';
+            echo '<tr><th><label for="confirm_password">Conferma password</label></th><td><input name="confirm_password" id="confirm_password" type="password"></td></tr>';
+            echo '</table>';
+            echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva password', 'res-pong') . '</button></p>';
+            echo '</form>';
+            echo '<div id="rp-invite-wrapper" style="display:none;">';
+            echo '<h2>' . esc_html__('Invia Messaggio di Invito', 'res-pong') . '</h2>';
+            echo '<p><input type="text" readonly class="large-text" style="max-width: 600px;" id="rp-invite-subject" value="' . esc_attr($config['invitation_subject']) . '"></p>';
+            echo '<p style=" margin-bottom: 0;"><textarea id="rp-invite-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;">' . esc_textarea($config['invitation_text']) . '</textarea></p>';
+            echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
+            echo '<p><button type="button" class="button button-primary" id="rp-send-invite">' . esc_html__('Invia', 'res-pong') . '</button></p>';
+            echo '</div>';
+            echo '<div id="rp-reset-wrapper" style="display:none;">';
+            echo '<h2>' . esc_html__('Invia link di reset password', 'res-pong') . '</h2>';
+            echo '<p><input type="text" readonly class="large-text" style="max-width: 600px;" id="rp-reset-subject" value="' . esc_attr($config['reset_password_subject']) . '"></p>';
+            echo '<p style=" margin-bottom: 0;"><textarea id="rp-reset-text" rows="5" class="large-text" style="max-width:600px;min-height:10rem;">' . esc_textarea($config['reset_password_text']) . '</textarea></p>';
+            echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
+            echo '<p><button type="button" class="button button-primary" id="rp-send-reset">' . esc_html__('Invia', 'res-pong') . '</button></p>';
+            echo '</div>';
+            $default_timeout = date('Y-m-d\\T00:00:00', strtotime('+7 days'));
+            echo '<h2>' . esc_html__('Timeout', 'res-pong') . '</h2>';
+            echo '<form id="res-pong-timeout-form" data-entity="users" data-id="' . esc_attr($id) . '">';
+            echo '<table class="form-table">';
+            echo '<tr><th><label for="timeout">Timeout</label></th><td><input name="timeout" id="timeout" type="datetime-local" step="1" value="' . esc_attr($default_timeout) . '"></td></tr>';
+            echo '</table>';
+            echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva timeout', 'res-pong') . '</button></p>';
+            echo '</form>';
+            echo '<h2>' . esc_html__('Prenotazioni utente', 'res-pong') . '</h2>';
+            echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';
+        }
         $this->render_progress_overlay();
         echo '</div>';
     }
@@ -214,9 +216,9 @@ class Res_Pong_Admin_Frontend {
         echo '</p></form>';
         if ($editing) {
             echo '<p><a class="button" href="' . esc_url(admin_url('admin.php?page=res-pong-email&event_id=' . $id)) . '">Contatta i partecipanti</a></p>';
+            echo '<h2>' . esc_html__('Prenotazioni evento', 'res-pong') . '</h2>';
+            echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
         }
-        echo '<h2>' . esc_html__('Prenotazioni evento', 'res-pong') . '</h2>';
-        echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
         $this->render_progress_overlay();
         echo '</div>';
     }
