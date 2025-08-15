@@ -343,7 +343,20 @@
                     contentType: false,
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); input.remove(); },
-                    success: function(){ dt.ajax.reload(); showNotice('success', 'Importazione Completata'); },
+                    success: function(res){
+                        dt.ajax.reload();
+                        var msg = 'Importazione completata';
+                        if(res && res.skipped && res.skipped.length){
+                            msg += '. Utenti scartati: ' + res.skipped.map(function(u){
+                                var base = u.email || u.id || 'n/a';
+                                if(u.reasons && u.reasons.length){
+                                    return base + ' (' + u.reasons.join(', ') + ')';
+                                }
+                                return base;
+                            }).join(', ');
+                        }
+                        showNotice('success', msg);
+                    },
                     error: function(xhr){
                         var msg = 'Importazione fallita';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
@@ -742,7 +755,7 @@
                 });
                 toInput.autocomplete({
                     source: function(request, response){
-                        var term = request.term.toLowerCase();
+                        var term = request.term.toLowerCase().split(/,\s*/).pop();
                         response(items.filter(function(it){ return it.search.indexOf(term) !== -1; }));
                     },
                     minLength: 0,
