@@ -347,13 +347,14 @@
                         dt.ajax.reload();
                         var msg = 'Importazione completata';
                         if(res && res.skipped && res.skipped.length){
-                            msg += '. Utenti scartati: ' + res.skipped.map(function(u){
+                            msg += '<br>Utenti scartati:';
+                            res.skipped.forEach(function(u){
                                 var base = u.email || u.id || 'n/a';
                                 if(u.reasons && u.reasons.length){
-                                    return base + ' (' + u.reasons.join(', ') + ')';
+                                    base += ' (' + u.reasons.join(', ') + ')';
                                 }
-                                return base;
-                            }).join(', ');
+                                msg += '<br>' + base;
+                            });
                         }
                         showNotice('success', msg);
                     },
