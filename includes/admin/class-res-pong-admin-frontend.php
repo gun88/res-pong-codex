@@ -200,7 +200,7 @@ class Res_Pong_Admin_Frontend {
         echo '<h1>' . ($editing ? esc_html__('Modifica evento', 'res-pong') : esc_html__('Aggiungi evento', 'res-pong')) . '</h1>';
         echo '<form id="res-pong-detail-form" data-entity="events" data-id="' . esc_attr($id) . '">';
         echo '<table class="form-table">';
-        echo '<tr><th><label for="group_id">ID gruppo</label></th><td><select name="group_id" id="group_id"></select></td></tr>';
+        echo '<tr><th><label for="group_id">Gruppo</label></th><td><select name="group_id" id="group_id"></select></td></tr>';
         echo '<tr id="recurrence_row"><th><label for="recurrence">Ricorrenza</label></th><td><select name="recurrence" id="recurrence"><option value="none">Mai</option><option value="daily">Giornaliera</option><option value="weekly">Settimanale</option><option value="monthly">Mensile</option></select></td></tr>';
         echo '<tr id="recurrence_end_row"><th><label for="recurrence_end">Termine ricorrenza</label></th><td><input name="recurrence_end" id="recurrence_end" type="date" disabled></td></tr>';
         echo '<tr><th><label for="category">Categoria</label></th><td><input name="category" id="category" type="text"></td></tr>';

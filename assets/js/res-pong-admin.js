@@ -42,17 +42,7 @@
         btn.after(notice);
     }
     function rpConfirm(message){
-        return new Promise(function(resolve){
-            $('<div>').text(message).dialog({
-                modal: true,
-                title: 'Conferma',
-                buttons: {
-                    'Sì': function(){ $(this).dialog('close'); resolve(true); },
-                    'No': function(){ $(this).dialog('close'); resolve(false); }
-                },
-                close: function(){ $(this).remove(); }
-            });
-        });
+        return Promise.resolve(window.confirm(message));
     }
     function restUrl(path, params){
         var url = rp_admin.rest_url + path;
@@ -104,7 +94,7 @@
             { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.id + '">' + d + '</a>'; } },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'group_id', title: 'Gruppo', render: function(d, type, row){
-                if(!d){ return ''; }
+                if(!d || !row.group_name){ return ''; }
                 if(type === 'display'){
                     return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + row.group_name + ' (' + d + ')</a>';
                 }
@@ -303,7 +293,7 @@
         if(!opts.noCsv){
             toolbar.append(separator2, importBtn, exportBtn);
         }
-        var addFilter = opts.filterFuture || entity === 'events' || entity === 'reservations';
+        var addFilter = typeof opts.filterFuture === 'boolean' ? opts.filterFuture : (entity === 'events' || entity === 'reservations');
         if(addFilter){
             var separator3 = $('<span>•</span>');
             var futureFilter = $('<label>Filtra <select class="rp-future-filter"><option value="0">Solo Futuro</option><option value="1">Mostra tutto</option></select></label>');
@@ -433,6 +423,12 @@
                         field.val(data[key].replace(' ', 'T'));
                     } else {
                         field.val(data[key]);
+                    }
+                }
+                if(entity === 'events' && data.group_id){
+                    var gSel = form.find('[name=group_id]');
+                    if(!gSel.find('option[value="' + data.group_id + '"]').length){
+                        gSel.val('');
                     }
                 }
                 if(typeof data.password !== 'undefined'){
@@ -834,7 +830,7 @@
         var er = $('#res-pong-event-reservations');
         if(er.length){
             var eid = er.data('event');
-            initTable(er, 'reservations', function(showAll){ return restUrl('reservations', 'event_id=' + eid + '&active_only=' + (showAll ? '0' : '1')); }, { addParams: 'event_id=' + eid, noCsv: true, filterFuture: true });
+            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid); }, { addParams: 'event_id=' + eid, noCsv: true, filterFuture: false });
         }
         initDetail();
         initEmailPage();
