@@ -3,6 +3,7 @@
 defined('ABSPATH') || exit;
 
 require_once RES_PONG_PLUGIN_DIR . 'includes/common/class-res-pong-configuration.php';
+require_once RES_PONG_PLUGIN_DIR . 'includes/common/class-res-pong-util.php';
 
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-repository.php';
 require_once RES_PONG_PLUGIN_DIR . 'includes/admin/class-res-pong-admin-service.php';

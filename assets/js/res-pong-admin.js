@@ -159,13 +159,14 @@
         table.on('click', '.rp-delete', function(){
             var id = $(this).data('id');
             var row = table.DataTable().row($(this).closest('tr')).data();
-            var url = rp_admin.rest_url + entity + '/' + id;
+            var path = entity + '/' + id;
+            var params = '';
             var proceed = function(){
                 if(!confirm('Eliminare l\'elemento?')){ return; }
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: url,
+                    url: restUrl(path, params),
                     method: 'DELETE',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
@@ -179,7 +180,7 @@
             };
             if(entity === 'events' && row.group_id !== null){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
-                    if(apply){ url += '&apply_group=1'; }
+                    if(apply){ params = 'apply_group=1'; }
                     proceed();
                 });
             } else {
@@ -195,12 +196,13 @@
             }else{
                 data.enabled = row.enabled == 1 ? 0 : 1;
             }
-            var url = rp_admin.rest_url + entity + '/' + id;
+            var path = entity + '/' + id;
+            var params = '';
             var send = function(){
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: url,
+                    url: restUrl(path, params),
                     method: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -216,7 +218,7 @@
             };
             if(entity === 'events' && row.group_id !== null){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
-                    if(apply){ url += '&apply_group=1'; }
+                    if(apply){ params = 'apply_group=1'; }
                     send();
                 });
             } else {
@@ -229,7 +231,7 @@
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id + '/invite',
+                    url: restUrl( 'users/' + id + '/invite'),
                     method: 'POST',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
@@ -246,13 +248,15 @@
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id + '/impersonate',
+                    url: restUrl('users/' + id + '/impersonate'),
                     method: 'POST',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
-                    success: function(resp){ if(resp && resp.url){ window.open(resp.url, '_blank'); } },
+                    success: function(resp){ if(resp && resp.url){
+                        localStorage.setItem('res_pong_user', JSON.stringify(resp.user));
+                        window.open(resp.url, '_blank'); } },
                     error: function(xhr){
-                        var msg = 'Impersonazione fallita';
+                        var msg = 'Impersonificazione fallita';
                         if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                         showNotice('error', msg);
                     }
@@ -360,7 +364,7 @@
                     clearNotice();
                     showOverlay(true);
                     $.ajax({
-                        url: rp_admin.rest_url + entity + '/import',
+                        url: restUrl(entity + '/import'),
                         method: 'POST',
                         data: formData,
                         processData: false,
@@ -394,7 +398,7 @@
                 function next(){
                     if(i >= ids.length){ hideOverlay(); dt.ajax.reload(); return; }
                     var id = ids[i];
-                    var url = rp_admin.rest_url + entity + '/' + id;
+                    var url = restUrl(entity + '/' + id);
                     var method = action === 'delete' ? 'DELETE' : 'PUT';
                     var data = null;
                     if(action === 'enable'){ data = entity === 'reservations' ? { presence_confirmed:1 } : { enabled:1 }; }
@@ -427,7 +431,7 @@
     }
     function populateForm(entity, id, form){
         $.ajax({
-            url: rp_admin.rest_url + entity + '/' + id,
+            url: restUrl(entity + '/' + id),
             method: 'GET',
             beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
             success: function(data){
@@ -472,7 +476,7 @@
         var preEvent = params.get('event_id');
         function loadReservationOptions(callback){
             var uReq = $.ajax({
-                url: rp_admin.rest_url + 'users',
+                url: restUrl('users'),
                 method: 'GET',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             });
@@ -558,10 +562,11 @@
                 data[this.name] = val.replace('T', ' ');
             });
             var method = id ? 'PUT' : 'POST';
-            var url = rp_admin.rest_url + entity + (id ? '/' + id : '');
+            var path = entity + '/' + id;
+            var params = '';
             var send = function(){
                 $.ajax({
-                    url: url,
+                    url: restUrl(path, params),
                     method: method,
                     contentType: 'application/json',
                     data: JSON.stringify(data),
@@ -599,7 +604,7 @@
                     var gid = opt.data('group');
                     if(gid === undefined || gid === null || gid === ''){
                         $.ajax({
-                            url: rp_admin.rest_url + 'events/' + data.group_id,
+                            url: restUrl('events/' + data.group_id),
                             method: 'PUT',
                             contentType: 'application/json',
                             data: JSON.stringify({ group_id: 0 }),
@@ -619,7 +624,7 @@
             };
             if(entity === 'events' && id && form.data('has_group')){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
-                    if(apply){ url += '&apply_group=1'; }
+                    if(apply){ params = 'apply_group=1'; }
                     submit();
                 });
             } else {
@@ -629,13 +634,14 @@
         $('#res-pong-delete').on('click', function(e){
             e.preventDefault();
             if(!id){ return; }
-            var url = rp_admin.rest_url + entity + '/' + id;
+            var path = entity + '/' + id;
+            var params = '';
             var executeDelete = function(){
                 if(!confirm('Eliminare l\'elemento?')){ return; }
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: url,
+                    url: restUrl(path, params),
                     method: 'DELETE',
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
@@ -651,7 +657,7 @@
             };
             if(entity === 'events' && form.data('has_group')){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
-                    if(apply){ url += '&apply_group=1'; }
+                    if(apply){ params = 'apply_group=1'; }
                     executeDelete();
                 });
             } else {
@@ -663,13 +669,15 @@
             clearNotice();
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + 'users/' + id + '/impersonate',
+                url: restUrl('users/' + id + '/impersonate'),
                 method: 'POST',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 complete: function(){ hideOverlay(); },
-                success: function(resp){ if(resp && resp.url){ window.open(resp.url, '_blank'); } },
+                success: function(resp){ if(resp && resp.url){
+                    localStorage.setItem('res_pong_user', JSON.stringify(resp.user));
+                    window.open(resp.url, '_blank'); } },
                 error: function(xhr){
-                    var msg = 'Impersonazione fallita';
+                    var msg = 'Impersonificazione fallita';
                     if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
                     showNotice('error', msg);
                 }
@@ -688,7 +696,7 @@
             clearNotice();
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + 'users/' + id + '/reset-password',
+                url: restUrl('users/' + id + '/reset-password'),
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ password: pass }),
@@ -707,7 +715,7 @@
             clearNotice();
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + 'users/' + id + '/invite',
+                url: restUrl('users/' + id + '/invite'),
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ text: text }),
@@ -726,7 +734,7 @@
             clearNotice();
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + 'users/' + id + '/reset-password',
+                url: restUrl('users/' + id + '/reset-password'),
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ text: text }),
@@ -751,7 +759,7 @@
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id,
+                    url: restUrl('users/' + id),
                     method: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify({ timeout: val.replace('T', ' ') }),
@@ -769,7 +777,7 @@
                 clearNotice();
                 showOverlay(true);
                 $.ajax({
-                    url: rp_admin.rest_url + 'users/' + id,
+                    url: restUrl('users/' + id),
                     method: 'PUT',
                     contentType: 'application/json',
                     data: JSON.stringify({ timeout: null }),
@@ -795,7 +803,7 @@
         var toInput = $('#rp-messenger-to');
         var btn = form.find('button[type=submit]');
         $.ajax({
-            url: rp_admin.rest_url + 'users',
+            url: restUrl('users'),
             method: 'GET',
             beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
             success: function(users){
@@ -830,7 +838,7 @@
         var eventId = params.get('event_id');
         if(eventId){
             $.ajax({
-                url: rp_admin.rest_url + 'reservations?event_id=' + eventId + '&active_only=1',
+                url: restUrl('reservations', 'event_id=' + eventId + '&active_only=1'),
                 method: 'GET',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 success: function(res){
@@ -850,7 +858,7 @@
             btn.prop('disabled', true);
             showOverlay(true);
             $.ajax({
-                url: rp_admin.rest_url + 'email',
+                url: restUrl('email'),
                 method: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(data),

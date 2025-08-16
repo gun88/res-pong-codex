@@ -164,5 +164,11 @@ class Res_Pong_User_Repository {
         return $this->wpdb->get_results($this->wpdb->prepare($query, $user_id, $start, $end));
     }
 
+    public function get_fitet_monitor_id($id) {
+        $query = "SELECT id FROM {$this->wpdb->prefix}fitet_monitor_players WHERE code = %s";
+        return $this->wpdb->get_var($this->wpdb->prepare($query, $id));
+    }
+
+
 
 }

@@ -281,16 +281,16 @@ class Res_Pong_Admin_Service {
 
     public function rest_impersonate_user($request) {
         $id = $request['id'];
-        $user = $this->repository->get_user($id);
+        $user = (object) $this->repository->get_user($id);
         if (!$user) {
             return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
-        $expires = time() + HOUR_IN_SECONDS;
-        $payload = $id . '|' . $expires;
-        $hash = hash_hmac('sha256', $payload, RES_PONG_COOKIE_KEY);
-        $token = $payload . '|' . $hash;
-        setcookie(RES_PONG_COOKIE_NAME, $token, $expires, '/', COOKIE_DOMAIN, is_ssl(), true);
-        return new WP_REST_Response(['url' => home_url('/')], 200);
+        $ttl = HOUR_IN_SECONDS;
+        $token = Res_Pong_Util::res_pong_token_make((int)$user->id, $ttl);
+        Res_Pong_Util::res_pong_clear_cookie();
+        Res_Pong_Util::res_pong_set_cookie($token, $ttl);
+        Res_Pong_Util::adjust_user($user);
+        return new WP_REST_Response(['url' => $this->configuration->get('app_url'), 'user' => $user], 200);
     }
 
     public function rest_send_email($request) {
