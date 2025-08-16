@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  server: ''
+  server: '/index.php'
 }
