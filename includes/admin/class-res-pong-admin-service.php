@@ -196,7 +196,7 @@ class Res_Pong_Admin_Service {
         $token = $this->generate_reset_token();
         $this->repository->update_user($id, ['reset_token' => $token]);
 
-        $url = $this->configuration->get('first_access_page_url') . '?token=' . $this->base64url_encode($token);
+        $url = $this->configuration->get('app_url') . '/#/first-access?token=' . $this->base64url_encode($token);
         $params = $request->get_json_params();
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('invitation_text');
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
@@ -226,7 +226,7 @@ class Res_Pong_Admin_Service {
         }
         $token = $this->generate_reset_token();
         $this->repository->update_user($id, ['reset_token' => $token]);
-        $url = $this->configuration->get('password_update_page_url') . '?token=' . $this->base64url_encode($token);
+        $url = $this->configuration->get('app_url') . '/#/password-update?token=' . $this->base64url_encode($token);
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('reset_password_text');
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
         $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];

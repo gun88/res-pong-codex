@@ -94,8 +94,7 @@ class Res_Pong_Admin_Frontend {
                 'max_active_reservations'  => isset($_POST['max_active_reservations']) ? intval($_POST['max_active_reservations']) : 0,
                 'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
                 'default_email_address'    => isset($_POST['default_email_address']) ? sanitize_email($_POST['default_email_address']) : '',
-                'first_access_page_url'    => isset($_POST['first_access_page_url']) ? esc_url_raw($_POST['first_access_page_url']) : '',
-                'password_update_page_url' => isset($_POST['password_update_page_url']) ? esc_url_raw($_POST['password_update_page_url']) : '',
+                'app_url' => isset($_POST['app_url']) ? esc_url_raw($_POST['app_url']) : '',
                 'invitation_subject'       => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
                 'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
                 'reset_password_subject'   => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
@@ -115,12 +114,11 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="max_active_reservations">Max prenotazioni attive</label></th><td><input name="max_active_reservations" id="max_active_reservations" type="number" value="' . esc_attr($config['max_active_reservations']) . '"></td></tr>';
         echo '<tr><th><label for="next_reservation_delay">Ritardo prossima prenotazione</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
         echo '<tr><th><label for="default_email_address">Email di default</label></th><td><input name="default_email_address" id="default_email_address" type="email" class="regular-text" value="' . esc_attr($config['default_email_address']) . '"></td></tr>';
+        echo '<tr><th><label for="app_url">URL Applicazione</label></th><td><input name="app_url" id="app_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['app_url']) . '"></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail primo accesso</h2></th></tr>';
-        echo '<tr><th><label for="first_access_page_url">URL pagina primo accesso</label></th><td><input name="first_access_page_url" id="first_access_page_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['first_access_page_url']) . '"></td></tr>';
         echo '<tr><th><label for="invitation_subject">Oggetto invito</label></th><td><input name="invitation_subject" id="invitation_subject" type="text" class="large-text" style="max-width:600px;" value="' . esc_attr($config['invitation_subject']) . '"></td></tr>';
         echo '<tr><th><label for="invitation_text">Testo invito</label></th><td><textarea name="invitation_text" id="invitation_text" rows="3" class="large-text" style="max-width:600px;min-height:10rem">' . esc_textarea($config['invitation_text']) . '</textarea><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail aggiornamento password</h2></th></tr>';
-        echo '<tr><th><label for="password_update_page_url">URL pagina aggiornamento password</label></th><td><input name="password_update_page_url" id="password_update_page_url" style="max-width:600px;" class="large-text" type="text" value="' . esc_attr($config['password_update_page_url']) . '"></td></tr>';
         echo '<tr><th><label for="reset_password_subject">Oggetto reset password</label></th><td><input name="reset_password_subject" id="reset_password_subject" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['reset_password_subject']) . '"></td></tr>';
         echo '<tr><th><label for="reset_password_text">Testo reset password</label></th><td><textarea name="reset_password_text" id="reset_password_text" rows="3" class="large-text" style="max-width:600px;min-height:10rem">' . esc_textarea($config['reset_password_text']) . '</textarea><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
         echo '</table>';
