@@ -11,7 +11,7 @@ class Res_Pong_Configuration {
         'first_access_page_url' => 'https://localhost/#/first-access',
         'password_update_page_url' => 'https://localhost/#/password-update',
         'invitation_subject' => 'Portale Prenotazioni - Effettua il tuo primo accesso',
-        'invitation_text' => "Ciao #first_name,\n\nBenvenuto nel portale prenotazioni!\nClicca sul seguente link per effettuare il primo accesso.",
+        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel portale prenotazioni!\nClicca sul link per effettuare il primo accesso.",
         'reset_password_subject' => 'Portale Prenotazioni - Reset password',
         'reset_password_text' => "Ciao #first_name,\n\nAbbiamo ricevuto una richiesta di reset della tua password. Se non sei stato tu a richiedere il reset, ignora questa email, altrimenti clicca sul seguente link per reimpostare la tua password.",
     ];
