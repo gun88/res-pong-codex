@@ -131,22 +131,22 @@
             { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + ' (' + row.event_id + ')</a>'; } },
             { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
             { data: 'event_start_datetime', title: 'Data evento' },
-            { data: 'created_at', title: 'Creato il' },
+            { data: 'created_at', title: 'Prenotato il' },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('reservations', d); } }
         ],
         user_reservations: [
             { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + ' (' + row.event_id + ')</a>'; } },
             { data: 'event_start_datetime', title: 'Data evento' },
             { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
-            { data: 'id', title: 'ID Prenotazione', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'created_at', title: 'Creato il' },
+            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'created_at', title: 'Prenotato il' },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('user_reservations', d); } }
         ],
         event_reservations: [
             { data: 'name', title: 'Utente', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
             { data: null, title: 'Presenza', className: 'rp-action-group-col', orderable: false, render: function(d){ return presenceToggle(d); } },
-            { data: 'id', title: 'ID Prenotazione', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'created_at', title: 'Creato il' },
+            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'created_at', title: 'Prenotato il' },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('event_reservations', d); } }
         ]
     };

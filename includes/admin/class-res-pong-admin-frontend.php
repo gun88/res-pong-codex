@@ -234,7 +234,7 @@ class Res_Pong_Admin_Frontend {
         echo '<table class="form-table">';
         echo '<tr><th><label for="user_id">ID utente</label></th><td><select name="user_id" id="user_id"></select></td></tr>';
         echo '<tr><th><label for="event_id">ID evento</label></th><td><select name="event_id" id="event_id"></select></td></tr>';
-        echo '<tr><th><label for="created_at">Creato il</label></th><td><input name="created_at" id="created_at" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_created) . '"' ) . '></td></tr>';
+        echo '<tr><th><label for="created_at">Prenotato il</label></th><td><input name="created_at" id="created_at" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_created) . '"' ) . '></td></tr>';
         echo '<tr><th><label for="presence_confirmed">Presenza confermata</label></th><td><input name="presence_confirmed" id="presence_confirmed" type="checkbox" value="1"></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva', 'res-pong') . '</button>';
