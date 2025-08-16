@@ -177,7 +177,7 @@
                     }
                 });
             };
-            if(entity === 'events' && row.group_id){
+            if(entity === 'events' && row.group_id !== null){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
                     if(apply){ url += '&apply_group=1'; }
                     proceed();
@@ -214,7 +214,7 @@
                     }
                 });
             };
-            if(entity === 'events' && row.group_id){
+            if(entity === 'events' && row.group_id !== null){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
                     if(apply){ url += '&apply_group=1'; }
                     send();
@@ -442,11 +442,17 @@
                         field.val(data[key]);
                     }
                 }
-                if(entity === 'events' && data.group_id){
+                if(entity === 'events'){
                     var gSel = form.find('[name=group_id]');
-                    if(!gSel.find('option[value="' + data.group_id + '"]').length){
+                    if(parseInt(data.group_id) === 0){
                         gSel.val('');
+                        gSel.find('option[value="' + id + '"]').prop('disabled', true);
+                    }else if(data.group_id){
+                        if(!gSel.find('option[value="' + data.group_id + '"]').length){
+                            gSel.val('');
+                        }
                     }
+                    form.data('has_group', data.group_id !== null);
                 }
                 if(typeof data.password !== 'undefined'){
                     var hasPassword = !!data.password;
@@ -611,7 +617,7 @@
                 showOverlay(true);
                 ensureMaster(send);
             };
-            if(entity === 'events' && id && $('#group_id').val()){
+            if(entity === 'events' && id && form.data('has_group')){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
                     if(apply){ url += '&apply_group=1'; }
                     submit();
@@ -643,7 +649,7 @@
                     }
                 });
             };
-            if(entity === 'events' && $('#group_id').val()){
+            if(entity === 'events' && form.data('has_group')){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
                     if(apply){ url += '&apply_group=1'; }
                     executeDelete();
