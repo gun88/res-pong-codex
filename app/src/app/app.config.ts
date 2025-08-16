@@ -8,7 +8,6 @@ import Lara from '@primeng/themes/lara';
 import {definePreset} from '@primeng/themes';
 import {HttpInterceptorFn, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {tap} from 'rxjs';
-import {ResPongService} from '../service/res-pong.service';
 
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
