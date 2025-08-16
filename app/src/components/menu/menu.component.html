@@ -1,6 +1,11 @@
 <p-menubar [model]="menu">
   <ng-template #start>
-    <img src="favicon.jpg" alt="logo" style="width: 2rem;">
+    <img src="favicon.jpg" alt="logo" style="width: 2rem;" class="hidden md:block">
+  </ng-template>
+  <ng-template #menuicon>
+    <img src="favicon.jpg" alt="logo" style="width: 2rem; margin-right: var(--p-menubar-gap)" class="block md:hidden">
+    <i class="pi pi-bars" style="color: var(--p-menubar-mobile-button-color)"></i>
+
   </ng-template>
   <ng-template #end>
     @if (loggedIn$ | async) {
