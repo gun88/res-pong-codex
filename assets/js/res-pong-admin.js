@@ -49,7 +49,22 @@
         btn.after(notice);
     }
     function rpConfirm(message){
-        return Promise.resolve(window.confirm(message));
+        if(typeof window.jQuery === 'undefined'){
+            return Promise.resolve(window.confirm(message));
+        }
+        return new Promise(function(resolve){
+            var overlay = $('<div class="rp-confirm-overlay"></div>').appendTo('body');
+            var dialog = $('<div class="rp-confirm-dialog"><p></p><div class="rp-confirm-buttons"><button class="button button-primary rp-confirm-yes">Si</button><button class="button rp-confirm-no">No</button></div></div>').appendTo(overlay);
+            dialog.find('p').text(message);
+            overlay.on('click', '.rp-confirm-yes', function(){
+                overlay.remove();
+                resolve(true);
+            });
+            overlay.on('click', '.rp-confirm-no', function(){
+                overlay.remove();
+                resolve(false);
+            });
+        });
     }
     function restUrl(path, params){
         var url = rp_admin.rest_url + path;
