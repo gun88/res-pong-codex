@@ -30,7 +30,7 @@ export class TimelineComponent {
   _events!: any;
   _monthPointer!: number;
   @Input() loading!: boolean;
-  showAll = localStorage.getItem('res_pong_timeline_show_all') == 'false';
+  showAll = false; // localStorage.getItem('res_pong_timeline_show_all') == 'false';
 
   @Input()
   set monthPointer(monthPointer: number) {
