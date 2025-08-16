@@ -7,6 +7,7 @@ class Res_Pong_Configuration {
         'almost_full_players' => 4,
         'max_active_reservations' => 1,
         'next_reservation_delay' => 300,
+        'avatar_management' => 'none',
         'default_email_address' => '',
         'app_url' => 'https://my-site/prenotazioni',
         'invitation_subject' => 'Portale Prenotazioni - Effettua il tuo primo accesso',
