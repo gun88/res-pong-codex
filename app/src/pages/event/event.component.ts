@@ -11,10 +11,11 @@ import {FormsModule} from '@angular/forms';
 import {catchError, EMPTY, finalize, map, of, switchMap, tap} from 'rxjs';
 import {Skeleton} from 'primeng/skeleton';
 import {ResPongService} from '../../service/res-pong.service';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Common} from '../../util/common';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
+import {SwipeNavDirective} from '../../directives/swipe-nav.directive';
 
 @Component({
   selector: 'res-pong-user-event',
@@ -33,8 +34,8 @@ import {ConfirmationService} from 'primeng/api';
     NgStyle,
     Skeleton,
     Button,
-    RouterLink,
-    ConfirmDialog
+    ConfirmDialog,
+    SwipeNavDirective
   ],
   standalone: true,
   providers: [ConfirmationService],
@@ -42,6 +43,7 @@ import {ConfirmationService} from 'primeng/api';
   styleUrl: './event.component.scss'
 })
 export class EventComponent implements OnInit {
+  private router = inject(Router);
   private resPongService = inject(ResPongService);
   private activatedRoute = inject(ActivatedRoute);
   private confirmationService = inject(ConfirmationService);
@@ -187,5 +189,13 @@ export class EventComponent implements OnInit {
       default:
         return 'pi pi-info-circle';
     }
+  }
+
+  next() {
+    this.router.navigate(['/events', this.event.other_events.next_id])
+  }
+
+  prev() {
+    this.router.navigate(['/events', this.event.other_events.prev_id])
   }
 }

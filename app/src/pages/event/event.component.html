@@ -1,4 +1,6 @@
-<div class="rp-event rp-large-page">
+<div class="rp-event rp-large-page" rpSwipeNav
+     (swipeLeft)="prev()"
+     (swipeRight)="next()">
 
   <div *ngIf="eventLoadingError">
     <p-message icon="pi pi-times-circle" severity="error">{{ eventLoadingError }}</p-message>
@@ -15,11 +17,9 @@
             <h2 class="m-0 line-height-3">{{ event?.name }}</h2>
 
             <div style="white-space: nowrap;display: flex; gap: 0.5rem; align-items: center;">
-              <p-button size="small" [routerLink]="['/events', event.other_events.prev_id]"
-                        [disabled]="!event.other_events.prev_id"
+              <p-button size="small" (onClick)="prev()" [disabled]="!event.other_events.prev_id"
                         icon="pi pi-chevron-left" [rounded]="true" severity="secondary" [outlined]="true"/>
-              <p-button size="small" [routerLink]="['/events', event.other_events.next_id]"
-                        [disabled]="!event.other_events.next_id"
+              <p-button size="small" (onClick)="next()" [disabled]="!event.other_events.next_id"
                         icon="pi pi-chevron-right" [rounded]="true" severity="secondary" [outlined]="true"/>
             </div>
 
