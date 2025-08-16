@@ -340,6 +340,8 @@ class Res_Pong_Admin_Service {
         if ($inserted === false) {
             return new WP_Error('insert_failed', 'Creazione prenotazione fallita', ['status' => 500]);
         }
+        $data['id'] = $inserted;
+        error_log("Inserted reservation: " . print_r($data, true));
         return new WP_REST_Response($data, 201);
     }
 

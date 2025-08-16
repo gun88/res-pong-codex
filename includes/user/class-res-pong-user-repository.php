@@ -84,7 +84,7 @@ class Res_Pong_User_Repository {
         WHERE 
             r.event_id = %s
         ORDER BY 
-            r.created_at DESC
+            r.created_at
     ";
 
         return $this->wpdb->get_results($this->wpdb->prepare($query, $event_id));

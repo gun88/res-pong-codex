@@ -922,7 +922,7 @@
         var er = $('#res-pong-event-reservations');
         if(er.length){
             var eid = er.data('event');
-            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
+            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=0'); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
         }
         initDetail();
         initEmailPage();
