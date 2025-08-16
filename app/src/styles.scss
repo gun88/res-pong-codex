@@ -94,12 +94,15 @@ p-menubar {
             flex-wrap: wrap;
             justify-content: center;
             flex-direction: row;
+            gap: 0;
 
             .rp-calendar-event {
 
               .rp-calendar-label {
                 margin: 2px;
                 display: block;
+                padding: 6px;
+                border-radius: 50%;
 
                 .rp-calendar-label-badge {
                   display: none;
@@ -429,7 +432,6 @@ p-menubar {
 
   @media screen and (max-width: 768px) {
     &.p-timeline-vertical {
-
       grid-template-rows: repeat(16, auto); /* 12 righe */
 
     }

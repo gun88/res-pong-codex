@@ -35,7 +35,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   loading = false;
   currentDate = new Date();
   title = Common.formatMonthYear(this.monthPointer);
-  mode: 'calendar' | 'timeline' = (localStorage.getItem('res_pong_reservation_view_mode') || 'calendar') as 'calendar' | 'timeline';
+  mode: 'calendar' | 'timeline' = (localStorage.getItem('res_pong_reservation_view_mode') || 'timeline') as 'calendar' | 'timeline';
   events: any = undefined;
   subTitle: string = '•••';
 

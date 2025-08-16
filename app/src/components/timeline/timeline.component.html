@@ -21,17 +21,17 @@
           </div>
         </div>
       </div>
-      <div *ngIf="!loading && !_events[day.date]" class="rp-timeline-content-day-no-event">(Nessun evento)</div>
-      <div *ngIf="loading">
+      <div *ngIf="!loading && monthPointerChangeWorked && !_events[day.date]" class="rp-timeline-content-day-no-event">(Nessun evento)</div>
+      <div *ngIf="loading || !monthPointerChangeWorked">
         <p-skeleton height="2rem" styleClass="mb-2"/>
       </div>
     </div>
   </ng-template>
 </p-timeline>
-<div *ngIf="!showAll && !loading && days.length == 0">
+<div *ngIf="!showAll && !loading && monthPointerChangeWorked && days.length == 0">
   <p-message icon="pi pi-info-circle" severity="secondary" text="Nessun evento per questo mese"></p-message>
 </div>
-<div class="flex items-center justify-content-center gap-1 my-3 align-items-center">
+<div class="flex items-center justify-content-center gap-1 my-3 align-items-center" *ngIf="false">
   <div>
     <p-toggleswitch [(ngModel)]="showAll" (onChange)="showAllToggle()"/>
   </div>

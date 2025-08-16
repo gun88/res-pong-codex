@@ -26,13 +26,15 @@ export class TimelineComponent {
   @Output() onDaySelected = new EventEmitter<any[]>();
   private originalData: any = undefined;
   days!: any;
+  monthPointerChangeWorked: boolean = false;
   _events!: any;
   _monthPointer!: number;
   @Input() loading!: boolean;
-  showAll = localStorage.getItem('res_pong_timeline_show_all') == 'true';
+  showAll = localStorage.getItem('res_pong_timeline_show_all') == 'false';
 
   @Input()
   set monthPointer(monthPointer: number) {
+    this.monthPointerChangeWorked = false;
     this._monthPointer = monthPointer;
     this._events = {}
     this.days = []
@@ -56,6 +58,7 @@ export class TimelineComponent {
     if (!this.originalData) return;
     this._events = this.mapEventsByDay(this.originalData.events);
     this.prepareStructure(this.showAll ? undefined : Object.keys(this._events));
+    this.monthPointerChangeWorked = true;
   }
 
 
