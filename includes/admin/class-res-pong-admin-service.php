@@ -336,11 +336,11 @@ class Res_Pong_Admin_Service {
         if ($this->repository->find_reservation($data['user_id'], $data['event_id'])) {
             return new WP_Error('reservation_exists', 'Prenotazione già esistente', ['status' => 409]);
         }
-        $inserted = $this->repository->insert_reservation($data);
-        if ($inserted === false) {
+        $id = $this->repository->insert_reservation($data);
+        if ($id === false) {
             return new WP_Error('insert_failed', 'Creazione prenotazione fallita', ['status' => 500]);
         }
-        $data['id'] = $inserted;
+        $data['id'] = $id;
         error_log("Inserted reservation: " . print_r($data, true));
         return new WP_REST_Response($data, 201);
     }

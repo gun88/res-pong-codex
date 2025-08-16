@@ -188,7 +188,11 @@ class Res_Pong_Admin_Repository {
     }
 
     public function insert_reservation($data) {
-        return $this->wpdb->insert($this->table_reservation, $data);
+        $insert = $this->wpdb->insert($this->table_reservation, $data);
+        if (!$insert) {
+            return false;
+        }
+        return  $this->wpdb->insert_id;
     }
 
     public function update_reservation($id, $data) {
