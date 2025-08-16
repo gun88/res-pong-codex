@@ -97,6 +97,14 @@ class Res_Pong_Admin_Service {
         }
         unset($data['recurrence'], $data['recurrence_end']);
         if ($group_id) {
+            $group_event = $this->repository->get_event($group_id);
+            if ($group_event) {
+                if ($group_event['group_id'] === null) {
+                    $this->repository->update_event($group_id, ['group_id' => 0]);
+                } elseif ((int)$group_event['group_id'] > 0) {
+                    $group_id = (int)$group_event['group_id'];
+                }
+            }
             $data['group_id'] = $group_id;
             $id = $this->repository->insert_event($data);
             $data['id'] = $id;
@@ -106,7 +114,7 @@ class Res_Pong_Admin_Service {
         $id = $this->repository->insert_event($data);
         $data['id'] = $id;
         if ($recurrence !== 'none' && $recurrence_end) {
-            $this->repository->update_event($id, ['group_id' => $id]);
+            $this->repository->update_event($id, ['group_id' => 0]);
             $start = new DateTime($data['start_datetime']);
             $end = new DateTime($data['end_datetime']);
             $limit = new DateTime($recurrence_end . ' 23:59:59');
@@ -139,7 +147,7 @@ class Res_Pong_Admin_Service {
                     $this->repository->insert_event($e);
                 }
             }
-            $data['group_id'] = $id;
+            $data['group_id'] = 0;
         }
         return new WP_REST_Response($data, 201);
     }
@@ -148,13 +156,38 @@ class Res_Pong_Admin_Service {
         $id = (int)$request['id'];
         unset($request['recurrence'], $request['recurrence_end']);
         $data = $request->get_json_params();
+        if (array_key_exists('group_id', $data)) {
+            $group_id = $data['group_id'] !== '' ? (int)$data['group_id'] : null;
+            if ($group_id) {
+                $group_event = $this->repository->get_event($group_id);
+                if ($group_event) {
+                    if ($group_event['group_id'] === null) {
+                        $this->repository->update_event($group_id, ['group_id' => 0]);
+                    } elseif ((int)$group_event['group_id'] > 0) {
+                        $group_id = (int)$group_event['group_id'];
+                    }
+                }
+                $data['group_id'] = $group_id;
+            } else {
+                $data['group_id'] = null;
+            }
+        }
         $apply = $request->get_param('apply_group');
         if ($apply) {
             $event = $this->repository->get_event($id);
-            if ($event && $event['group_id']) {
-                $this->repository->update_events_by_group($event['group_id'], $data);
-            } else {
-                $this->repository->update_event($id, $data);
+            if ($event) {
+                $gid = null;
+                if ($event['group_id'] === 0) {
+                    $gid = $id;
+                } elseif ($event['group_id']) {
+                    $gid = $event['group_id'];
+                }
+                if ($gid) {
+                    $this->repository->update_event($gid, $data);
+                    $this->repository->update_events_by_group($gid, $data);
+                } else {
+                    $this->repository->update_event($id, $data);
+                }
             }
         } else {
             $this->repository->update_event($id, $data);
@@ -167,10 +200,19 @@ class Res_Pong_Admin_Service {
         $apply = $request->get_param('apply_group');
         if ($apply) {
             $event = $this->repository->get_event($id);
-            if ($event && $event['group_id']) {
-                $this->repository->delete_events_by_group($event['group_id']);
-            } else {
-                $this->repository->delete_event($id);
+            if ($event) {
+                $gid = null;
+                if ($event['group_id'] === 0) {
+                    $gid = $id;
+                } elseif ($event['group_id']) {
+                    $gid = $event['group_id'];
+                }
+                if ($gid) {
+                    $this->repository->delete_events_by_group($gid);
+                    $this->repository->delete_event($gid);
+                } else {
+                    $this->repository->delete_event($id);
+                }
             }
         } else {
             $this->repository->delete_event($id);
