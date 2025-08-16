@@ -579,7 +579,7 @@
                 data[this.name] = val.replace('T', ' ');
             });
             var method = id ? 'PUT' : 'POST';
-            var path = entity + '/' + id;
+            var path = id ? (entity + '/' + id) : entity;
             var params = '';
             var send = function(){
                 $.ajax({

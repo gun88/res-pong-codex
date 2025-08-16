@@ -213,7 +213,14 @@ class Res_Pong_User_Service {
         if (!$event) {
             return new \WP_REST_Response(['error' => 'Evento non trovato'], 404);
         }
-        $user = $this->repository->get_user_by_id_with_active_reservations($user_id, date('Y-m-d H:i:s'), $event->group_id);
+        $delay = $this->configuration->get('next_reservation_delay');
+        $date = date('Y-m-d H:i:s', strtotime('-' . $delay . ' minutes'));
+        if (isset($event->group_id) && $event->group_id > 0) {
+            $group_id = $event->group_id;
+        } else {
+            $group_id = $event->id;
+        }
+        $user = $this->repository->get_user_by_id_with_active_reservations($user_id, $date, $group_id);
         $players = $this->repository->get_reservations_by_event_id_with_user_data($event_id);
         foreach ($players as $player) {
             $player->current_user = $user_id == $player->user_id;
@@ -336,7 +343,7 @@ class Res_Pong_User_Service {
         } else if ($event->user_status == 'max-booking-reached') {
             // max numero prenotazioni raggiunto... messaggio e no azioni
             $active_reservations = $user->active_reservations;
-            $status_message = ['type' => 'warn', 'text' => "Hai già " . ($active_reservations == 1 ? "una prenotazione" : "$active_reservations prenotazioni") . " attiva in un altra data per questa tipologia di evento. Non puoi effettuare altre prenotazioni."];
+            $status_message = ['type' => 'warn', 'text' => "Hai " . ($active_reservations == 1 ? "una prenotazione attiva in un altra data" : "$active_reservations prenotazioni attive in altre date") . " per questa tipologia di evento. Non puoi effettuare altre prenotazioni."];
         } else if ($event->user_status == 'timeout') {
             // utente in castigo 😂... messaggio e no azioni
             $status_message = ['type' => 'warn', 'text' => "Sei in timeout! Potrai effettuare di nuovo la prenotazione solo dopo questa data: " . $user->timeout . "."];

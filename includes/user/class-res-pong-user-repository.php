@@ -19,16 +19,16 @@ class Res_Pong_User_Repository {
         return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_user} WHERE id = %s", $id));
     }
 
-    public function get_user_by_id_with_active_reservations($id, $date, $group_id) {
+    public function get_user_by_id_with_active_reservations($user_id, $date, $group_id) {
         $query = "SELECT U.*, COUNT(E.id) AS active_reservations
                     FROM wp_RP_USER AS U
                              LEFT JOIN wp_RP_RESERVATION AS R ON R.user_id = U.id
-                             LEFT JOIN wp_RP_EVENT AS E ON E.id = R.event_id AND E.start_datetime > %s AND E.group_id = %s
+                             LEFT JOIN wp_RP_EVENT AS E ON E.id = R.event_id AND E.end_datetime > %s AND (E.group_id = %s OR E.id = %s)
                     WHERE U.id = %s
                     GROUP BY U.id, U.email, U.username, U.last_name, U.first_name, U.category,
                              U.password, U.timeout, U.reset_token, U.enabled";
 
-        return $this->wpdb->get_row($this->wpdb->prepare($query, $date, $group_id, $id));
+        return $this->wpdb->get_row($this->wpdb->prepare($query, $date, $group_id, $group_id, $user_id));
     }
 
     public function get_enabled_user_by_token($token) {
