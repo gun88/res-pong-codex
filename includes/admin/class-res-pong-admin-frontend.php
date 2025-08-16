@@ -109,6 +109,7 @@ class Res_Pong_Admin_Frontend {
                 'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
                 'default_email_address'    => isset($_POST['default_email_address']) ? sanitize_email($_POST['default_email_address']) : '',
                 'app_url' => isset($_POST['app_url']) ? esc_url_raw($_POST['app_url']) : '',
+                'avatar_management'       => isset($_POST['avatar_management']) ? sanitize_text_field($_POST['avatar_management']) : 'none',
                 'invitation_subject'       => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
                 'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
                 'reset_password_subject'   => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
@@ -129,6 +130,7 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="next_reservation_delay">Ritardo prossima prenotazione</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
         echo '<tr><th><label for="default_email_address">Email di default</label></th><td><input name="default_email_address" id="default_email_address" type="email" class="regular-text" value="' . esc_attr($config['default_email_address']) . '"></td></tr>';
         echo '<tr><th><label for="app_url">URL Applicazione</label></th><td><input name="app_url" id="app_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['app_url']) . '"></td></tr>';
+        echo '<tr><th><label for="avatar_management">Gestione Avatar</label></th><td><select name="avatar_management" id="avatar_management"><option value="none"' . selected($config['avatar_management'], 'none', false) . '>Nessuna</option><option value="fitet_monitor"' . selected($config['avatar_management'], 'fitet_monitor', false) . '>Fitet Monitor</option><option value="custom"' . selected($config['avatar_management'], 'custom', false) . '>Personalizzata</option></select></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail primo accesso</h2></th></tr>';
         echo '<tr><th><label for="invitation_subject">Oggetto invito</label></th><td><input name="invitation_subject" id="invitation_subject" type="text" class="large-text" style="max-width:600px;" value="' . esc_attr($config['invitation_subject']) . '"></td></tr>';
         echo '<tr><th><label for="invitation_text">Testo invito</label></th><td><textarea name="invitation_text" id="invitation_text" rows="3" class="large-text" style="max-width:600px;min-height:10rem">' . esc_textarea($config['invitation_text']) . '</textarea><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
