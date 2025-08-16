@@ -74,6 +74,12 @@ class Res_Pong_Admin_Repository {
         dbDelta($sql);
     }
 
+    public function drop_tables() {
+        $this->wpdb->query("DROP TABLE IF EXISTS {$this->table_reservation}");
+        $this->wpdb->query("DROP TABLE IF EXISTS {$this->table_event}");
+        $this->wpdb->query("DROP TABLE IF EXISTS {$this->table_user}");
+    }
+
     // ------------------------
     // RP_USER methods
     // ------------------------
