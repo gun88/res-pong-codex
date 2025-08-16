@@ -87,6 +87,20 @@ class Res_Pong_Admin_Frontend {
     }
 
     public function render_configurations_page() {
+        $reinitialize_notice = '';
+        if (isset($_POST['rp_reinitialize_nonce']) && wp_verify_nonce($_POST['rp_reinitialize_nonce'], 'rp_reinitialize')) {
+            $repo = new Res_Pong_Admin_Repository();
+            global $wpdb;
+            $repo->drop_tables();
+            $repo->create_tables();
+            delete_option('res_pong_configuration');
+            if (!empty($wpdb->last_error)) {
+                $reinitialize_notice = '<div class="notice notice-error is-dismissible"><p>' . esc_html__('Errore durante la reinizializzazione', 'res-pong') . '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>';
+                $wpdb->last_error = '';
+            } else {
+                $reinitialize_notice = '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Reinizializzazione completata', 'res-pong') . '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>';
+            }
+        }
         if (isset($_POST['rp_configurations_nonce']) && wp_verify_nonce($_POST['rp_configurations_nonce'], 'rp_save_configurations')) {
             $data = [
                 'almost_closed_minutes'     => isset($_POST['almost_closed_minutes']) ? intval($_POST['almost_closed_minutes']) : 0,
@@ -123,6 +137,15 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="reset_password_text">Testo reset password</label></th><td><textarea name="reset_password_text" id="reset_password_text" rows="3" class="large-text" style="max-width:600px;min-height:10rem">' . esc_textarea($config['reset_password_text']) . '</textarea><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva', 'res-pong') . '</button></p>';
+        echo '</form>';
+        echo '<h2>' . esc_html__('Reinizializza', 'res-pong') . '</h2>';
+        echo '<p>' . esc_html__('Clicca reinizializza per cancellare e ricreare le tabelle del db e reimpostare i parametri di configurazione al default del plugin. L\'esecuzione di questa azione comporta la perdita di tutti i dati, assicurati di aver fatto degli export.', 'res-pong') . '</p>';
+        echo '<form method="post" onsubmit="return confirm(\'' . esc_js(__('Sei sicuro di voler reinizializzare? Questa azione cancellerà tutti i dati.', 'res-pong')) . '\');">';
+        wp_nonce_field('rp_reinitialize', 'rp_reinitialize_nonce');
+        echo '<p class="submit"><button type="submit" class="button rp-button-danger">' . esc_html__('Reinizializza', 'res-pong') . '</button></p>';
+        if ($reinitialize_notice !== '') {
+            echo $reinitialize_notice;
+        }
         echo '</form>';
         echo '</div>';
     }
