@@ -127,6 +127,7 @@
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('events', d); } }
         ],
         reservations: [
+            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'name', title: 'Utente', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
             { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + ' (' + row.event_id + ')</a>'; } },
             { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
@@ -270,7 +271,7 @@
         if(!order.length){
             if(entity === 'users'){ order = [[1, 'asc']]; }
             else if(entity === 'events'){ order = [[2, 'desc']]; }
-            else if(entity === 'reservations'){ order = [[3, 'desc']]; }
+            else if(entity === 'reservations'){ order = [[4, 'desc']]; }
         }
         var columnsDef = opts.columns || columns[entity];
         var selectable = opts.selectable !== undefined ? opts.selectable : true;
