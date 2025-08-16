@@ -1,4 +1,11 @@
 (function($){
+    /* IMPORTANT WARNING!
+     *
+     * In case of REST call with query parameters, remember to generate the final URL through the restUrl
+     * function, providing the path and the parameters. This function create correct URL with query parameters
+     * checking the permalink configuration of the site. If permalinks mode is not enabled, query parameters must be
+     * added joined by '&', otherwise, as usual, joined by '?'.
+     */
     function renderCheckbox(data){
         return '<input type="checkbox" class="rp-select" value="' + data.id + '">';
     }
@@ -454,7 +461,7 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             });
             var eReq = $.ajax({
-                url: rp_admin.rest_url + 'events&open_only=0',
+                url: restUrl('events', 'open_only=0'),
                 method: 'GET',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             });
@@ -479,7 +486,7 @@
         }
         function loadEventGroupOptions(callback){
             $.ajax({
-                url: rp_admin.rest_url + 'events&open_only=0',
+                url: restUrl('events', 'open_only=0'),
                 method: 'GET',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 success: function(events){
