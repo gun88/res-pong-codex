@@ -30,15 +30,17 @@ class Res_Pong_Admin_Repository {
         $sql = "
         CREATE TABLE {$this->table_user} (
             id VARCHAR(20) PRIMARY KEY,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            username VARCHAR(100) NOT NULL UNIQUE,
+            email VARCHAR(255) NOT NULL,
+            username VARCHAR(100) NOT NULL,
             last_name VARCHAR(100) NOT NULL,
             first_name VARCHAR(100) NOT NULL,
             category VARCHAR(25),
             password VARCHAR(255) NOT NULL,
             timeout VARCHAR(25) DEFAULT NULL,
             reset_token VARCHAR(255) DEFAULT NULL,
-            enabled TINYINT DEFAULT 1 NOT NULL
+            enabled TINYINT DEFAULT 1 NOT NULL,
+            UNIQUE idx_unique_email (email),
+            UNIQUE idx_unique_username (username)
         ) $charset_collate;
 
         CREATE TABLE {$this->table_event} (
@@ -61,9 +63,9 @@ class Res_Pong_Admin_Repository {
             event_id INT,
             created_at VARCHAR(25) NOT NULL,
             presence_confirmed TINYINT DEFAULT 0,
-            UNIQUE (user_id, event_id),
-            FOREIGN KEY (user_id) REFERENCES {$this->table_user}(id) ON DELETE CASCADE,
-            FOREIGN KEY (event_id) REFERENCES {$this->table_event}(id) ON DELETE CASCADE,
+            UNIQUE idx_user_id_event_id(user_id, event_id),
+            CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES {$this->table_user}(id) ON DELETE CASCADE,
+            CONSTRAINT fk_event_id FOREIGN KEY (event_id) REFERENCES {$this->table_event}(id) ON DELETE CASCADE,
             INDEX idx_event_id (event_id),
             INDEX idx_user_id (user_id)
         ) $charset_collate;
