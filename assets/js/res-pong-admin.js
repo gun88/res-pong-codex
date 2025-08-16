@@ -45,7 +45,7 @@
     });
     function showButtonMessage(btn, type, text){
         btn.siblings('.notice').remove();
-        var notice = $('<div class="notice notice-' + type + '"><p>' + text + '</p></div>');
+        var notice = $('<div class="notice notice-' + type + ' is-dismissible"><p>' + text + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
         btn.after(notice);
     }
     function rpConfirm(message){
@@ -485,15 +485,20 @@
             });
         }
         function loadEventGroupOptions(callback){
+            var sel = $('#group_id');
+            sel.html('<option value="">Caricamento...</option>');
             $.ajax({
                 url: restUrl('events', 'open_only=0'),
                 method: 'GET',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                 success: function(events){
-                    var sel = $('#group_id');
+                    sel.empty();
                     sel.append('<option value="">Nessuno</option>');
                     $.each(events, function(_, e){
-                        sel.append('<option value="' + e.id + '">' + e.name + ' (' + e.id + ')</option>');
+                        if(e.group_id === null || parseInt(e.group_id) === 0){
+                            var g = e.group_id === null ? '' : e.group_id;
+                            sel.append('<option value="' + e.id + '" data-group="' + g + '">' + e.name + ' (' + e.id + ')</option>');
+                        }
                     });
                     if(callback){ callback(); }
                 }
@@ -538,9 +543,7 @@
             });
             var method = id ? 'PUT' : 'POST';
             var url = rp_admin.rest_url + entity + (id ? '/' + id : '');
-            var submit = function(){
-                clearNotice();
-                showOverlay(true);
+            var send = function(){
                 $.ajax({
                     url: url,
                     method: method,
@@ -555,6 +558,10 @@
                                 setTimeout(function(){
                                     window.location = rp_admin.admin_url + '?page=res-pong-' + entity.slice(0,-1) + '-detail&id=' + resp.id;
                                 }, 2000);
+                            }else if(entity === 'reservations'){
+                                setTimeout(function(){
+                                    window.location = rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + resp.id;
+                                }, 1000);
                             }else{
                                 id = resp.id;
                                 form.attr('data-id', id);
@@ -569,6 +576,30 @@
                         showButtonMessage(form.find('button[type=submit]'), type, msg);
                     }
                 });
+            };
+            var ensureMaster = function(cb){
+                if(entity === 'events' && data.group_id){
+                    var opt = $('#group_id option:selected');
+                    var gid = opt.data('group');
+                    if(gid === undefined || gid === null || gid === ''){
+                        $.ajax({
+                            url: rp_admin.rest_url + 'events/' + data.group_id,
+                            method: 'PUT',
+                            contentType: 'application/json',
+                            data: JSON.stringify({ group_id: 0 }),
+                            beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                            success: cb,
+                            error: cb
+                        });
+                        return;
+                    }
+                }
+                cb();
+            };
+            var submit = function(){
+                clearNotice();
+                showOverlay(true);
+                ensureMaster(send);
             };
             if(entity === 'events' && id && $('#group_id').val()){
                 rpConfirm('Applicare la modifica a tutta la serie di eventi?').then(function(apply){
