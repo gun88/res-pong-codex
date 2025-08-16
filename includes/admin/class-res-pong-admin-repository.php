@@ -213,8 +213,18 @@ class Res_Pong_Admin_Repository {
         return $csv;
     }
 
-    private function import_csv($file, $table) {
-        $handle = fopen($file, 'r');
+    private function open_csv_handle($data) {
+        if (is_string($data) && !file_exists($data)) {
+            $handle = fopen('php://temp', 'r+');
+            fwrite($handle, $data);
+            rewind($handle);
+            return $handle;
+        }
+        return fopen($data, 'r');
+    }
+
+    private function import_csv($data, $table) {
+        $handle = $this->open_csv_handle($data);
         if (!$handle) {
             return false;
         }
@@ -240,8 +250,8 @@ class Res_Pong_Admin_Repository {
         return $this->rows_to_csv($this->get_users());
     }
 
-    public function import_users_csv($file) {
-        $handle = fopen($file, 'r');
+    public function import_users_csv($data) {
+        $handle = $this->open_csv_handle($data);
         if (!$handle) {
             return false;
         }
@@ -298,7 +308,7 @@ class Res_Pong_Admin_Repository {
             return $skipped;
         }
         fclose($handle);
-        return $this->import_csv($file, $this->table_user);
+        return $this->import_csv($data, $this->table_user);
     }
 
     public function export_events_csv() {
@@ -306,16 +316,16 @@ class Res_Pong_Admin_Repository {
         return $this->rows_to_csv($this->wpdb->get_results($sql, ARRAY_A));
     }
 
-    public function import_events_csv($file) {
-        return $this->import_csv($file, $this->table_event);
+    public function import_events_csv($data) {
+        return $this->import_csv($data, $this->table_event);
     }
 
     public function export_reservations_csv() {
         return $this->rows_to_csv($this->get_reservations(null, null, false));
     }
 
-    public function import_reservations_csv($file) {
-        return $this->import_csv($file, $this->table_reservation);
+    public function import_reservations_csv($data) {
+        return $this->import_csv($data, $this->table_reservation);
     }
 
     private function normalize_name($name) {
