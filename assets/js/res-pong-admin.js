@@ -359,19 +359,36 @@
                 input.on('change', function(){
                     var file = this.files[0];
                     if(!file){ input.remove(); return; }
-                    var formData = new FormData();
-                    formData.append('file', file);
                     clearNotice();
                     showOverlay(true);
-                    $.ajax({
-                        url: restUrl(entity + '/import'),
-                        method: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        complete: function(){ hideOverlay(); input.remove(); dt.ajax.reload(); },
-                        error: function(xhr){ var msg = 'Errore durante l\'import'; if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; } showNotice('error', msg); }
-                    });
+                    var reader = new FileReader();
+                    reader.onload = function(ev){
+                        var lines = ev.target.result.split(/\r?\n/).filter(function(l){ return l.trim() !== ''; });
+                        var header = lines.shift();
+                        var index = 0;
+                        function sendChunk(){
+                            if(index >= lines.length){
+                                hideOverlay();
+                                input.remove();
+                                dt.ajax.reload();
+                                return;
+                            }
+                            var chunkLines = lines.slice(index, index + 10);
+                            index += 10;
+                            var csv = [header].concat(chunkLines).join('\n');
+                            $.ajax({
+                                url: restUrl(entity + '/import'),
+                                method: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({csv: csv}),
+                                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                                success: function(){ sendChunk(); },
+                                error: function(xhr){ var msg = 'Errore durante l\'import'; if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; } showNotice('error', msg); hideOverlay(); input.remove(); dt.ajax.reload(); }
+                            });
+                        }
+                        sendChunk();
+                    };
+                    reader.readAsText(file);
                 }).trigger('click');
             });
         }

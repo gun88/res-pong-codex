@@ -366,11 +366,12 @@ class Res_Pong_Admin_Service {
     }
 
     public function rest_import_users($request) {
-        $files = $request->get_file_params();
-        if (empty($files['file'])) {
-            return new WP_Error('no_file', 'Nessun file caricato', ['status' => 400]);
+        $params = $request->get_json_params();
+        $csv = $params['csv'] ?? '';
+        if ($csv === '') {
+            return new WP_Error('no_data', 'Nessun dato ricevuto', ['status' => 400]);
         }
-        $result = $this->repository->import_users_csv($files['file']['tmp_name']);
+        $result = $this->repository->import_users_csv($csv);
         if (is_wp_error($result)) {
             return $result;
         }
@@ -391,11 +392,12 @@ class Res_Pong_Admin_Service {
     }
 
     public function rest_import_events($request) {
-        $files = $request->get_file_params();
-        if (empty($files['file'])) {
-            return new WP_Error('no_file', 'Nessun file caricato', ['status' => 400]);
+        $params = $request->get_json_params();
+        $csv = $params['csv'] ?? '';
+        if ($csv === '') {
+            return new WP_Error('no_data', 'Nessun dato ricevuto', ['status' => 400]);
         }
-        $result = $this->repository->import_events_csv($files['file']['tmp_name']);
+        $result = $this->repository->import_events_csv($csv);
         if (is_wp_error($result)) {
             return $result;
         }
@@ -415,11 +417,12 @@ class Res_Pong_Admin_Service {
     }
 
     public function rest_import_reservations($request) {
-        $files = $request->get_file_params();
-        if (empty($files['file'])) {
-            return new WP_Error('no_file', 'Nessun file caricato', ['status' => 400]);
+        $params = $request->get_json_params();
+        $csv = $params['csv'] ?? '';
+        if ($csv === '') {
+            return new WP_Error('no_data', 'Nessun dato ricevuto', ['status' => 400]);
         }
-        $result = $this->repository->import_reservations_csv($files['file']['tmp_name']);
+        $result = $this->repository->import_reservations_csv($csv);
         if (is_wp_error($result)) {
             return $result;
         }
