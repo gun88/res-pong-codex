@@ -8,6 +8,11 @@
   aspect-ratio: 1;
   align-items: center;
   min-width: 50px;
+  max-width: 50px;
+  width: 50px;
+  min-height: 50px;
+  max-height: 50px;
+  height: 50px;
 
   .rp-timeline-marker-day-number {
     font-size: .8rem;
