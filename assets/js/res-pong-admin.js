@@ -61,18 +61,20 @@
     function actionButtons(entity, data){
         var edit = '<button class="button rp-edit rp-action-btn" data-id="' + data.id + '" title="Modifica"><span class="dashicons dashicons-edit"></span></button>';
         var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '" title="Elimina"><span class="dashicons dashicons-trash"></span></button>';
-        var toggleLabel, state, toggleClass, toggleIcon;
-        if(entity === 'reservations'){
-            state = parseInt(data.presence_confirmed);
-            toggleLabel = state ? 'Assente' : 'Presente';
-        }else{
-            state = parseInt(data.enabled);
-            toggleLabel = state ? 'Disabilita' : 'Abilita';
+        var buttons = edit + del;
+        if(entity === 'reservations' || entity === 'user_reservations'){
+            var state = parseInt(data.presence_confirmed);
+            var toggleLabel = state ? 'Assente' : 'Presente';
+            var toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
+            var toggleIcon = state ? 'dashicons-no-alt' : 'dashicons-yes';
+            buttons += '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '" title="' + toggleLabel + '"><span class="dashicons ' + toggleIcon + '"></span></button>';
+        }else if(entity !== 'event_reservations'){
+            var state2 = parseInt(data.enabled);
+            var toggleLabel2 = state2 ? 'Disabilita' : 'Abilita';
+            var toggleClass2 = state2 ? 'rp-button-disable' : 'rp-button-enable';
+            var toggleIcon2 = state2 ? 'dashicons-no-alt' : 'dashicons-yes';
+            buttons += '<button class="button rp-toggle rp-action-btn ' + toggleClass2 + '" data-id="' + data.id + '" title="' + toggleLabel2 + '"><span class="dashicons ' + toggleIcon2 + '"></span></button>';
         }
-        toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
-        toggleIcon = state ? 'dashicons-no-alt' : 'dashicons-yes';
-        var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '" title="' + toggleLabel + '"><span class="dashicons ' + toggleIcon + '"></span></button>';
-        var buttons = edit + del + toggle;
         if(entity === 'users'){
             buttons += '<button class="button rp-impersonate rp-action-btn" data-id="' + data.id + '" title="Impersona"><span class="dashicons dashicons-admin-users"></span></button>';
             if(!data.password){
@@ -82,6 +84,14 @@
             buttons += '<button class="button rp-contact rp-action-btn" data-id="' + data.id + '" title="Contatta"><span class="dashicons dashicons-email"></span></button>';
         }
         return '<div class="rp-action-group">' + buttons + '</div>';
+    }
+    function presenceToggle(data){
+        var state = parseInt(data.presence_confirmed);
+        var toggleLabel = state ? 'Assente' : 'Presente';
+        var toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
+        var toggleIcon = state ? 'dashicons-no-alt' : 'dashicons-yes';
+        var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '" title="' + toggleLabel + '"><span class="dashicons ' + toggleIcon + '"></span></button>';
+        return '<div class="rp-action-group">' + toggle + '</div>';
     }
     var columns = {
         users: [
@@ -117,15 +127,27 @@
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('events', d); } }
         ],
         reservations: [
-            { data: null, title: '', orderable: false, render: renderCheckbox },
-            { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'user_id', title: 'ID utente', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'username', title: 'Nome utente' },
-            { data: 'event_id', title: 'ID evento', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + d + '">' + d + '</a>'; } },
-            { data: 'event_name', title: 'Evento' },
+            { data: 'name', title: 'Utente', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
+            { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + ' (' + row.event_id + ')</a>'; } },
+            { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
+            { data: 'event_start_datetime', title: 'Data evento' },
             { data: 'created_at', title: 'Creato il' },
-            { data: 'presence_confirmed', title: 'Presenza', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('reservations', d); } }
+        ],
+        user_reservations: [
+            { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + ' (' + row.event_id + ')</a>'; } },
+            { data: 'event_start_datetime', title: 'Data evento' },
+            { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
+            { data: 'id', title: 'ID Prenotazione', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'created_at', title: 'Creato il' },
+            { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('user_reservations', d); } }
+        ],
+        event_reservations: [
+            { data: 'name', title: 'Utente', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
+            { data: null, title: 'Presenza', className: 'rp-action-group-col', orderable: false, render: function(d){ return presenceToggle(d); } },
+            { data: 'id', title: 'ID Prenotazione', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'created_at', title: 'Creato il' },
+            { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('event_reservations', d); } }
         ]
     };
     function handleActions(table, entity){
@@ -248,8 +270,10 @@
         if(!order.length){
             if(entity === 'users'){ order = [[1, 'asc']]; }
             else if(entity === 'events'){ order = [[2, 'desc']]; }
-            else if(entity === 'reservations'){ order = [[6, 'desc']]; }
+            else if(entity === 'reservations'){ order = [[3, 'desc']]; }
         }
+        var columnsDef = opts.columns || columns[entity];
+        var selectable = opts.selectable !== undefined ? opts.selectable : true;
         var showAll = false;
         var dt = table.DataTable({
             ajax: {
@@ -257,20 +281,22 @@
                 dataSrc: '',
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
-            columns: columns[entity],
+            columns: columnsDef,
             order: order
         });
         dt.on('preXhr.dt', function(){ showOverlay(true); });
         dt.on('xhr.dt error.dt', function(){ hideOverlay(); });
 
-        $(dt.column(0).header()).html('<input type="checkbox" id="rp-select-all">');
-        table.on('change', '#rp-select-all', function(){
-            var checked = $(this).is(':checked');
-            table.find('.rp-select').prop('checked', checked);
-        });
-        table.on('change', '.rp-select', function(){
-            if(!this.checked){ $('#rp-select-all').prop('checked', false); }
-        });
+        if(selectable){
+            $(dt.column(0).header()).html('<input type="checkbox" id="rp-select-all">');
+            table.on('change', '#rp-select-all', function(){
+                var checked = $(this).is(':checked');
+                table.find('.rp-select').prop('checked', checked);
+            });
+            table.on('change', '.rp-select', function(){
+                if(!this.checked){ $('#rp-select-all').prop('checked', false); }
+            });
+        }
 
         handleActions(table, entity);
 
@@ -279,32 +305,31 @@
         var length = wrapper.find('div.dataTables_length');
         var filter = wrapper.find('div.dataTables_filter');
         toolbar.append(length);
-        var bulk = $('<div class="rp-bulk"><select id="rp-bulk-action"><option value="">Bulk Actions</option></select> <button class="button" id="rp-apply-bulk">Applica</button></div>');
-        var opt = '';
-        if(entity === 'users'){
-            opt = '<option value="delete">Elimina</option><option value="enable">Abilita</option><option value="disable">Disabilita</option><option value="timeout">Timeout</option>';
-        }else if(entity === 'events'){
-            opt = '<option value="delete">Elimina</option><option value="enable">Abilita</option><option value="disable">Disabilita</option>';
-        }else if(entity === 'reservations'){
-            opt = '<option value="delete">Elimina</option><option value="enable">Presente</option><option value="disable">Assente</option>';
+        if(selectable){
+            var bulk = $('<div class="rp-bulk"><select id="rp-bulk-action"><option value="">Bulk Actions</option></select> <button class="button" id="rp-apply-bulk">Applica</button></div>');
+            var opt = '';
+            if(entity === 'users'){
+                opt = '<option value="delete">Elimina</option><option value="enable">Abilita</option><option value="disable">Disabilita</option><option value="timeout">Timeout</option>';
+            }else if(entity === 'events'){
+                opt = '<option value="delete">Elimina</option><option value="enable">Abilita</option><option value="disable">Disabilita</option>';
+            }else if(entity === 'reservations'){
+                opt = '<option value="delete">Elimina</option><option value="enable">Presente</option><option value="disable">Assente</option>';
+            }
+            bulk.find('select').append(opt);
+            toolbar.append($('<span>•</span>'), bulk);
         }
-        bulk.find('select').append(opt);
-        var separator0 = $('<span>•</span>');
-        var separator1 = $('<span>•</span>');
-        var separator2 = $('<span>•</span>');
         var addBtn = $('<button class="button rp-button-add" id="res-pong-add"><span class="dashicons dashicons-plus"></span><span>Aggiungi</span></button>');
-        var importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
-        var exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
-        toolbar.append(separator0, bulk);
-        toolbar.append(separator1, addBtn);
+        toolbar.append($('<span>•</span>'), addBtn);
+        var importBtn, exportBtn;
         if(!opts.noCsv){
-            toolbar.append(separator2, importBtn, exportBtn);
+            importBtn = $('<button class="button" id="res-pong-import">Importa CSV</button>');
+            exportBtn = $('<button class="button" id="res-pong-export">Esporta CSV</button>');
+            toolbar.append($('<span>•</span>'), importBtn, exportBtn);
         }
         var addFilter = typeof opts.filterFuture === 'boolean' ? opts.filterFuture : (entity === 'events' || entity === 'reservations');
         if(addFilter){
-            var separator3 = $('<span>•</span>');
             var futureFilter = $('<label>Filtra <select class="rp-future-filter"><option value="0">Solo Futuro</option><option value="1">Mostra tutto</option></select></label>');
-            toolbar.append(separator3, futureFilter);
+            toolbar.append($('<span>•</span>'), futureFilter);
         }
         toolbar.append(filter);
         wrapper.prepend(toolbar);
@@ -317,96 +342,80 @@
             }
             window.location = url;
         });
-        exportBtn.on('click', function(e){
-            e.preventDefault();
-            window.location = restUrl(entity + '/export', '_wpnonce=' + rp_admin.nonce);
-        });
-        importBtn.on('click', function(e){
-            e.preventDefault();
-            var input = $('<input type="file" accept=".csv" style="display:none">');
-            $('body').append(input);
-            input.on('change', function(){
-                var file = this.files[0];
-                if(!file){ input.remove(); return; }
-                var formData = new FormData();
-                formData.append('file', file);
+        if(!opts.noCsv){
+            exportBtn.on('click', function(e){
+                e.preventDefault();
+                window.location = restUrl(entity + '/export', '_wpnonce=' + rp_admin.nonce);
+            });
+            importBtn.on('click', function(e){
+                e.preventDefault();
+                var input = $('<input type="file" accept=".csv" style="display:none">');
+                $('body').append(input);
+                input.on('change', function(){
+                    var file = this.files[0];
+                    if(!file){ input.remove(); return; }
+                    var formData = new FormData();
+                    formData.append('file', file);
+                    clearNotice();
+                    showOverlay(true);
+                    $.ajax({
+                        url: rp_admin.rest_url + entity + '/import',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        complete: function(){ hideOverlay(); input.remove(); dt.ajax.reload(); },
+                        error: function(xhr){ var msg = 'Errore durante l\'import'; if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; } showNotice('error', msg); }
+                    });
+                }).trigger('click');
+            });
+        }
+        if(selectable){
+            toolbar.find('#rp-apply-bulk').on('click', function(){
+                var action = $('#rp-bulk-action').val();
+                var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
+                if(!action || ids.length === 0){ return; }
+                if(action === 'delete' && !confirm('Elimina elementi selezionati?')){ return; }
+                var timeoutDate = null;
+                if(action === 'timeout'){
+                    var def = new Date();
+                    def.setHours(0,0,0,0);
+                    def.setDate(def.getDate() + 7);
+                    var defStr = def.getFullYear() + '-' + ('0' + (def.getMonth()+1)).slice(-2) + '-' + ('0' + def.getDate()).slice(-2) + ' 00:00:00';
+                    timeoutDate = prompt('Timeout date (YYYY-MM-DD HH:MM:SS)', defStr);
+                    if(!timeoutDate){ return; }
+                }
                 clearNotice();
-                showOverlay(true);
-                $.ajax({
-                    url: rp_admin.rest_url + entity + '/import',
-                    method: 'POST',
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                    complete: function(){ hideOverlay(); input.remove(); },
-                    success: function(res){
-                        dt.ajax.reload();
-                        var msg = 'Importazione completata';
-                        if(res && res.skipped && res.skipped.length){
-                            msg += '<br>Utenti scartati:';
-                            res.skipped.forEach(function(u){
-                                var base = u.email || u.id || 'n/a';
-                                if(u.reasons && u.reasons.length){
-                                    base += ' (' + u.reasons.join(', ') + ')';
-                                }
-                                msg += '<br>' + base;
-                            });
+                var overlay = showOverlay(false);
+                var bar = overlay.bar;
+                var text = overlay.text;
+                var i = 0;
+                function next(){
+                    if(i >= ids.length){ hideOverlay(); dt.ajax.reload(); return; }
+                    var id = ids[i];
+                    var url = rp_admin.rest_url + entity + '/' + id;
+                    var method = action === 'delete' ? 'DELETE' : 'PUT';
+                    var data = null;
+                    if(action === 'enable'){ data = entity === 'reservations' ? { presence_confirmed:1 } : { enabled:1 }; }
+                    if(action === 'disable'){ data = entity === 'reservations' ? { presence_confirmed:0 } : { enabled:0 }; }
+                    if(action === 'timeout'){ data = { timeout: timeoutDate }; }
+                    $.ajax({
+                        url: url,
+                        method: method,
+                        contentType: 'application/json',
+                        data: data ? JSON.stringify(data) : null,
+                        beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                        complete: function(){
+                            i++;
+                            var perc = Math.round(i / ids.length * 100);
+                            bar.val(perc); text.text(perc + '%');
+                            next();
                         }
-                        showNotice('success', msg);
-                    },
-                    error: function(xhr){
-                        var msg = 'Importazione fallita';
-                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
-                        showNotice('error', msg);
-                    }
-                });
-            }).trigger('click');
-        });
-        toolbar.find('#rp-apply-bulk').on('click', function(){
-            var action = $('#rp-bulk-action').val();
-            var ids = table.find('.rp-select:checked').map(function(){ return this.value; }).get();
-            if(!action || ids.length === 0){ return; }
-            if(action === 'delete' && !confirm('Elimina elementi selezionati?')){ return; }
-            var timeoutDate = null;
-            if(action === 'timeout'){
-                var def = new Date();
-                def.setHours(0,0,0,0);
-                def.setDate(def.getDate() + 7);
-                var defStr = def.getFullYear() + '-' + ('0' + (def.getMonth()+1)).slice(-2) + '-' + ('0' + def.getDate()).slice(-2) + ' 00:00:00';
-                timeoutDate = prompt('Timeout date (YYYY-MM-DD HH:MM:SS)', defStr);
-                if(!timeoutDate){ return; }
-            }
-            clearNotice();
-            var overlay = showOverlay(false);
-            var bar = overlay.bar;
-            var text = overlay.text;
-            var i = 0;
-            function next(){
-                if(i >= ids.length){ hideOverlay(); dt.ajax.reload(); return; }
-                var id = ids[i];
-                var url = rp_admin.rest_url + entity + '/' + id;
-                var method = action === 'delete' ? 'DELETE' : 'PUT';
-                var data = null;
-                if(action === 'enable'){ data = entity === 'reservations' ? { presence_confirmed:1 } : { enabled:1 }; }
-                if(action === 'disable'){ data = entity === 'reservations' ? { presence_confirmed:0 } : { enabled:0 }; }
-                if(action === 'timeout'){ data = { timeout: timeoutDate }; }
-                $.ajax({
-                    url: url,
-                    method: method,
-                    contentType: 'application/json',
-                    data: data ? JSON.stringify(data) : null,
-                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
-                    complete: function(){
-                        i++;
-                        var perc = Math.round(i / ids.length * 100);
-                        bar.val(perc); text.text(perc + '%');
-                        next();
-                    }
-                });
-            }
-            next();
-        });
+                    });
+                }
+                next();
+            });
+        }
         if(addFilter){
             toolbar.find('.rp-future-filter').on('change', function(){
                 showAll = $(this).val() === '1';
@@ -853,22 +862,24 @@
         var list = $('#res-pong-list');
         if(list.length){
             var ent = list.data('entity');
+            var opts = { filterFuture: ent === 'events' || ent === 'reservations' };
+            if(ent === 'reservations'){ opts.selectable = false; }
             initTable(list, ent, function(showAll){
                 var params = '';
                 if(ent === 'events'){ params = 'open_only=' + (showAll ? '0' : '1'); }
                 else if(ent === 'reservations'){ params = 'active_only=' + (showAll ? '0' : '1'); }
                 return restUrl(ent, params);
-            }, { filterFuture: ent === 'events' || ent === 'reservations' });
+            }, opts);
         }
         var ur = $('#res-pong-user-reservations');
         if(ur.length){
             var uid = ur.data('user');
-            initTable(ur, 'reservations', function(showAll){ return restUrl('reservations', 'user_id=' + uid + '&active_only=' + (showAll ? '0' : '1')); }, { addParams: 'user_id=' + uid, noCsv: true, filterFuture: true });
+            initTable(ur, 'reservations', function(showAll){ return restUrl('reservations', 'user_id=' + uid + '&active_only=' + (showAll ? '0' : '1')); }, { columns: columns.user_reservations, addParams: 'user_id=' + uid, noCsv: true, filterFuture: true, selectable: false, order: [[1, 'desc']] });
         }
         var er = $('#res-pong-event-reservations');
         if(er.length){
             var eid = er.data('event');
-            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid); }, { addParams: 'event_id=' + eid, noCsv: true, filterFuture: false });
+            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
         }
         initDetail();
         initEmailPage();
