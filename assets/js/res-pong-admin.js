@@ -506,6 +506,13 @@
                 var users = uRes[0];
                 var events = eRes[0];
                 var uSel = $('#user_id');
+                users.sort(function(a, b){
+                    var nameA = (a.last_name + ' ' + a.first_name).toUpperCase();
+                    var nameB = (b.last_name + ' ' + b.first_name).toUpperCase();
+                    if(nameA < nameB){ return -1; }
+                    if(nameA > nameB){ return 1; }
+                    return 0;
+                });
                 $.each(users, function(_, u){
                     uSel.append('<option value="' + u.id + '">' + u.last_name + ' ' + u.first_name + ' (' + u.id + ')</option>');
                 });
@@ -590,7 +597,11 @@
                     beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
                     complete: function(){ hideOverlay(); },
                     success: function(resp){
-                        showButtonMessage(form.find('button[type=submit]'), 'success', 'Salvato');
+                        if(entity === 'reservations' && !id){
+                            showNotice('success', 'Prenotazione salvata');
+                        }else{
+                            showButtonMessage(form.find('button[type=submit]'), 'success', 'Salvato');
+                        }
                         if(!id && resp && resp.id){
                             if(entity === 'users' || entity === 'events'){
                                 setTimeout(function(){
