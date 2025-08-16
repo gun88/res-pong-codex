@@ -2,8 +2,8 @@
     /* IMPORTANT WARNING!
      *
      * In case of REST call with query parameters, remember to generate the final URL through the restUrl
-     * function, providing the path and the parameters. This function create correct URL with query parameters
-     * checking the permalink configuration of the site. If permalinks mode is not enabled, query parameters must be
+     * function, providing the path and the parameters. This function creates the correct URL with query parameters
+     * checking the permalink configuration of the site. If permalink mode is not enabled, query parameters must be
      * added joined by '&', otherwise, as usual, joined by '?'.
      */
     function renderCheckbox(data){
