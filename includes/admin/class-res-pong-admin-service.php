@@ -280,7 +280,6 @@ class Res_Pong_Admin_Service {
         return rest_ensure_response(['success' => true]);
     }
 
-
     public function rest_get_reservation($request) {
         $id = (int)$request['id'];
         $reservation = $this->repository->get_reservation($id);
@@ -396,17 +395,5 @@ class Res_Pong_Admin_Service {
 
     private function base64url_encode($data) {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-    }
-
-    public function update_configurations(array $data) {
-        $this->configuration->update($data);
-    }
-
-    public function get_all_configurations() {
-        return $this->configuration->get_all();
-    }
-
-    public function get_configuration($key) {
-        return $this->configuration->get($key);
     }
 }
