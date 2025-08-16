@@ -1,14 +1,15 @@
 import {Component, inject, OnDestroy, OnInit} from '@angular/core';
 import {ResPongService} from '../../service/res-pong.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {Button} from 'primeng/button';
 import {ProgressBar} from 'primeng/progressbar';
 import {NgIf, NgStyle} from '@angular/common';
 import {CalendarComponent} from '../../components/calendar/calendar.component';
 import {TimelineComponent} from '../../components/timeline/timeline.component';
 import {Common} from '../../util/common';
-import {BehaviorSubject, of, Subject} from 'rxjs';
+import {of, Subject} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {SwipeNavDirective} from '../../directives/swipe-nav.directive';
 
 @Component({
   selector: 'res-pong-user-reservations',
@@ -18,29 +19,31 @@ import {catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUnti
     NgStyle,
     CalendarComponent,
     TimelineComponent,
-    NgIf
+    NgIf,
+    SwipeNavDirective
   ],
   standalone: true,
   templateUrl: './reservations.component.html',
   styleUrl: './reservations.component.scss'
 })
 export class ReservationsComponent implements OnInit, OnDestroy {
+  private activatedRoute = inject(ActivatedRoute);
   private resPongService = inject(ResPongService);
   private router = inject(Router);
 
   private destroy$ = new Subject<void>();
-  private monthPointer$ = new BehaviorSubject<number>(Common.getMonthIndexFromDate());
 
-  monthPointer: number = this.monthPointer$.value;
-  loading = false;
+  monthPointer!: number;
+  loading = true;
   currentDate = new Date();
-  title = Common.formatMonthYear(this.monthPointer);
+  title!: string;
   mode: 'calendar' | 'timeline' = (localStorage.getItem('res_pong_reservation_view_mode') || 'timeline') as 'calendar' | 'timeline';
   events: any = undefined;
   subTitle: string = '•••';
 
   ngOnInit(): void {
-    this.monthPointer$.pipe(
+    this.activatedRoute.paramMap.pipe(
+      map(params => params.has('index') ? Number(params.get('index')) : Common.getMonthIndexFromDate()),
       tap(ptr => {
         this.monthPointer = ptr;
         this.currentDate = Common.getFirstDayOfTheMonth(ptr);
@@ -70,7 +73,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
             })
           }),
           map((events: any[]) => ({
-            events, start, end, monthPointer: this.monthPointer$.value,
+            events, start, end, monthPointer: this.monthPointer,
           }))
         )
       ),
@@ -85,8 +88,6 @@ export class ReservationsComponent implements OnInit, OnDestroy {
         this.subTitle = '•••'
       }
     });
-
-    // trigger iniziale (BehaviorSubject ha già il valore iniziale)
   }
 
   ngOnDestroy(): void {
@@ -95,15 +96,15 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   }
 
   public prev() {
-    this.monthPointer$.next(this.monthPointer - 1);
+    this.router.navigate(['/reservations', this.monthPointer - 1]);
   }
 
   public next() {
-    this.monthPointer$.next(this.monthPointer + 1);
+    this.router.navigate(['/reservations', this.monthPointer + 1]);
   }
 
   public today() {
-    this.monthPointer$.next(Common.getMonthIndexFromDate());
+    this.router.navigate(['/reservations', Common.getMonthIndexFromDate()]);
   }
 
   public month() {

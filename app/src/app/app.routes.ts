@@ -28,6 +28,7 @@ export const isNotLogged: CanActivateFn = () => {
 
 export const routes: Routes = [
   {path: 'reservations', component: ReservationsComponent, canActivate: [isLogged]},
+  {path: 'reservations/:index', component: ReservationsComponent, canActivate: [isLogged]},
   {path: 'history', component: HistoryComponent, canActivate: [isLogged]},
   {path: 'user', component: UserComponent, canActivate: [isLogged]},
   {path: 'events/:id', component: EventComponent, canActivate: [isLogged]},

@@ -86,7 +86,7 @@ class Res_Pong_User_Service {
         $token = Res_Pong_Util::res_pong_token_make((int)$user->id, $ttl);
         Res_Pong_Util::res_pong_set_cookie($token, $ttl);
         Res_Pong_Util::adjust_user($user);
-        $this->load_avatar($user);
+        $user->avatar = $this->load_avatar($user->id);
 
         return new \WP_REST_Response(['success' => true, 'error' => null, 'user' => $user], 200);
 
@@ -153,7 +153,7 @@ class Res_Pong_User_Service {
             return new \WP_REST_Response('Utente disabilitato', 401);
         }
         Res_Pong_Util::adjust_user($user);
-        $this->load_avatar($user);
+        $user->avatar = $this->load_avatar($user->id);
         return rest_ensure_response($user);
     }
 
@@ -174,7 +174,7 @@ class Res_Pong_User_Service {
         }
 
         Res_Pong_Util::adjust_user($user);
-        $this->load_avatar($user);
+        $user->avatar = $this->load_avatar($user->id);
         return rest_ensure_response($user);
     }
 
@@ -187,19 +187,19 @@ class Res_Pong_User_Service {
 
     // ---------------------------------------------------------------
 
-    private function load_avatar($user) {
-        $user->avatar = null;
+    public function load_avatar($user_id) {
         if ($this->configuration->get('avatar_management') === 'fitet_monitor') {
-            $fitet_id = $this->repository->get_fitet_monitor_id($user->id);
+            $fitet_id = $this->repository->get_fitet_monitor_id($user_id);
             foreach (['jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'] as $extension) {
                 $candidate = ABSPATH . "wp-content/uploads/fitet-monitor/players/$fitet_id.$extension";
                 if (file_exists($candidate)) {
-                    $user->avatar = get_site_url()."/wp-content/uploads/fitet-monitor/players/$fitet_id.$extension";
-                    return;
+                    return get_site_url() . "/wp-content/uploads/fitet-monitor/players/$fitet_id.$extension";
                 }
             }
         }
+        return null;
     }
+
 
     private function generate_reset_token() {
         $expires = time() + 3600; // scade tra 1 ora
@@ -217,7 +217,7 @@ class Res_Pong_User_Service {
         $players = $this->repository->get_reservations_by_event_id_with_user_data($event_id);
         foreach ($players as $player) {
             $player->current_user = $user_id == $player->user_id;
-            $this->load_avatar($player);
+            $player->avatar = $this->load_avatar($player->user_id);
         }
         $other_events = $this->repository->get_next_and_previous_event($event_id, $event->start_datetime);
         if (!empty($other_events)) {
