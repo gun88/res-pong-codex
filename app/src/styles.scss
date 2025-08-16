@@ -452,6 +452,10 @@ p-menubar {
     display: none;
   }
 
+  .p-timeline-event-separator {
+    min-width: 51px;
+  }
+
   .p-timeline-event-content {
     /*    max-width: 50%;
         min-width: 240px;*/
@@ -488,6 +492,7 @@ p-menubar {
   }
 
 }
+
 .p-avatar-circle {
   aspect-ratio: 1;
 }
