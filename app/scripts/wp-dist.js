@@ -21,6 +21,14 @@ function pad(n) {
     const version = pkg.version;
     const pluginName = titleCase(name);
 
+    const envFile = path.join(appDir, 'src', 'environments', 'environment.ts');
+    let envContent = fs.readFileSync(envFile, 'utf8');
+    const buildDate = new Date();
+    const buildStr = `${buildDate.getFullYear()}${pad(buildDate.getMonth() + 1)}${pad(buildDate.getDate())}${pad(buildDate.getHours())}${pad(buildDate.getMinutes())}${pad(buildDate.getSeconds())}`;
+    envContent = envContent.replace(/(version:\s*')[^']+(')/, `$1${version}$2`);
+    envContent = envContent.replace(/(build:\s*')[^']+(')/, `$1${buildStr}$2`);
+    fs.writeFileSync(envFile, envContent);
+
     execSync('npx ng build --configuration production', {cwd: appDir, stdio: 'inherit'});
 
     const pluginFile = path.join(rootDir, 'res-pong.php');
