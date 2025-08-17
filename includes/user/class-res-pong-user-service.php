@@ -343,7 +343,27 @@ class Res_Pong_User_Service {
         } else if ($event->user_status == 'max-booking-reached') {
             // max numero prenotazioni raggiunto... messaggio e no azioni
             $active_reservations = $user->active_reservations;
-            $status_message = ['type' => 'warn', 'text' => "Hai " . ($active_reservations == 1 ? "una prenotazione attiva in un altra data" : "$active_reservations prenotazioni attive in altre date") . " per questa tipologia di evento. Non puoi effettuare altre prenotazioni."];
+            if ($active_reservations == 1) {
+                $status_message = ['type' => 'warn', 'text' =>
+                    "Hai già una prenotazione attiva per un altro evento della stessa tipologia." .
+                    "Per garantire a tutti la possibilità di partecipare, è possibile avere solo una " .
+                    "prenotazione attiva alla volta per questo tipo di evento. Dopo la sua conclusione il " .
+                    "pulsante “Prenota” tornerà disponibile"];
+/*
+ Prenotazione non disponibile
+Hai già una prenotazione attiva per un altro evento della stessa tipologia.
+Per garantire a tutti la possibilità di partecipare, è possibile avere solo una prenotazione attiva alla volta per questo tipo di evento.
+
+Puoi:
+
+partecipare all’evento già prenotato (dopo la sua conclusione il pulsante “Prenota” tornerà disponibile),
+
+oppure cancellare la tua prenotazione attuale per liberare lo slot e prenotarti a questo evento.
+ */
+            } else {
+                $status_message = ['type' => 'warn', 'text' => "Hai " . ($active_reservations == 1 ? "una prenotazione attiva in un altra data" : "$active_reservations prenotazioni attive in altre date") . " per questa tipologia di evento. Non puoi effettuare altre prenotazioni."];
+
+            }
         } else if ($event->user_status == 'timeout') {
             // utente in castigo 😂... messaggio e no azioni
             $status_message = ['type' => 'warn', 'text' => "Sei in timeout! Potrai effettuare di nuovo la prenotazione solo dopo questa data: " . $user->timeout . "."];
