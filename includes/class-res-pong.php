@@ -50,7 +50,7 @@ class Res_Pong {
         error_log('deactivate res-pong');
     }
 
-    private function copy_app_folder() {
+    public function copy_app_folder() {
         $src = RES_PONG_PLUGIN_DIR . 'app';
         if (RES_PONG_DEV) {
             $dev_path = RES_PONG_PLUGIN_DIR . 'app/dist/browser';
