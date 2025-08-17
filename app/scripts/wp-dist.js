@@ -16,9 +16,13 @@ function pad(n) {
   try {
     const appDir = path.resolve(__dirname, '..');
     const rootDir = path.resolve(appDir, '..');
-    const pkg = require(path.join(appDir, 'package.json'));
+    const packageJsonPath = path.join(appDir, 'package.json');
+    const pkg = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
     const name = pkg.name;
-    const version = pkg.version;
+    const [major, minor, patch] = pkg.version.split('.').map(Number);
+    const version = [major, minor, patch + 1].join('.');
+    pkg.version = version;
+    fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2) + '\n');
     const pluginName = titleCase(name);
 
     const envFile = path.join(appDir, 'src', 'environments', 'environment.ts');
