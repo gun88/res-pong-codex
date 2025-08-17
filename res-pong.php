@@ -39,7 +39,7 @@ register_activation_hook(__FILE__, function () use ($res_pong) {
     $res_pong->activate();
 });
 
-add_filter('upgrader_post_install', [$res_pong, 'copy_app_folder'], 10, 3);
+add_filter('upgrader_process_complete', [$res_pong, 'copy_app_folder'], 10, 2);
 
 /**
  * Plugin deactivation function
