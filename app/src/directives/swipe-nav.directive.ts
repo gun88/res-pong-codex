@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Directive, EventEmitter, HostBinding, HostListener, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Directive({
@@ -9,11 +9,13 @@ export class SwipeNavDirective {
   @Input() nextLink?: string | any[];
   @Input() prevLink?: string | any[];
 
-  @Input() thresholdPx = 60;      // distanza minima in px per considerare lo swipe
-  @Input() maxDurationMs = 600;   // durata massima del gesto
+  @Input() thresholdPx = 60;
+  @Input() maxDurationMs = 600;
 
   @Output() swipeLeft = new EventEmitter<void>();
   @Output() swipeRight = new EventEmitter<void>();
+
+  @HostBinding('style.touch-action') touchAction = 'pan-y'; // needed on iOS
 
   private startX = 0;
   private startY = 0;
@@ -22,27 +24,55 @@ export class SwipeNavDirective {
 
   constructor(private router: Router) {}
 
+  // ===== Pointer fallback-safe =====
   @HostListener('pointerdown', ['$event'])
   onPointerDown(ev: PointerEvent) {
-    if (ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return;
-    this.tracking = true;
-    this.startX = ev.clientX;
-    this.startY = ev.clientY;
-    this.startTime = performance.now();
+    if (ev.pointerType && ev.pointerType !== 'touch' && ev.pointerType !== 'pen') return;
+    this.begin(ev.clientX, ev.clientY);
   }
 
   @HostListener('pointerup', ['$event'])
   onPointerUp(ev: PointerEvent) {
     if (!this.tracking) return;
-    this.tracking = false;
+    this.end(ev.clientX, ev.clientY);
+  }
 
-    const dx = ev.clientX - this.startX;
-    const dy = ev.clientY - this.startY;
+  @HostListener('pointercancel')
+  onPointerCancel() {
+    this.tracking = false;
+  }
+
+  // ===== Touch fallback (iOS/Android where pointer events may be limited) =====
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(ev: TouchEvent) {
+    if (this.tracking) return;
+    const t = ev.touches[0];
+    this.begin(t.clientX, t.clientY);
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(ev: TouchEvent) {
+    if (!this.tracking) return;
+    const t = ev.changedTouches[0];
+    this.end(t.clientX, t.clientY);
+  }
+
+  private begin(x: number, y: number) {
+    this.tracking = true;
+    this.startX = x;
+    this.startY = y;
+    this.startTime = performance.now();
+  }
+
+  private end(x: number, y: number) {
+    const dx = x - this.startX;
+    const dy = y - this.startY;
     const dt = performance.now() - this.startTime;
+    this.tracking = false;
 
     if (dt > this.maxDurationMs) return;
     if (Math.abs(dx) < this.thresholdPx) return;
-    if (Math.abs(dy) > Math.abs(dx)) return; // ignore diagonal/vertical drags
+    if (Math.abs(dy) > Math.abs(dx)) return;
 
     if (dx < 0) {
       this.swipeLeft.emit();
@@ -50,18 +80,6 @@ export class SwipeNavDirective {
     } else {
       this.swipeRight.emit();
       if (this.prevLink) this.router.navigate(Array.isArray(this.prevLink) ? this.prevLink : [this.prevLink]);
-    }
-  }
-
-  // Prevent default scrolling only for quick horizontal swipes in progress
-  @HostListener('touchmove', ['$event'])
-  onTouchMove(ev: TouchEvent) {
-    if (!this.tracking) return;
-    const touch = ev.touches[0];
-    const dx = touch.clientX - this.startX;
-    const dy = touch.clientY - this.startY;
-    if (Math.abs(dx) > Math.abs(dy)) {
-      ev.preventDefault();
     }
   }
 }
