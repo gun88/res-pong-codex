@@ -59,5 +59,11 @@ class Res_Pong_Util {
         $padded = str_pad($replaced, strlen($replaced) % 4 === 0 ? strlen($replaced) : strlen($replaced) + (4 - strlen($replaced) % 4), '=', STR_PAD_RIGHT);
         return base64_decode($padded);
     }
+
+    public static function generate_reset_token($expires = 3600) {
+        $expires += time();
+        $random = bin2hex(random_bytes(16));
+        return $expires . '|' . $random;
+    }
 }
 

@@ -131,7 +131,7 @@ class Res_Pong_User_Service {
 
         $user = $this->repository->get_enabled_user_by_email($email);
         if ($user) {
-            $token = $this->generate_reset_token();
+            $token = Res_Pong_Util::generate_reset_token();
             $this->repository->update_user_token($user->id, $token);
             $url = $this->configuration->get('app_url') . '/#/password-update?token=' . Res_Pong_Util::base64url_encode($token);
             $text = $this->configuration->get('reset_password_text');
@@ -198,14 +198,6 @@ class Res_Pong_User_Service {
             }
         }
         return null;
-    }
-
-
-    private function generate_reset_token() {
-        $expires = time() + 3600; // scade tra 1 ora
-        $random = bin2hex(random_bytes(16));
-        $token = $expires . '|' . $random;
-        return $token;
     }
 
     private function _get_event_for_logged_user($event_id, int $user_id) {

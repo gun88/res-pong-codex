@@ -235,10 +235,10 @@ class Res_Pong_Admin_Service {
         if (!$user) {
             return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
-        $token = $this->generate_reset_token();
+        $token = Res_Pong_Util::generate_reset_token(MONTH_IN_SECONDS);
         $this->repository->update_user($id, ['reset_token' => $token]);
 
-        $url = $this->configuration->get('app_url') . '/#/first-access?token=' . $this->base64url_encode($token);
+        $url = $this->configuration->get('app_url') . '/#/first-access?token=' . Res_Pong_Util::base64url_encode($token);
         $params = $request->get_json_params();
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('invitation_text');
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
@@ -266,9 +266,9 @@ class Res_Pong_Admin_Service {
             $this->repository->update_user($id, ['password' => $hashed, 'reset_token' => null]);
             return new WP_REST_Response(['success' => true], 200);
         }
-        $token = $this->generate_reset_token();
+        $token = Res_Pong_Util::generate_reset_token();
         $this->repository->update_user($id, ['reset_token' => $token]);
-        $url = $this->configuration->get('app_url') . '/#/password-update?token=' . $this->base64url_encode($token);
+        $url = $this->configuration->get('app_url') . '/#/password-update?token=' . Res_Pong_Util::base64url_encode($token);
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('reset_password_text');
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
         $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
@@ -434,13 +434,4 @@ class Res_Pong_Admin_Service {
         return new WP_REST_Response(['success' => true], 200);
     }
 
-    private function generate_reset_token() {
-        $expires = time() + 3600;
-        $random = bin2hex(random_bytes(16));
-        return $expires . '|' . $random;
-    }
-
-    private function base64url_encode($data) {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
-    }
 }
