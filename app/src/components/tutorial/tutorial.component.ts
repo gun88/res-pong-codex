@@ -7,8 +7,7 @@ import { TutorialService, TutorialState } from '../../service/tutorial.service';
     selector: 'res-pong-user-tutorial',
     standalone: true,
     imports: [NgIf, PopoverModule],
-    templateUrl: './tutorial.component.html',
-    styleUrl: './tutorial.component.scss'
+    templateUrl: './tutorial.component.html'
 })
 export class TutorialComponent implements OnInit, OnDestroy {
     private tutorial = inject(TutorialService);
