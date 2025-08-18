@@ -8,28 +8,42 @@
 
   </ng-template>
   <ng-template #end>
-    @if (loggedIn$ | async) {
-      <p-button (click)="menu.toggle($event)"
-                styleClass="rp-menu-profile-button"
-                severity="secondary"
-                [text]="true"
-                *ngIf="(user$ | async) as user">
+    <div class="flex align-items-center gap-2">
+      <div>
+        <p-button (click)="help()"
+                  severity="secondary"
+                  ariaLabel="Aiuto"
+                  icon="pi pi-question-circle"
+                  iconPos="left"
+                  *ngIf="loggedIn$ | async">
+        </p-button>
+      </div>
+      <div>
+        @if (loggedIn$ | async) {
+          <p-button (click)="menu.toggle($event)"
+                    styleClass="rp-menu-profile-button"
+                    severity="secondary"
+                    [text]="true"
+                    *ngIf="(user$ | async) as user">
 
-        <div class="hidden md:block">{{ user.first_name }}</div>
+            <div class="hidden md:block">{{ user.first_name }}</div>
 
-        @if (user.avatar) {
-          <p-avatar [image]="user.avatar" size="normal" shape="circle"/>
+            @if (user.avatar) {
+              <p-avatar [image]="user.avatar" size="normal" shape="circle"/>
 
-        } @else if (user.monogram) {
-          <p-avatar [label]="user.monogram" size="normal" shape="circle"/>
-        } @else {
-          <p-avatar [label]="'...'" size="normal" shape="circle"/>
+            } @else if (user.monogram) {
+              <p-avatar [label]="user.monogram" size="normal" shape="circle"/>
+            } @else {
+              <p-avatar [label]="'...'" size="normal" shape="circle"/>
+
+            }
+
+          </p-button>
 
         }
+      </div>
+    </div>
 
-      </p-button>
-
-    }
     <p-menu #menu [model]="userMenu" [popup]="true" appendTo="body"></p-menu>
 
   </ng-template>

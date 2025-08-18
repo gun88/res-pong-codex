@@ -126,4 +126,8 @@ export class MenuComponent {
       btn.click(); // richiude usando la logica nativa della Menubar
     }
   }
+
+  help() {
+    // todo qui fa partire il tutorial per la pagina corrente
+  }
 }
