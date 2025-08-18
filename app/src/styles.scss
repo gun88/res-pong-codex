@@ -594,3 +594,9 @@ p-menubar {
     transform: translateX(6px);
   }
 }
+
+.rp-event-status-message-block {
+  .p-message-content {
+    place-items: start;
+  }
+}

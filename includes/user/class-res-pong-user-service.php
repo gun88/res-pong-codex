@@ -361,10 +361,11 @@ class Res_Pong_User_Service {
             // max numero prenotazioni raggiunto... messaggio e no azioni
             $active_reservations = $user->active_reservations;
             if ($active_reservations == 1) {
-                $status_message = ['type' => 'warn', 'text' =>
-                    "Hai già una prenotazione attiva per un altro evento della stessa tipologia. " .
+                $status_message = ['type' => 'warn', 'lines' => [
+                    "Hai già una prenotazione attiva per un altro evento della stessa tipologia.",
                     "Per garantire a tutti la possibilità di partecipare, è possibile avere solo una " .
-                    "prenotazione attiva alla volta per questo tipo di evento."];
+                    "prenotazione attiva alla volta per questo tipo di evento."]
+                ];
                 /*
                  Prenotazione non disponibile
                 Hai già una prenotazione attiva per un altro evento della stessa tipologia.

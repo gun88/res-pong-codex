@@ -78,7 +78,16 @@
         <p-divider/>
         <div class="flex flex-column gap-2 rp-event-status-message-block">
           <p-message [severity]="event.status_message.type"
-                     [icon]="event.status_message.icon">{{ event.status_message.text }}
+                     [icon]="event.status_message.icon">
+            @if (!!event.status_message.lines) {
+              <div class="flex flex-column gap-2">
+                @for (line of event.status_message.lines; track $index) {
+                  <p class="m-0">{{ line }}</p>
+                }
+              </div>
+            } @else {
+              {{ event.status_message.text }}
+            }
           </p-message>
         </div>
 
