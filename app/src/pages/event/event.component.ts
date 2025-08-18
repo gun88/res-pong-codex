@@ -15,7 +15,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Common} from '../../util/common';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
-import {SwipeNavDirective} from '../../directives/swipe-nav.directive';
 
 @Component({
   selector: 'res-pong-user-event',
@@ -34,8 +33,7 @@ import {SwipeNavDirective} from '../../directives/swipe-nav.directive';
     NgStyle,
     Skeleton,
     Button,
-    ConfirmDialog,
-    SwipeNavDirective
+    ConfirmDialog
   ],
   standalone: true,
   providers: [ConfirmationService],
@@ -192,10 +190,12 @@ export class EventComponent implements OnInit {
   }
 
   next() {
-    this.router.navigate(['/events', this.event.other_events.next_id])
+    if (this.event.other_events.next_id !== null)
+      this.router.navigate(['/events', this.event.other_events.next_id])
   }
 
   prev() {
-    this.router.navigate(['/events', this.event.other_events.prev_id])
+    if (this.event.other_events.prev_id !== null)
+      this.router.navigate(['/events', this.event.other_events.prev_id])
   }
 }

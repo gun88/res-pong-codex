@@ -1,6 +1,6 @@
-<div class="rp-event rp-large-page" rpSwipeNav
-     (swipeLeft)="prev()"
-     (swipeRight)="next()">
+<div class="rp-event rp-large-page"
+     (swipeleft)="prev()"
+     (swiperight)="next()">
 
   <div *ngIf="eventLoadingError">
     <p-message icon="pi pi-times-circle" severity="error">{{ eventLoadingError }}</p-message>

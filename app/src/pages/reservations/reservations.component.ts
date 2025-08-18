@@ -9,7 +9,6 @@ import {TimelineComponent} from '../../components/timeline/timeline.component';
 import {Common} from '../../util/common';
 import {of, Subject} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUntil, tap} from 'rxjs/operators';
-import {SwipeNavDirective} from '../../directives/swipe-nav.directive';
 
 @Component({
   selector: 'res-pong-user-reservations',
@@ -19,8 +18,7 @@ import {SwipeNavDirective} from '../../directives/swipe-nav.directive';
     NgStyle,
     CalendarComponent,
     TimelineComponent,
-    NgIf,
-    SwipeNavDirective
+    NgIf
   ],
   standalone: true,
   templateUrl: './reservations.component.html',

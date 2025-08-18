@@ -1,4 +1,11 @@
-import {ApplicationConfig, inject, LOCALE_ID, provideZoneChangeDetection} from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  inject,
+  Injectable,
+  LOCALE_ID,
+  provideZoneChangeDetection
+} from '@angular/core';
 import {provideRouter, Router, withHashLocation} from '@angular/router';
 
 import {routes} from './app.routes';
@@ -10,6 +17,7 @@ import {HttpInterceptorFn, provideHttpClient, withInterceptors} from '@angular/c
 import {tap} from 'rxjs';
 import {registerLocaleData} from '@angular/common';
 import localeIt from '@angular/common/locales/it';
+import {HAMMER_GESTURE_CONFIG, HammerGestureConfig, HammerModule} from '@angular/platform-browser';
 
 registerLocaleData(localeIt);
 
@@ -28,8 +36,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   );
 };
 
+@Injectable()
+export class ResPongHammerConfig extends HammerGestureConfig {
+  override overrides = {
+    swipe: {direction: Hammer.DIRECTION_HORIZONTAL}
+  };
+}
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
+    importProvidersFrom(HammerModule),
+    {provide: HAMMER_GESTURE_CONFIG, useClass: ResPongHammerConfig},
     provideHttpClient(withInterceptors([authInterceptor])),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes, withHashLocation()),
