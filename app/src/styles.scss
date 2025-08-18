@@ -548,6 +548,10 @@ p-menubar {
   pointer-events: none;
 }
 
+.tutorial-text p {
+  margin-top: 0;
+}
+
 .tutorial-highlight:before {
   z-index: -1;
 
@@ -571,4 +575,22 @@ p-menubar {
 .rp-swipe-zone {
   touch-action: pan-y;
   -ms-touch-action: pan-y;
+}
+
+.rp-swipe-icon {
+  width: 41px;aspect-ratio: .9;
+  display: inline-block;
+  animation: swipeAnim 1s infinite alternate ease-in-out;
+}
+
+@keyframes swipeAnim {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(-6px);
+  }
+  100% {
+    transform: translateX(6px);
+  }
 }

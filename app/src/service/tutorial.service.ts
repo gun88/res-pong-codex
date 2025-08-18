@@ -22,27 +22,27 @@ export class TutorialService {
 
 
     private tutorialSteps: TutorialStep[] = [
-         {selector: '.rp-event-title-block-container', text: "Nome dell'evento visualizzato in questa pagina. Qui è indicata anche la data dell'evento e la sua durata."},
-        {selector: '.rp-event-navigator', text: "Tramite questi pulsanti puoi navigare tra gli eventi. Da dispositivo mobile, è possibile navigare anche tramite swipe verso destra e sinistra."},
-        {selector: '.rp-event-actions-block', text: "Usa questi pulsanti per Prenotare un evento o Cancellare la tua prenotazione."},
-        {selector: '.rp-event-status-message-block', text: "Questo è un messaggio con le informazioni sull'evento e la tua prenotazione."},
-        {selector: '.rp-event-participants-block', text: "In questa sezione trovi la lista dei giocatori iscritti all'evento corrente."},
+        {selector: '.rp-event-title-block-container', text: "event-title"},
+        {selector: '.rp-event-navigator', text: "event-navigator"},
+        {selector: '.rp-event-actions-block', text: "event-actions"},
+        {selector: '.rp-event-status-message-block', text: "event-status"},
+        {selector: '.rp-event-participants-block', text: "event-participants"},
 
-        {selector: '.rp-reservations-title-box', text: "Qui sono riportati il mese e l'anno che stai visualizzando. Al di sotto dell'etichetta, il numero di eventi disponibili per questo intervallo di tempo."},
-        {selector: '#rp-reservations-navigator', text: "Tramite questi pulsanti puoi navigare tra i mesi. Premi 'Oggi' per tornare al mese corrente. Da dispositivo mobile, è possibile navigare anche tramite swipe verso destra e sinistra."},
-        {selector: '#rp-reservations-view-switcher', text: "Scegli la modalità di visualizzazione. La modalità 'Mese' mostra la pagina di calendario mentre la modalità 'Lista' mostra l'elenco degli eventi."},
-        {selector: '.rp-calendar-day-with-events', text: "Qui c'è un evento. Clicca qui per aprire la pagina di dettaglio, dove potrai prenotarti, cancellare la tua prenotazione o vedere le informazioni dell'evento."},
-        {selector: '.rp-calendar-legend-container', text: "Qui trovi la legenda delle disponibilità. Tramite i colori delle etichette degli eventi, puoi già capire se c'è disponibilità."},
+        {selector: '.rp-reservations-title-box', text: "reservations-title"},
+        {selector: '#rp-reservations-navigator', text: "reservations-navigator"},
+        {selector: '#rp-reservations-view-switcher', text: "reservations-view-switcher"},
+        {selector: '.p-datepicker-day-cell:not(.p-datepicker-other-month) .rp-calendar-day-with-events', text: "reservations-event"},
+        {selector: '.rp-calendar-legend-container', text: "reservations-legend"},
 
-        {selector: '.rp-user-data-section', text: "In questa sezione trovi i tuoi dati."},
-        {selector: '.rp-user-data-section-username', text: "Il tuo username, autogenerato dalla piattaforma. Puoi usarlo per autenticarti al posto della e-mail."},
-        {selector: '.rp-user-data-section-email', text: "L'indirizzo e-mail che hai fornito alla società e con il quale è stato registrato il tuo account."},
-        {selector: '.rp-user-logout', text: "Pulsante di Log Out. Clicca qui per terminare la sessione."},
-        {selector: '.rp-user-password-update', text: "In questa sezione trovi il modulo per reimpostare la password. Inserisci la tua nuova password e la conferma, poi premi invia."},
+        {selector: '.rp-user-data-section', text: "user-data-section"},
+        {selector: '.rp-user-data-section-username', text: "user-data-section-username"},
+        {selector: '.rp-user-data-section-email', text: "user-data-section-email"},
+        {selector: '.rp-user-logout', text: "user-logout"},
+        {selector: '.rp-user-password-update', text: "user-password"},
 
-        {selector: '.p-menubar.p-menubar-mobile', text: "Dal menu potrai accedere alle pagine principali del sito. La pagina Prenotazioni, da dove potrai vedere tutti gli eventi in programma, e lo Storico, da dove potrai vedere tutte le tue prenotazioni."},
-        {selector: '.p-menubar:not(.p-menubar-mobile) .p-menubar-root-list', text: "Dal menu potrai accedere alle pagine principali del sito. La pagina Prenotazioni, da dove potrai vedere tutti gli eventi in programma, e lo Storico, da dove potrai vedere tutte le tue prenotazioni."},
-        {selector: '.rp-menu-profile-button-container', text: "Clicca qui per aprire il menu del tuo profilo. Da qui puoi visualizzare i tuoi dati, modificare la password o fare logout."},
+        {selector: '.p-menubar.p-menubar-mobile', text: "menubar-menu"},
+        {selector: '.p-menubar:not(.p-menubar-mobile) .p-menubar-root-list', text: "menubar-menu"},
+        {selector: '.rp-menu-profile-button-container', text: "menubar-profile"},
 
     ];
 

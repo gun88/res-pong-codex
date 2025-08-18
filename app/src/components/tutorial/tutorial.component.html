@@ -1,8 +1,91 @@
 <p-popover #popover [dismissable]="false" styleClass="rp-tutorial-popover">
-    <div class="tutorial-text">{{ state?.step?.text }}</div>
+    <div class="tutorial-text">
+        @switch (state?.step?.text) {
+            @case ('event-title') {
+                <p>Nome dell'evento visualizzato in questa pagina.</p>
+                <p>Qui è indicata anche la data dell'evento e la sua durata.</p>
+            }
+            @case ('event-navigator') {
+                <p>Tramite questi pulsanti puoi navigare tra gli eventi.</p>
+                <p>Da dispositivo mobile, è possibile navigare anche tramite <strong><em class="text-primary">swipe</em></strong>
+                    verso destra e sinistra.</p>
+                <p class="text-center"><img src="swipe.png" alt="swipe" class="rp-swipe-icon"></p>
+            }
+            @case ('event-actions') {
+                <p>Usa questi pulsanti per Prenotare un evento o Cancellare la tua prenotazione.</p>
+                <p>Se uno dei due pulsanti è disabilitato, non puoi eseguire l'azione corrispondente.</p>
+            }
+            @case ('event-status') {
+                <p>Questo è un messaggio con le informazioni sull'evento e la tua prenotazione.</p>
+            }
+            @case ('event-participants') {
+                <p>In questa sezione trovi la lista dei giocatori iscritti all'evento corrente.</p>
+            }
+            @case ('reservations-title') {
+                <p>Qui sono riportati il mese e l'anno che stai visualizzando.</p>
+                <p>Al di sotto dell'etichetta, il numero di eventi disponibili per questo intervallo di tempo.</p>
+            }
+            @case ('reservations-navigator') {
+                <p>Tramite questi pulsanti puoi navigare tra i mesi. Premi <strong>Oggi</strong> per tornare al mese
+                    corrente.</p>
+                <p>Da dispositivo mobile, è possibile navigare anche tramite <strong><em class="text-primary">swipe</em></strong>
+                    verso destra e sinistra.</p>
+                <p class="text-center"><img src="swipe.png" alt="swipe" class="rp-swipe-icon"></p>
+            }
+            @case ('reservations-view-switcher') {
+                <p>Scegli la modalità di visualizzazione.</p>
+                <p>La modalità <strong>Mese</strong> mostra la pagina di calendario.</p>
+                <p>La modalità <strong>Lista</strong> mostra l'elenco degli eventi.</p>
+            }
+            @case ('reservations-event') {
+                <p>Qui c'è un evento.</p>
+                <p>Clicca qui per aprire la pagina di dettaglio, dove potrai prenotarti, cancellare
+                    la tua prenotazione o vedere le informazioni dell'evento.</p>
+            }
+            @case ('reservations-legend') {
+                <p>Qui trovi la legenda delle disponibilità.</p>
+                <p>Tramite i colori delle etichette degli eventi, puoi già capire se c'è disponibilità.</p>
+            }
+            @case ('user-data-section') {
+                <p>In questa sezione trovi i tuoi dati.</p>
+            }
+            @case ('user-data-section-username') {
+                <p>Il tuo username, autogenerato dalla piattaforma.</p>
+                <p><u>Puoi usarlo per autenticarti</u> al posto della e-mail.</p>
+            }
+            @case ('user-data-section-email') {
+                <p>L'indirizzo e-mail che hai fornito alla società e con il quale è stato registrato il tuo account.</p>
+            }
+            @case ('user-logout') {
+                <p>Pulsante di Log Out.</p>
+                <p>Clicca qui per terminare la sessione.</p>
+            }
+            @case ('user-password') {
+                <p>In questa sezione trovi il modulo per reimpostare la password. </p>
+                <p>Inserisci la tua nuova password e la conferma, poi premi invia.</p>
+            }
+            @case ('menubar-menu') {
+                <p>Dal menu potrai accedere alle pagine principali del sito.</p>
+                <p>La pagina <strong>Prenotazioni</strong>, da dove potrai vedere tutti gli eventi in programma.</p>
+                <p>Lo <strong>Storico</strong>, da dove potrai vedere tutte le tue prenotazioni.</p>
+            }
+            @case ('menubar-profile') {
+                <p>Clicca qui per aprire il menu del tuo profilo.</p>
+                <p>Da qui puoi:</p>
+                <ul>
+                    <li>Visualizzare i tuoi dati</li>
+                    <li>Modificare la password</li>
+                    <li>Fare logout</li>
+                </ul>
+            }
+            @default {
+                {{ state?.step?.text }}
+            }
+        }
+    </div>
     <div class="tutorial-actions">
-        <p-button (click)="end()"  label="Chiudi Tutorial" size="small" severity="secondary"></p-button>
-        <p-button (click)="next()"  *ngIf="!state?.step?.last" size="small" label="Avanti"></p-button>
+        <p-button (click)="end()" label="Chiudi Tutorial" size="small" severity="secondary"></p-button>
+        <p-button (click)="next()" *ngIf="!state?.step?.last" size="small" label="Avanti"></p-button>
     </div>
 </p-popover>
 <div class="tutorial-overlay" *ngIf="state"></div>
