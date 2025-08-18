@@ -9,6 +9,7 @@ import {TimelineComponent} from '../../components/timeline/timeline.component';
 import {Common} from '../../util/common';
 import {of, Subject} from 'rxjs';
 import {catchError, debounceTime, distinctUntilChanged, map, switchMap, takeUntil, tap} from 'rxjs/operators';
+import {TutorialService, TutorialStep} from '../../service/tutorial.service';
 
 @Component({
   selector: 'res-pong-user-reservations',
@@ -28,6 +29,7 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   private activatedRoute = inject(ActivatedRoute);
   private resPongService = inject(ResPongService);
   private router = inject(Router);
+  private tutorial = inject(TutorialService);
 
   private destroy$ = new Subject<void>();
 
@@ -38,8 +40,13 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   mode: 'calendar' | 'timeline' = (localStorage.getItem('res_pong_reservation_view_mode') || 'timeline') as 'calendar' | 'timeline';
   events: any = undefined;
   subTitle: string = '•••';
+  private tutorialSteps: TutorialStep[] = [
+    {selector: '.rp-reservations-title-box', text: 'In questa sezione trovi il mese corrente.'},
+    {selector: '.rp-calendar-legend', text: 'Qui trovi la legenda delle disponibilità.'}
+  ];
 
   ngOnInit(): void {
+    this.tutorial.register('/reservations', this.tutorialSteps);
     this.activatedRoute.paramMap.pipe(
       map(params => params.has('index') ? Number(params.get('index')) : Common.getMonthIndexFromDate()),
       tap(ptr => {
