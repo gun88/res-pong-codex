@@ -39,8 +39,16 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 @Injectable()
 export class ResPongHammerConfig extends HammerGestureConfig {
   override overrides = {
-    swipe: {direction: Hammer.DIRECTION_HORIZONTAL}
+    swipe: {direction: Hammer.DIRECTION_HORIZONTAL, velocity: 0.3, threshold: 15},
+    pan: {enable: false}
   };
+
+  override buildHammer(element: HTMLElement) {
+    const mc = new Hammer.Manager(element, { touchAction: 'pan-y' });
+    const swipe = new Hammer.Swipe({ direction: Hammer.DIRECTION_HORIZONTAL, velocity: 0.3, threshold: 15 });
+    mc.add(swipe);
+    return mc;
+  }
 }
 
 
