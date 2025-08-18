@@ -31,6 +31,8 @@
 
   <div *ngIf="mode === 'calendar'">
     <res-pong-user-calendar [events]="events" [currentDate]="currentDate"
+                            (swipeLeft)="prev()"
+                            (swipeRight)="next()"
                             (onDaySelected)="onSelection($event)"></res-pong-user-calendar>
   </div>
   <div *ngIf="mode === 'timeline'">

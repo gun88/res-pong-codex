@@ -1,4 +1,14 @@
-import {Component, EventEmitter, HostListener, inject, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  EventEmitter,
+  HostListener,
+  inject,
+  Input,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {DatePicker} from 'primeng/datepicker';
 import {PrimeNG} from 'primeng/config';
 import {Common} from '../../util/common';
@@ -19,13 +29,15 @@ import {Dialog} from 'primeng/dialog';
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.scss'
 })
-export class CalendarComponent implements OnInit {
+export class CalendarComponent implements OnInit, AfterViewInit {
   private primengConfig = inject(PrimeNG);
   private fullNames = ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'];
   private shortNames = ['Dom', 'Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab'];
   private minNames = ['D', 'L', 'M', 'M', 'G', 'V', 'S'];
   private _events!: any;
   @ViewChild('rpc') datePicker!: DatePicker;
+  @ViewChild(DatePicker, {static: true}) calendar!: DatePicker;
+
   _currentDate: any;
   dayMap: any = {};
   @Output() onDaySelected = new EventEmitter<any[]>();
@@ -77,8 +89,9 @@ export class CalendarComponent implements OnInit {
     let {month, year} = Common.getMonthYearFromIndex(this._events.monthPointer);
     this._currentDate = new Date(year, month, 1);
     this.dayMap = this.mapEventsByDay(this._events.events);
-    if (this.datePicker)
+    if (this.datePicker) {
       this.datePicker.updateUI()
+    }
 
   }
 
@@ -131,4 +144,21 @@ export class CalendarComponent implements OnInit {
     this.selectedDay = undefined;
 
   }
+
+
+  @Output() swipeLeft = new EventEmitter<void>();
+  @Output() swipeRight = new EventEmitter<void>();
+  
+  ngAfterViewInit() {
+    const panel = this.datePicker.el.nativeElement
+      .querySelector('.p-datepicker .p-datepicker-panel') as HTMLElement;
+
+    const hammer = new Hammer(panel);
+    hammer.get('swipe').set({direction: Hammer.DIRECTION_HORIZONTAL});
+    hammer.on('swipeleft', () => this.swipeLeft.emit());
+    hammer.on('swiperight', () => this.swipeRight.emit());
+
+  }
+
+
 }
