@@ -35,23 +35,34 @@ class Res_Pong_User_Service {
     }
 
     public function create_user_reservations_for_logged_user($request) {
-        // todo: questo metodo deve essere eseguito in maniera atomica o con dei lock per eveitare concorrenza sul risultato can join
-        //  due chiamate in serie potrebbero restituire true sul primo can join e false sul secondo
-        //  se queste 2 chiamate vengono fatte in parallelo, potrebbero restituire true per entrambi i can join e permettere prenotazioni anche quando non consentito
         $event_id = $request->get_param('event_id');
         $user_id = $this->res_pong_get_logged_user_id();
-        $event = $this->_get_event_for_logged_user($event_id, $user_id);
 
-        if ($event->can_join) {
-            $created_at = date('Y-m-d H:i:s');
-            $this->repository->insert_reservation(['event_id' => $event_id, 'user_id' => $user_id, 'created_at' => $created_at]);
-            $event = $this->_get_event_for_logged_user($event_id, $user_id);
-        } else {
-            if (!empty($event->status_message)) {
-                $event->status_message['text'] = 'Impossibile completare la prenotazione. ' . $event->status_message['text'];
-                $event->status_message['type'] = 'error';
+        $event = $this->repository->transaction(function () use ($event_id, $user_id) {
+            $ev = $this->repository->get_event_by_id($event_id);
+            $group_id = isset($ev->group_id) && $ev->group_id > 0 ? $ev->group_id : $ev->id;
+
+            $this->repository->acquire_guard($user_id, $group_id);
+
+            try {
+                $event = $this->_get_event_for_logged_user($event_id, $user_id);
+                if ($event->can_join) {
+                    $created_at = date('Y-m-d H:i:s');
+                    $this->repository->insert_reservation(['event_id' => $event_id, 'user_id' => $user_id, 'created_at' => $created_at]);
+                    $event = $this->_get_event_for_logged_user($event_id, $user_id);
+                } else {
+                    if (!empty($event->status_message)) {
+                        $event->status_message['text'] = 'Impossibile completare la prenotazione. ' . $event->status_message['text'];
+                        $event->status_message['type'] = 'error';
+                    }
+                }
+            } finally {
+                $this->repository->release_guard($user_id, $group_id);
             }
-        }
+
+            return $event;
+        });
+
         return rest_ensure_response($event);
     }
 

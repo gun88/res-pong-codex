@@ -4,6 +4,7 @@ class Res_Pong_User_Repository {
     private $table_user;
     private $table_event;
     private $table_reservation;
+    private $table_guard;
     private $wpdb;
 
     public function __construct() {
@@ -13,6 +14,7 @@ class Res_Pong_User_Repository {
         $this->table_user = $prefix . 'RP_USER';
         $this->table_event = $prefix . 'RP_EVENT';
         $this->table_reservation = $prefix . 'RP_RESERVATION';
+        $this->table_guard = $prefix . 'RP_GUARD';
     }
 
     public function get_user_by_id($id) {
@@ -41,6 +43,16 @@ class Res_Pong_User_Repository {
 
     public function insert_reservation($data) {
         return $this->wpdb->insert($this->table_reservation, $data);
+    }
+
+    public function acquire_guard($user_id, $group_id) {
+        $sql = $this->wpdb->prepare("INSERT INTO {$this->table_guard} (user_id, group_id) VALUES (%s, %d)", $user_id, $group_id);
+        $this->wpdb->query($sql);
+    }
+
+    public function release_guard($user_id, $group_id) {
+        $sql = $this->wpdb->prepare("DELETE FROM {$this->table_guard} WHERE user_id = %s AND group_id = %d", $user_id, $group_id);
+        $this->wpdb->query($sql);
     }
 
     public function get_reservations_by_user_id($user_id) {
