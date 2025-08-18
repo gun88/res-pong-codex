@@ -169,6 +169,26 @@ class Res_Pong_User_Repository {
         return $this->wpdb->get_var($this->wpdb->prepare($query, $id));
     }
 
+    public function transaction(callable $fn)
+    {
+        $this->wpdb->query('START TRANSACTION');
+
+        try {
+            $result = $fn();
+
+            // If any low-level DB error occurred inside the closure, fail the tx
+            if (!empty($this->wpdb->last_error)) {
+                throw new \RuntimeException($this->wpdb->last_error);
+            }
+
+            $this->wpdb->query('COMMIT');
+            return $result;
+        } catch (\Throwable $e) {
+            $this->wpdb->query('ROLLBACK');
+            throw $e; // rethrow so caller can decide how to respond
+        }
+    }
+
 
 
 }

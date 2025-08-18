@@ -35,6 +35,9 @@ class Res_Pong_User_Service {
     }
 
     public function create_user_reservations_for_logged_user($request) {
+        // todo: questo metodo deve essere eseguito in maniera atomica o con dei lock per eveitare concorrenza sul risultato can join
+        //  due chiamate in serie potrebbero restituire true sul primo can join e false sul secondo
+        //  se queste 2 chiamate vengono fatte in parallelo, potrebbero restituire true per entrambi i can join e permettere prenotazioni anche quando non consentito
         $event_id = $request->get_param('event_id');
         $user_id = $this->res_pong_get_logged_user_id();
         $event = $this->_get_event_for_logged_user($event_id, $user_id);
@@ -340,17 +343,17 @@ class Res_Pong_User_Service {
                     "Hai già una prenotazione attiva per un altro evento della stessa tipologia. " .
                     "Per garantire a tutti la possibilità di partecipare, è possibile avere solo una " .
                     "prenotazione attiva alla volta per questo tipo di evento."];
-/*
- Prenotazione non disponibile
-Hai già una prenotazione attiva per un altro evento della stessa tipologia.
-Per garantire a tutti la possibilità di partecipare, è possibile avere solo una prenotazione attiva alla volta per questo tipo di evento.
+                /*
+                 Prenotazione non disponibile
+                Hai già una prenotazione attiva per un altro evento della stessa tipologia.
+                Per garantire a tutti la possibilità di partecipare, è possibile avere solo una prenotazione attiva alla volta per questo tipo di evento.
 
-Puoi:
+                Puoi:
 
-partecipare all’evento già prenotato (dopo la sua conclusione il pulsante “Prenota” tornerà disponibile),
+                partecipare all’evento già prenotato (dopo la sua conclusione il pulsante “Prenota” tornerà disponibile),
 
-oppure cancellare la tua prenotazione attuale per liberare lo slot e prenotarti a questo evento.
- */
+                oppure cancellare la tua prenotazione attuale per liberare lo slot e prenotarti a questo evento.
+                 */
             } else {
                 $status_message = ['type' => 'warn', 'text' => "Hai " . ($active_reservations == 1 ? "una prenotazione attiva in un altra data" : "$active_reservations prenotazioni attive in altre date") . " per questa tipologia di evento. Non puoi effettuare altre prenotazioni."];
 

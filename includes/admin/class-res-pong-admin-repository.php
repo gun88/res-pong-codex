@@ -6,6 +6,7 @@ class Res_Pong_Admin_Repository {
     private $table_user;
     private $table_event;
     private $table_reservation;
+    private $table_guard;
     private $wpdb;
 
     public function __construct() {
@@ -15,6 +16,7 @@ class Res_Pong_Admin_Repository {
         $this->table_user = $prefix . 'RP_USER';
         $this->table_event = $prefix . 'RP_EVENT';
         $this->table_reservation = $prefix . 'RP_RESERVATION';
+        $this->table_guard = $prefix . 'RP_GUARD';
     }
 
     // ------------------------
@@ -68,6 +70,12 @@ class Res_Pong_Admin_Repository {
             CONSTRAINT fk_event_id FOREIGN KEY (event_id) REFERENCES {$this->table_event}(id) ON DELETE CASCADE,
             INDEX idx_event_id (event_id),
             INDEX idx_user_id (user_id)
+        ) $charset_collate;
+
+        CREATE TABLE {$this->table_guard} (
+            user_id VARCHAR(20),
+            group_id INT,
+            PRIMARY KEY (user_id, group_id)
         ) $charset_collate;
         ";
 
