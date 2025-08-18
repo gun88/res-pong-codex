@@ -4,6 +4,7 @@ import {MenuItem, MenuItemCommandEvent} from 'primeng/api';
 import {Avatar} from 'primeng/avatar';
 import {MenuModule} from 'primeng/menu';
 import {ResPongService} from '../../service/res-pong.service';
+import {TutorialService} from '../../service/tutorial.service';
 import {Observable} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {Button} from 'primeng/button';
@@ -31,6 +32,7 @@ import {ProgressSpinner} from 'primeng/progressspinner';
 export class MenuComponent {
   private resPongService = inject(ResPongService);
   private router = inject(Router);
+  private tutorial = inject(TutorialService);
 
   loggingOut = false;
 
@@ -128,6 +130,6 @@ export class MenuComponent {
   }
 
   help() {
-    // todo qui fa partire il tutorial per la pagina corrente
+    this.tutorial.startForUrl(this.router.url);
   }
 }
