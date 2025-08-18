@@ -52,6 +52,10 @@ class Res_Pong_User_Service {
                     $event = $this->_get_event_for_logged_user($event_id, $user_id);
                 } else {
                     if (!empty($event->status_message)) {
+                        if (!empty($event->status_message['lines'])) {
+                            array_unshift($event->status_message['lines'], 'Impossibile completare la prenotazione.');
+                        }
+                        $event->status_message['type'] = 'error';
                         $event->status_message['text'] = 'Impossibile completare la prenotazione. ' . $event->status_message['text'];
                         $event->status_message['type'] = 'error';
                     }
@@ -76,6 +80,9 @@ class Res_Pong_User_Service {
             $event = $this->_get_event_for_logged_user($event_id, $user_id);
         } else {
             if (!empty($event->status_message)) {
+                if (!empty($event->status_message['lines'])) {
+                    array_unshift($event->status_message['lines'], 'Impossibile cancellare la prenotazione.');
+                }
                 $event->status_message['text'] = 'Impossibile cancellare la prenotazione. ' . $event->status_message['text'];
                 $event->status_message['type'] = 'error';
             }
