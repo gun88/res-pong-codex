@@ -1,13 +1,13 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { NgIf, NgStyle } from '@angular/common';
 import { TutorialService, TutorialState } from '../../service/tutorial.service';
+import {Popover} from 'primeng/popover';
 
 @Component({
     selector: 'res-pong-user-tutorial',
     standalone: true,
-    imports: [NgIf, NgStyle],
-    templateUrl: './tutorial.component.html',
-    styleUrl: './tutorial.component.scss'
+  imports: [NgIf, NgStyle, Popover],
+    templateUrl: './tutorial.component.html'
 })
 export class TutorialComponent implements OnInit, OnDestroy {
     private tutorial = inject(TutorialService);
