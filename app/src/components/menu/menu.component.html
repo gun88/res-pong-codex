@@ -18,7 +18,7 @@
                   *ngIf="loggedIn$ | async">
         </p-button>
       </div>
-      <div>
+      <div class="rp-menu-profile-button-container">
         @if (loggedIn$ | async) {
           <p-button (click)="menu.toggle($event)"
                     styleClass="rp-menu-profile-button"

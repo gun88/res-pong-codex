@@ -145,10 +145,9 @@ export class CalendarComponent implements OnInit, AfterViewInit {
 
   }
 
-
   @Output() swipeLeft = new EventEmitter<void>();
   @Output() swipeRight = new EventEmitter<void>();
-  
+
   ngAfterViewInit() {
     const panel = this.datePicker.el.nativeElement
       .querySelector('.p-datepicker .p-datepicker-panel') as HTMLElement;

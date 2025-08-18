@@ -10,3 +10,10 @@
   --p-button-sm-icon-only-width: 2rem;
   --p-button-sm-font-size: .8rem
 }
+
+.rp-event-navigator {
+  white-space: nowrap;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

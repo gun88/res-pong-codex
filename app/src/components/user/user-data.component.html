@@ -1,5 +1,5 @@
 <div class="user-info" role="group" aria-label="Dati utente">
-  <h2 *ngIf="title">{{ title }}</h2>
+  <h2 *ngIf="title" class="rp-user-data-section">{{ title }}</h2>
   <div class="mb-2 mt-2" *ngIf="error">
     <p-message size="small" icon="pi pi-exclamation-circle" severity="error">{{ error }}</p-message>
   </div>
@@ -15,13 +15,13 @@
       <p-avatar [label]="'...'" styleClass="mr-2" size="xlarge" shape="circle"/>
     }
   </div>
-  <div class="user-field">
+  <div class="user-field rp-user-data-section-username">
     <span class="label">Username</span>
     <p-skeleton *ngIf="loading" height="1rem" width="8rem"/>
     <span *ngIf="!loading" class="value">{{ (user?.username || 'N/A') }}</span>
   </div>
 
-  <div class="user-field">
+  <div class="user-field rp-user-data-section-email">
     <span class="label">Email</span>
     <p-skeleton *ngIf="loading" height="1rem" width="8rem"/>
     <span *ngIf="!loading" class="value">{{ (user?.email || 'N/A') }}</span>

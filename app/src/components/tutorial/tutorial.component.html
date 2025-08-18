@@ -1,8 +1,8 @@
-<p-popover #popover [dismissable]="false">
+<p-popover #popover [dismissable]="false" styleClass="rp-tutorial-popover">
     <div class="tutorial-text">{{ state?.step?.text }}</div>
-    <div class="tutorial-actions">aaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-        <a (click)="next()">Avanti</a>
-        <a (click)="end()">Chiudi Tutorial</a>
+    <div class="tutorial-actions">
+        <p-button (click)="end()"  label="Chiudi Tutorial" size="small" severity="secondary"></p-button>
+        <p-button (click)="next()"  *ngIf="!state?.step?.last" size="small" label="Avanti"></p-button>
     </div>
 </p-popover>
 <div class="tutorial-overlay" *ngIf="state"></div>

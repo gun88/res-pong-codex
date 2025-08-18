@@ -124,6 +124,6 @@ export class MenuComponent {
   }
 
   help() {
-    this.tutorial.startForUrl(this.router.url);
+    this.tutorial.start();
   }
 }

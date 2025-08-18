@@ -1,12 +1,13 @@
-import {Component, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, HostListener, inject, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {NgIf} from '@angular/common';
 import {Popover, PopoverModule} from 'primeng/popover';
 import {TutorialService, TutorialState} from '../../service/tutorial.service';
+import {Button} from "primeng/button";
 
 @Component({
     selector: 'res-pong-user-tutorial',
     standalone: true,
-    imports: [NgIf, PopoverModule],
+    imports: [NgIf, PopoverModule, Button],
     templateUrl: './tutorial.component.html'
 })
 export class TutorialComponent implements OnInit, OnDestroy {
@@ -17,18 +18,24 @@ export class TutorialComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.sub = this.tutorial.tutorial$.subscribe(state => {
-            this.popover?.hide();
             this.removeHighlight();
+            this.popover?.hide();
             this.state = state;
             if (state) {
                 const el = document.querySelector(state.step.selector) as HTMLElement | null;
                 if (el) {
                     el.classList.add('tutorial-highlight');
                     el.scrollIntoView({behavior: 'smooth', block: 'center'});
-                    setTimeout(() => this.popover?.show(null, el));
+                    setTimeout(() => this.popover?.show(null, el), 250);
+
                 } else {
-                    setTimeout(() => this.popover?.show(null));
+                    console.log('Tutorial selector not found:', state.step.selector);
+                    this.next()
                 }
+            } else {
+                setTimeout(() => {
+                    this.popover?.hide();
+                });
             }
         });
     }
@@ -45,6 +52,17 @@ export class TutorialComponent implements OnInit, OnDestroy {
     end() {
         this.tutorial.end();
         this.popover?.hide();
+    }
+
+    @HostListener('document:keydown', ['$event'])
+    handleKeyboard(event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+            this.end();
+        }
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            this.next();
+        }
     }
 
     private removeHighlight() {

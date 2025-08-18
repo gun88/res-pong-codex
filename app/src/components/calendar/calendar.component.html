@@ -4,7 +4,7 @@
                  [firstDayOfWeek]="1"
                  [inline]="true">
     <ng-template #date let-date>
-      <div class="rp-calendar-day" (click)="onSelectDay(date)">
+      <div class="rp-calendar-day" (click)="onSelectDay(date)" [class.rp-calendar-day-with-events]="dayMap[date.month] && dayMap[date.month][date.day]">
         <div class="rp-calendar-day-number">{{ date.day }}</div>
         <div *ngIf="dayMap[date.month] && dayMap[date.month][date.day]" class="rp-calendar-events">
           <div *ngFor="let e of dayMap[date.month][date.day]; let i = index; " class="rp-calendar-event">

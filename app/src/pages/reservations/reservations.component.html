@@ -1,7 +1,7 @@
 <div class="rp-large-page"
      (swipeleft)="prev()"
      (swiperight)="next()">
-  <div class="flex items-center justify-between w-full align-items-center gap-3 flex-column-reverse sm:flex-row">
+  <div class="flex items-center justify-content-between w-full align-items-center gap-3 flex-column-reverse sm:flex-row">
     <div class="flex items-center justify-between gap-1" id="rp-reservations-navigator">
       <p-button icon="pi pi-angle-left" size="small" [rounded]="true" severity="secondary" [outlined]="true"
                 (onClick)="prev()"/>
@@ -10,11 +10,11 @@
                 (onClick)="next()"/>
 
     </div>
-    <div class="flex-1 text-center rp-reservations-title-box">
+    <div class="text-center rp-reservations-title-box">
       <h2 class="m-0">{{ title }}</h2>
       <span class="rp-subtitle">({{ subTitle }})</span>
     </div>
-    <div class="flex items-center justify-between gap-1">
+    <div class="flex items-center justify-between gap-1" id="rp-reservations-view-switcher">
       <p-button label="Mese" size="small" [rounded]="true"
                 [severity]="mode === 'calendar' ? 'primary': 'secondary'"
                 [outlined]="true" (onClick)="month()"/>
@@ -42,7 +42,7 @@
   </div>
 
   <div class="rp-calendar-legend-container">
-    <h4>Leggenda disponibilità</h4>
+    <h4>Legenda disponibilità</h4>
     <div class="rp-calendar-legend text-xs">
       <div>
         <div class="rp-legend-dot rp-calendar-label-closed"></div>
