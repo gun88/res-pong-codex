@@ -202,5 +202,4 @@ class Res_Pong_User_Repository {
     }
 
 
-
 }

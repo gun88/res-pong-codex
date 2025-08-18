@@ -32,9 +32,16 @@
   padding: .7rem 0;
   max-width: 250px;
   min-width: 240px;
+
   .rp-timeline-content-day-no-event {
     font-style: italic;
     color: var(--p-surface-700);
     font-size: .8rem;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .rp-timeline-content-day {
+    min-width: unset;
   }
 }

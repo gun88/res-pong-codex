@@ -1,4 +1,4 @@
-import {ApplicationConfig, inject, provideZoneChangeDetection} from '@angular/core';
+import {ApplicationConfig, inject, LOCALE_ID, provideZoneChangeDetection} from '@angular/core';
 import {provideRouter, Router, withHashLocation} from '@angular/router';
 
 import {routes} from './app.routes';
@@ -8,7 +8,10 @@ import Lara from '@primeng/themes/lara';
 import {definePreset} from '@primeng/themes';
 import {HttpInterceptorFn, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {tap} from 'rxjs';
+import {registerLocaleData} from '@angular/common';
+import localeIt from '@angular/common/locales/it';
 
+registerLocaleData(localeIt);
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const isWp = req.url.includes('/?rest_route=') || req.url.includes('/wp-json/');
@@ -30,6 +33,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideZoneChangeDetection({eventCoalescing: true}),
     provideRouter(routes, withHashLocation()),
+    {provide: LOCALE_ID, useValue: 'it'},
     providePrimeNG({
       theme: {
         preset: definePreset(Lara, {

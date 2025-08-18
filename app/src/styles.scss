@@ -432,6 +432,7 @@ p-menubar {
     grid-auto-columns: 1fr;
     width: fit-content;
     margin: auto;
+    // max-width: 100%;
   }
 
   @media screen and (max-width: 768px) {
@@ -499,4 +500,17 @@ p-menubar {
 
 .p-avatar-circle {
   aspect-ratio: 1;
+}
+
+.p-menubar-item-link-active {
+  // font-weight: 500;
+  .p-menubar-item-label {
+    text-decoration: underline !important;
+    text-underline-offset: 2px;
+
+  }
+  color: var(--p-primary-color) !important;
+  .p-menubar-item-icon {
+    color: var(--p-primary-color) !important;
+  }
 }

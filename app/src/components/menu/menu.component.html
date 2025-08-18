@@ -1,6 +1,6 @@
-<p-menubar [model]="menu">
+<p-menubar [model]="menu" #mb >
   <ng-template #start>
-    <img src="favicon.jpg" alt="logo" style="width: 2rem;" class="hidden md:block">
+    <img src="favicon.jpg" alt="logo" style="width: 2rem;" class="hidden md:block" routerLink="/">
   </ng-template>
   <ng-template #menuicon>
     <img src="favicon.jpg" alt="logo" style="width: 2rem; margin-right: var(--p-menubar-gap)" class="block md:hidden">
@@ -30,10 +30,7 @@
       </p-button>
 
     }
-    <p-menu #menu [model]="userMenu" [popup]="true" appendTo="body">
-
-
-    </p-menu>
+    <p-menu #menu [model]="userMenu" [popup]="true" appendTo="body"></p-menu>
 
   </ng-template>
 </p-menubar>
@@ -42,3 +39,8 @@
     <p-progress-spinner strokeWidth="3"></p-progress-spinner>
   </div>
 </p-block-ui>
+
+
+
+<pre>
+</pre>

@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, ElementRef, HostListener, inject, ViewChild} from '@angular/core';
 import {Menubar} from "primeng/menubar";
 import {MenuItem, MenuItemCommandEvent} from 'primeng/api';
 import {Avatar} from 'primeng/avatar';
@@ -7,9 +7,10 @@ import {ResPongService} from '../../service/res-pong.service';
 import {Observable} from 'rxjs';
 import {AsyncPipe, NgIf} from '@angular/common';
 import {Button} from 'primeng/button';
-import {Router} from '@angular/router';
+import {Router, RouterLink} from '@angular/router';
 import {BlockUI} from 'primeng/blockui';
 import {ProgressSpinner} from 'primeng/progressspinner';
+
 
 @Component({
   selector: 'res-pong-user-menu',
@@ -21,8 +22,10 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     NgIf,
     Button,
     BlockUI,
-    ProgressSpinner
+    ProgressSpinner,
+    RouterLink
   ],
+  standalone: true,
   templateUrl: './menu.component.html'
 })
 export class MenuComponent {
@@ -86,4 +89,41 @@ export class MenuComponent {
       ]
     }
   ];
+
+
+  private isActive(path: string): boolean {
+    console.log(this.router.url, path);
+    return this.router.url === path;
+  }
+
+  @ViewChild('mb', {read: ElementRef}) menubarEl!: ElementRef<HTMLElement>;
+
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(ev: MouseEvent) {
+    const root = this.menubarEl?.nativeElement;
+    if (!root) return;
+
+    const target = ev.target as Node;
+
+    // 1) Trova il bottone hamburger della Menubar
+    const btn = root.querySelector('.p-menubar-button') as HTMLButtonElement | null;
+
+    // Se il click è sul bottone (o dentro di lui), lascia che gestisca lui il toggle
+    if (btn && (target === btn || btn.contains(target))) return;
+
+    // 2) Trova il contenitore del menu mobile (submenu) renderizzato dalla Menubar
+    // Usa il selettore specifico che hai indicato e qualche fallback comune
+    const submenu = root.querySelector(
+      '.p-menubarsub, .p-menubar-root-list, .p-submenu-list'
+    ) as HTMLElement | null;
+
+    const clickedInsideSubmenu = submenu?.contains(target) ?? false;
+
+    // 3) Se il menu è aperto e il click NON è dentro il submenu => chiudi
+    const isOpen = btn?.getAttribute('aria-expanded') === 'true';
+    if (btn && isOpen && !clickedInsideSubmenu) {
+      btn.click(); // richiude usando la logica nativa della Menubar
+    }
+  }
 }
