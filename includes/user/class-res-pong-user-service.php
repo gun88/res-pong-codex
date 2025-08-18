@@ -116,16 +116,16 @@ class Res_Pong_User_Service {
         try {
             $token = Res_Pong_Util::base64url_decode($req->get_param('token'));
         } catch (Exception $e) {
-            return new \WP_REST_Response(['success' => false, 'message' => 'Link scaduto'], 400);
+            return new \WP_REST_Response(['success' => false, 'message' => '_expired_link_'], 400);
         }
 
         list($ts, $rand) = explode('|', $token);
         if (time() > intval($ts)) {
-            return new \WP_REST_Response(['success' => false, 'message' => 'Link scaduto'], 400);
+            return new \WP_REST_Response(['success' => false, 'message' => '_expired_link_'], 400);
         }
         $user = $this->repository->get_enabled_user_by_token($token);
         if ($user === null) {
-            return new \WP_REST_Response(['success' => false, 'message' => 'Link scaduto'], 400);
+            return new \WP_REST_Response(['success' => false, 'message' => '_expired_link_'], 400);
         }
         return $this->password_update($req, $user);
 
@@ -175,16 +175,16 @@ class Res_Pong_User_Service {
         try {
             $token = Res_Pong_Util::base64url_decode($req->get_param('token'));
         } catch (Exception $e) {
-            return new \WP_REST_Response(['success' => false, 'message' => 'Link scaduto'], 400);
+            return new \WP_REST_Response(['success' => false, 'message' => '_expired_link_'], 400);
         }
 
         list($ts, $rand) = explode('|', $token);
         if (time() > intval($ts)) {
-            return new \WP_REST_Response(['success' => false, 'message' => 'Link scaduto'], 400);
+            return new \WP_REST_Response(['success' => false, 'message' => '_expired_link_'], 400);
         }
         $user = $this->repository->get_enabled_user_by_token($token);
         if ($user === null) {
-            return new \WP_REST_Response(['success' => false, 'message' => 'Link scaduto'], 400);
+            return new \WP_REST_Response(['success' => false, 'message' => '_expired_link_'], 400);
         }
 
         Res_Pong_Util::adjust_user($user);

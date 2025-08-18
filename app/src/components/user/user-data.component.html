@@ -1,7 +1,18 @@
 <div class="user-info" role="group" aria-label="Dati utente">
   <h2 *ngIf="title" class="rp-user-data-section">{{ title }}</h2>
   <div class="mb-2 mt-2" *ngIf="error">
-    <p-message size="small" icon="pi pi-exclamation-circle" severity="error">{{ error }}</p-message>
+    <p-message size="small" icon="pi pi-exclamation-circle" severity="error" class="rp-user-data-error-message">
+      @switch (error) {
+        @case ('_expired_link_') {
+          <span>Link scaduto. Vai alla pagina di <a
+            routerLink="/login">login</a> o richiedi il <a routerLink="/password-recovery">reset della password</a>.</span>
+        }
+        @default {
+          {{ error }}
+        }
+      }
+
+    </p-message>
   </div>
 
   <div class="user-field">
