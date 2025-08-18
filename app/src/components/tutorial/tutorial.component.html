@@ -1,0 +1,9 @@
+<div class="tutorial-overlay" *ngIf="state">
+  <div class="tutorial-popup" [ngStyle]="popupStyle">
+    <div class="tutorial-text">{{ state.step.text }}</div>
+    <div class="tutorial-actions">
+      <a (click)="next()">Avanti</a>
+      <a (click)="end()">Chiudi Tutorial</a>
+    </div>
+  </div>
+</div>
