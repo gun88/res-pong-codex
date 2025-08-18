@@ -154,6 +154,7 @@ class Res_Pong_User_Service {
             $text = str_replace($placeholders, $replacements, $text);
             $message = $text . "\n\nClicca qui: " . $url;
             $subject = $this->configuration->get('reset_password_subject');
+            $message = $message . "\n" . $this->configuration->get('mail_signature');
             wp_mail($email, $subject, $message);
         }
         // Rispondi comunque success per non rivelare se l'utente esiste
@@ -269,6 +270,16 @@ class Res_Pong_User_Service {
             $hashed_password = password_hash($password, PASSWORD_DEFAULT);
             $this->repository->update_user_password($user->id, $hashed_password);
             $this->repository->update_user_token($user->id, null);
+
+            $email = $user->email;
+            $text = $this->configuration->get('update_password_text');
+            $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
+            $replacements = [$user->email, $user->username, $user->last_name, $user->first_name, $user->category];
+            $message = str_replace($placeholders, $replacements, $text);
+            $subject = $this->configuration->get('update_password_subject');
+            $message = $message . "\n" . $this->configuration->get('mail_signature');
+            wp_mail($email, $subject, $message);
+
             return new \WP_REST_Response(['success' => true, 'message' => 'Password aggiornata'], 200);
         }
     }
