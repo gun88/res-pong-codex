@@ -1,6 +1,6 @@
 <div class="rp-event rp-large-page rp-swipe-zone"
-     (swipeleft)="prev()"
-     (swiperight)="next()">
+     (swipeleft)="next()"
+     (swiperight)="prev()">
 
   <div *ngIf="eventLoadingError">
     <p-message icon="pi pi-times-circle" severity="error">{{ eventLoadingError }}</p-message>

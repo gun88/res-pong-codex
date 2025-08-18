@@ -114,6 +114,10 @@ class Res_Pong_Admin_Frontend {
                 'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
                 'reset_password_subject'   => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
                 'reset_password_text'      => isset($_POST['reset_password_text']) ? sanitize_textarea_field($_POST['reset_password_text']) : '',
+                'update_password_subject'   => isset($_POST['update_password_subject']) ? sanitize_text_field($_POST['update_password_subject']) : '',
+                'update_password_text'      => isset($_POST['update_password_text']) ? sanitize_textarea_field($_POST['update_password_text']) : '',
+                'mail_signature'            => isset($_POST['mail_signature']) ? sanitize_textarea_field($_POST['mail_signature']) : '',
+
             ];
             $this->configuration->update($data);
             echo '<div class="updated"><p>' . esc_html__('Impostazioni salvate', 'res-pong') . '</p></div>';
