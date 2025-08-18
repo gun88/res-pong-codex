@@ -92,12 +92,6 @@ export class MenuComponent {
     }
   ];
 
-
-  private isActive(path: string): boolean {
-    console.log(this.router.url, path);
-    return this.router.url === path;
-  }
-
   @ViewChild('mb', {read: ElementRef}) menubarEl!: ElementRef<HTMLElement>;
 
 

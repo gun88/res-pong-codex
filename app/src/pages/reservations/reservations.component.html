@@ -2,7 +2,7 @@
      (swipeleft)="prev()"
      (swiperight)="next()">
   <div class="flex items-center justify-between w-full align-items-center gap-3 flex-column-reverse sm:flex-row">
-    <div class="flex items-center justify-between gap-1">
+    <div class="flex items-center justify-between gap-1" id="rp-reservations-navigator">
       <p-button icon="pi pi-angle-left" size="small" [rounded]="true" severity="secondary" [outlined]="true"
                 (onClick)="prev()"/>
       <p-button label="Oggi" size="small" [rounded]="true" severity="secondary" [outlined]="true" (onClick)="today()"/>

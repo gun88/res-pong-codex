@@ -15,7 +15,7 @@ export class TutorialComponent implements OnInit, OnDestroy {
     private sub: any;
     @ViewChild('popover') popover?: Popover;
 
-    ngOnInit(): void {
+    ngOnInit() {
         this.sub = this.tutorial.tutorial$.subscribe(state => {
             this.popover?.hide();
             this.removeHighlight();
@@ -33,25 +33,28 @@ export class TutorialComponent implements OnInit, OnDestroy {
         });
     }
 
-    ngOnDestroy(): void {
+    ngOnDestroy() {
         this.sub?.unsubscribe();
         this.removeHighlight();
     }
 
-    next(): void {
+    next() {
         this.tutorial.next();
     }
 
-    end(): void {
+    end() {
         this.tutorial.end();
         this.popover?.hide();
     }
 
-    private removeHighlight(): void {
+    private removeHighlight() {
+
         if (this.state) {
             const el = document.querySelector(this.state.step.selector) as HTMLElement | null;
             el?.classList.remove('tutorial-highlight');
         }
+
     }
 }
+
 

@@ -42,7 +42,8 @@ export class ReservationsComponent implements OnInit, OnDestroy {
   subTitle: string = '•••';
   private tutorialSteps: TutorialStep[] = [
     {selector: '.rp-reservations-title-box', text: 'In questa sezione trovi il mese corrente.'},
-    {selector: '.rp-calendar-legend-container', text: 'Qui trovi la legenda delle disponibilità.'}
+    {selector: '#rp-reservations-navigator', text: 'Qui cambi giorno o swipe.'},
+    {selector: '.rp-calendar-legend-container', text: 'Qui trovi la legenda delle disponibilità.'},
   ];
 
   ngOnInit(): void {
