@@ -12,6 +12,9 @@ import {UserDataComponent} from "../../components/user/user-data.component";
 import {PasswordFormComponent} from "../../components/password/password-form.component";
 import {BlockUI} from 'primeng/blockui';
 import {ProgressSpinner} from 'primeng/progressspinner';
+import {NgIf} from '@angular/common';
+import {ToggleSwitch} from 'primeng/toggleswitch';
+import {EmailPreferencesComponent} from '../../components/email-preferences.component.ts/email-preferences.component';
 
 @Component({
     selector: 'res-pong-user-user',
@@ -29,7 +32,10 @@ import {ProgressSpinner} from 'primeng/progressspinner';
     UserDataComponent,
     PasswordFormComponent,
     BlockUI,
-    ProgressSpinner
+    ProgressSpinner,
+    NgIf,
+    ToggleSwitch,
+    EmailPreferencesComponent
   ],
     templateUrl: './user.component.html',
     styleUrl: './user.component.scss'

@@ -99,6 +99,12 @@ export class ResPongService {
   public deleteReservation(eventId: number) {
     return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/reservations&event_id=${eventId}`);
   }
+
+
+  public saveEmailPreferences(send_email_on_reservation: boolean, send_email_on_deletion: boolean) {
+    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/user/email-preferences`, {send_email_on_reservation, send_email_on_deletion});
+
+  }
 }
 
 
