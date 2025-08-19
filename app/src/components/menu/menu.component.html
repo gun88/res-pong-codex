@@ -13,10 +13,11 @@
         <p-button (click)="help()"
                   pTooltip="Non sai cosa fare? Usa la Guida!"
                   tooltipPosition="bottom"
+                  tooltipStyleClass="rp-menu-guide"
                   appendTo="body"
                   severity="secondary"
-                  ariaLabel="Aiuto"
-                  icon="pi pi-question-circle"
+                  ariaLabel="Guida"
+                  icon="pi pi-lightbulb"
                   iconPos="left"
                   *ngIf="loggedIn$ | async">
         </p-button>

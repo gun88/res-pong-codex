@@ -126,6 +126,7 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
   }
 
   help() {
+    this.unbindActivityListeners();
     this.tutorial.start();
   }
 
@@ -143,6 +144,10 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.unbindActivityListeners();
+  }
+
+  private unbindActivityListeners() {
     this.clearTimer();
     window.removeEventListener('mousemove', this.onActivity, true);
     window.removeEventListener('keydown', this.onActivity, true);
@@ -162,6 +167,7 @@ export class MenuComponent implements AfterViewInit, OnDestroy {
   }
 
   private resetTimer(): void {
+    if (this.tip) this.tip.hide();
     this.clearTimer();
     this.zone.runOutsideAngular(() => {
       this.timer = setTimeout(() => {

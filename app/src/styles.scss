@@ -578,7 +578,8 @@ p-menubar {
 }
 
 .rp-swipe-icon {
-  width: 41px;aspect-ratio: .9;
+  width: 41px;
+  aspect-ratio: .9;
   display: inline-block;
   animation: swipeAnim 1s infinite alternate ease-in-out;
 }
@@ -598,5 +599,11 @@ p-menubar {
 .rp-event-status-message-block {
   .p-message-content {
     place-items: start;
+  }
+}
+
+.rp-menu-guide {
+  .p-tooltip-text {
+    font-size: .8rem;
   }
 }
