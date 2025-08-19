@@ -1,6 +1,6 @@
 {
   "name": "res-pong",
-  "version": "0.1.15",
+  "version": "0.2.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
