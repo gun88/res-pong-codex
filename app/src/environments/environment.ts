@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
   server: '/index.php',
-  version: '0.2.1',
-  build: '20250819083604',
+  version: '0.2.2',
+  build: '20250819085718',
 }

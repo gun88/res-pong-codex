@@ -37,7 +37,7 @@ export class LoginComponent {
   form = inject(FormBuilder).group({
     username: ['', Validators.required],
     password: ['', Validators.required],
-    remember: [false]
+    remember: [true]
   });
   error: string = '';
 
