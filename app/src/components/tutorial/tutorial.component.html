@@ -78,6 +78,32 @@
                     <li>Fare logout</li>
                 </ul>
             }
+            @case ('history-name-col') {
+                <p>Nome dell'evento prenotato.</p>
+            }
+            @case ('history-date-col') {
+                <p>Data dell'evento prenotato.</p>
+            }
+            @case ('history-duration-col') {
+                <p>Durata dell'evento prenotato.</p>
+            }
+            @case ('history-reservation-col') {
+                <p>Data della tua prenotazione per l'evento.</p>
+            }
+            @case ('history-presence-col') {
+                <p>Presenza all'evento:</p>
+                <ul>
+                    <li><i class="pi pi-check-circle text-green-500"></i> Confermata</li>
+                    <li><i class="pi pi-times-circle text-red-500"></i> Non Confermata</li>
+                    <li><i class="pi pi-hourglass text-purple-400"></i> Non ancora disponibile</li>
+                </ul>
+            }
+            @case ('history-action-col') {
+                <p>Clicca qui per aprire la pagina di dettaglio dell'evento.</p>
+            }
+            @case ('history-paginator') {
+                <p>Usa la paginazione per muoverti tra i tuoi eventi.</p>
+            }
             @default {
                 {{ state?.step?.text }}
             }

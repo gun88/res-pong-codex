@@ -40,6 +40,14 @@ export class TutorialService {
         {selector: '.rp-user-logout', text: "user-logout"},
         {selector: '.rp-user-password-update', text: "user-password"},
 
+        {selector: '.rp-history-name-col', text: "history-name-col"},
+        {selector: '.rp-history-date-col', text: "history-date-col"},
+        {selector: '.rp-history-duration-col', text: "history-duration-col"},
+        {selector: '.rp-history-reservation-col', text: "history-reservation-col"},
+        {selector: '.rp-presence-col', text: "history-presence-col"},
+        {selector: '.rp-action-col', text: "history-action-col"},
+        {selector: '.rp-history-page .p-paginator', text: "history-paginator"},
+
         {selector: '.p-menubar.p-menubar-mobile', text: "menubar-menu"},
         {selector: '.p-menubar:not(.p-menubar-mobile) .p-menubar-root-list', text: "menubar-menu"},
         {selector: '.rp-menu-profile-button-container', text: "menubar-profile"},

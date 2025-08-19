@@ -1,4 +1,4 @@
-<div class="rp-large-page">
+<div class="rp-large-page rp-history-page">
   <h2>Storico Prenotazioni</h2>
   <div class="mb-2 mt-2" *ngIf="error">
     <p-message size="small" icon="pi pi-exclamation-circle" severity="error">{{ error }}</p-message>
@@ -57,28 +57,28 @@
 
       <ng-template pTemplate="body" let-row let-columns="columns">
         <tr>
-          <td>
+          <td class="rp-history-name-col">
             <span class="rp-column-title">Evento:</span>
             <span>{{ row['name'] }}</span>
           </td>
-          <td>
+          <td class="rp-history-date-col">
             <span class="rp-column-title">Data:</span>
 
             <span>{{ row['date'] | date:'EEEE d MMMM y, HH:mm' }}</span>
           </td>
-          <td>
+          <td class="rp-history-duration-col">
             <span class="rp-column-title">Durata:</span>
 
             <span>{{ row['duration'] }}</span>
           </td>
-          <td>
+          <td class="rp-history-reservation-col">
             <span class="rp-column-title">Prenotazione:</span>
             <span>{{ row['creation_date'] | date:'EEEE d MMMM y, HH:mm' }}</span>
           </td>
           <td class="rp-presence-col rp-presence-s{{row['presence_confirmed']}} text-center">
-            <span *ngIf="row['presence_confirmed'] != 'future'" class="rp-column-title">Presenza:</span>
+            <span class="rp-column-title">Presenza:</span>
             @if (row['presence_confirmed'] === 'future') {
-
+              <i class="pi pi-hourglass text-purple-400" style="margin-top: 2px"></i>
             } @else if (row['presence_confirmed'] == 1) {
               <i class="pi pi-check-circle text-green-500" style="margin-top: 2px"></i>
             } @else {
@@ -94,8 +94,6 @@
               <p-button label="Apri" size="small" icon="pi pi-search" styleClass="w-full"
                         routerLink="/events/{{ row.event_id }}" severity="primary"/>
             </div>
-
-
           </td>
         </tr>
       </ng-template>
