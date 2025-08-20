@@ -247,7 +247,7 @@ class Res_Pong_Admin_Service {
         $message = $text . "\n\nClicca qui: " . $url;
         $message = $message . "\n" . $this->configuration->get('mail_signature');
         $subject = $this->configuration->get('invitation_subject');
-        wp_mail($user['email'], $subject, $message);
+        Res_Pong_Util::send_email($user['email'], $subject, $message);
         return new WP_REST_Response(['success' => true], 200);
     }
 
@@ -277,7 +277,7 @@ class Res_Pong_Admin_Service {
         $message = $text . "\n\nClicca qui: " . $url;
         $message = $message . "\n" . $this->configuration->get('mail_signature');
         $subject = $this->configuration->get('reset_password_subject');
-        wp_mail($user['email'], $subject, $message);
+        Res_Pong_Util::send_email($user['email'], $subject, $message);
         return new WP_REST_Response(['success' => true], 200);
     }
 
@@ -315,13 +315,13 @@ class Res_Pong_Admin_Service {
                 $message = str_replace($placeholders, '', $text);
             }
             $message = $message . "\n" . $this->configuration->get('mail_signature');
-            wp_mail($email, $subject, $message);
+            Res_Pong_Util::send_email($email, $subject, $message);
         } else {
             $message = str_replace($placeholders, '', $text);
             $headers = ['Bcc: ' . implode(',', $recipients)];
             $to = $this->configuration->get('default_email_address');
             $message = $message . "\n" . $this->configuration->get('mail_signature');
-            wp_mail($to, $subject, $message, $headers);
+            Res_Pong_Util::send_email($to, $subject, $message, $headers);
         }
         return rest_ensure_response(['success' => true]);
     }

@@ -10,12 +10,22 @@ class Res_Pong_Configuration {
         'avatar_management' => 'none',
         'default_email_address' => '',
         'app_url' => 'https://my-site/prenotazioni',
-        'invitation_subject' => 'Portale Prenotazioni - Effettua il tuo primo accesso',
+        'invitation_subject' => 'Effettua il tuo primo accesso - Portale Prenotazioni',
         'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel portale prenotazioni!\nClicca sul link per effettuare il primo accesso.",
-        'reset_password_subject' => 'Portale Prenotazioni - Reset password',
+        'reset_password_subject' => 'Reset password - Portale Prenotazioni',
         'reset_password_text' => "Ciao #first_name,\n\nAbbiamo ricevuto una richiesta di reset della tua password. Se non sei stato tu a richiedere il reset, ignora questa email, altrimenti clicca sul seguente link per reimpostare la tua password.",
-        'update_password_subject' => 'Portale Prenotazioni - Password aggiornata',
+        'update_password_subject' => 'Password aggiornata - Portale Prenotazioni',
         'update_password_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: https://my-site/prenotazioni usando le tue nuove credenziali.",
+
+
+        'reservation_subject' => 'Prenotazione Confermata - #event_name #event_date - Portale Prenotazioni',
+        'reservation_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: https://my-site/prenotazioni usando le tue nuove credenziali.",
+
+        'deletion_subject' => 'Prenotazione Cancellata - #event_name #event_date - Portale Prenotazioni',
+        'deletion_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: https://my-site/prenotazioni usando le tue nuove credenziali.",
+
+
+
         'mail_signature' => "\n____________________\nPortale Prenotazioni\nhttps://my-site/prenotazioni\n",
     ];
 

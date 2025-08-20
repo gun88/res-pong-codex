@@ -2,6 +2,12 @@
 
 class Res_Pong_Util {
 
+    public static function send_email($to, $subject, $message, $headers = []) {
+        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+        wp_mail($to, $subject, $message, $headers);
+    }
+
+
     public static function res_pong_token_make(int $userId, int $ttl): string {
         $exp = time() + $ttl;
         $payload = $userId . '|' . $exp;

@@ -174,7 +174,7 @@ class Res_Pong_User_Service {
             $message = $text . "\n\nClicca qui: " . $url;
             $subject = $this->configuration->get('reset_password_subject');
             $message = $message . "\n" . $this->configuration->get('mail_signature');
-            wp_mail($email, $subject, $message);
+            Res_Pong_Util::send_email($email, $subject, $message);
         }
         // Rispondi comunque success per non rivelare se l'utente esiste
         return new \WP_REST_Response(['success' => true], 200);
@@ -313,7 +313,7 @@ class Res_Pong_User_Service {
             $message = str_replace($placeholders, $replacements, $text);
             $subject = $this->configuration->get('update_password_subject');
             $message = $message . "\n" . $this->configuration->get('mail_signature');
-            wp_mail($email, $subject, $message);
+            Res_Pong_Util::send_email($email, $subject, $message);
 
             return new \WP_REST_Response(['success' => true, 'message' => 'Password aggiornata'], 200);
         }
