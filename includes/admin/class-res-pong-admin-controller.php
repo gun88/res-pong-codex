@@ -209,6 +209,23 @@ class Res_Pong_Admin_Controller {
             },
         ]);
 
+        // Configurations
+        register_rest_route($namespace, '/configurations/export', [
+            'methods' => 'GET',
+            'callback' => [$this->service, 'rest_export_configurations'],
+            'permission_callback' => function () {
+                return current_user_can('manage_options');
+            },
+        ]);
+
+        register_rest_route($namespace, '/configurations/import', [
+            'methods' => 'POST',
+            'callback' => [$this->service, 'rest_import_configurations'],
+            'permission_callback' => function () {
+                return current_user_can('manage_options');
+            },
+        ]);
+
         register_rest_route($namespace, '/email', [
             'methods' => 'POST',
             'callback' => [$this->service, 'rest_send_email'],

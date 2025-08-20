@@ -840,6 +840,44 @@
         }
     }
 
+    function initConfigPage(){
+        var form = $('#rp-config-form');
+        if(!form.length){ return; }
+        var importBtn = $('#rp-config-import');
+        var exportBtn = $('#rp-config-export');
+        exportBtn.on('click', function(e){
+            e.preventDefault();
+            window.location = restUrl('configurations/export', '_wpnonce=' + rp_admin.nonce);
+        });
+        importBtn.on('click', function(e){
+            e.preventDefault();
+            var input = $('<input type="file" accept="application/json" style="display:none">');
+            $('body').append(input);
+            input.on('change', function(){
+                var file = this.files[0];
+                if(!file){ input.remove(); return; }
+                clearNotice();
+                showOverlay(true);
+                var reader = new FileReader();
+                reader.onload = function(ev){
+                    var conf;
+                    try{ conf = JSON.parse(ev.target.result); }catch(err){ showNotice('error', 'File JSON non valido'); hideOverlay(); input.remove(); return; }
+                    $.ajax({
+                        url: restUrl('configurations/import'),
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({config: conf}),
+                        beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                        complete: function(){ hideOverlay(); input.remove(); },
+                        success: function(){ showNotice('success', 'Configurazioni importate'); location.reload(); },
+                        error: function(xhr){ var msg = 'Errore durante l\'import'; if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; } showNotice('error', msg); }
+                    });
+                };
+                reader.readAsText(file);
+            }).trigger('click');
+        });
+    }
+
     function initEmailPage(){
         var form = $('#rp-messenger-form');
         if(!form.length){ return; }
@@ -939,6 +977,7 @@
             var eid = er.data('event');
             initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=0'); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
         }
+        initConfigPage();
         initDetail();
         initEmailPage();
     });
