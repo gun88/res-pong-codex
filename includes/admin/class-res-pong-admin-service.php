@@ -243,11 +243,6 @@ class Res_Pong_Admin_Service {
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('invitation_text');
         $message = $text;
         $subject = $this->configuration->get('invitation_subject');
-
-        error_log($subject);
-        error_log($message);
-        die();
-
         $email = $user['email'];
         $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
         $subject = Res_Pong_Util::replace_user_placeholders($user, $subject);
