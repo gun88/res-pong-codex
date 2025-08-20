@@ -406,7 +406,26 @@ class Res_Pong_Admin_Service {
 
     public function rest_delete_reservation($request) {
         $id = (int)$request['id'];
+        $reservation = $this->repository->get_reservation($id);
         $this->repository->delete_reservation($id);
+
+
+        $event =(object) $this->repository->get_event((int)$reservation['event_id']);
+
+        if (!empty($event->max_players)) {
+            $count = count($this->repository->get_reservations(null, (int)$request['event_id'], false));
+            $event->players_count = $count;
+            $availability = ($event->max_players - $count);
+
+            $notification_subscribers = !empty($event->notification_subscribers) ? json_decode($event->notification_subscribers) : [];
+
+            if ($availability > 0 && !empty($notification_subscribers)) {
+                Res_Pong_Util::enqueue_notification_messages($event, $notification_subscribers);
+            }
+        }
+
+
+
         return new WP_REST_Response(null, 204);
     }
 

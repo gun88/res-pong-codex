@@ -209,4 +209,10 @@ class Res_Pong_User_Repository {
         $this->wpdb->update($this->table_user, ['flags' => $flags], ['id' => $user_id], ['%s'], ['%s']);
     }
 
+    public function empty_event_notification_subscribers($event_id) {
+        $this->wpdb->update($this->table_event, ['notification_subscribers' => null], ['id' => $event_id], ['%s'], ['%s']);
+
+    }
+
+
 }

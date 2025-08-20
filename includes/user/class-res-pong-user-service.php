@@ -292,6 +292,42 @@ class Res_Pong_User_Service {
 
     // ---------------------------------------------------------------
 
+
+    public function send_notification_messages($event, $notification_subscribers) {
+
+        $event_notified_count = count($notification_subscribers);
+        foreach ($notification_subscribers as $user_id) {
+            $user = $this->repository->get_enabled_user_by_id($user_id);
+            if (!$user) return;
+
+            $email = $user->email;
+            $subject = $this->configuration->get('notify_availability_subject');
+            $message = $this->configuration->get('notify_availability_text');
+            $signature = $this->configuration->get('mail_signature');
+
+            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+            $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+            $subject = Res_Pong_Util::replace_event_placeholders($subject, $event);
+            $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+            $subject = Res_Pong_Util::replace_broadcast_message_warning($subject, $event_notified_count);
+
+            $message = Res_Pong_Util::replace_temporal_placeholders($message);
+            $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+            $message = Res_Pong_Util::replace_event_placeholders($message, $event);
+            $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+            $message = Res_Pong_Util::replace_broadcast_message_warning($message, $event_notified_count);
+
+            $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+            $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+            $signature = Res_Pong_Util::replace_event_placeholders($signature, $event);
+            $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+            $signature = Res_Pong_Util::replace_broadcast_message_warning($signature, $event_notified_count);
+
+            Res_Pong_Util::send_email($email, $subject, $message, $signature);
+        }
+        $this->repository->empty_event_notification_subscribers($event->id);
+    }
+
     private function load_avatar($user_id) {
         if ($this->configuration->get('avatar_management') === 'fitet_monitor') {
             $fitet_id = $this->repository->get_fitet_monitor_id($user_id);
@@ -587,41 +623,6 @@ class Res_Pong_User_Service {
         error_log("done___________________________");
         die(1);
     }*/
-
-    public function send_notification_messages($event, $notification_subscribers) {
-
-        $event_notified_count = count($notification_subscribers);
-        foreach ($notification_subscribers as $user_id) {
-            $user = $this->repository->get_enabled_user_by_id($user_id);
-            if (!$user) return;
-
-            $email = $user->email;
-            $subject = $this->configuration->get('notify_availability_subject');
-            $message = $this->configuration->get('notify_availability_text');
-            $signature = $this->configuration->get('mail_signature');
-
-            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
-            $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
-            $subject = Res_Pong_Util::replace_event_placeholders($subject, $event);
-            $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
-            $subject = Res_Pong_Util::replace_broadcast_message_warning($subject, $event_notified_count);
-
-            $message = Res_Pong_Util::replace_temporal_placeholders($message);
-            $message = Res_Pong_Util::replace_user_placeholders($message, $user);
-            $message = Res_Pong_Util::replace_event_placeholders($message, $event);
-            $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
-            $message = Res_Pong_Util::replace_broadcast_message_warning($message, $event_notified_count);
-
-            $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
-            $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
-            $signature = Res_Pong_Util::replace_event_placeholders($signature, $event);
-            $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
-            $signature = Res_Pong_Util::replace_broadcast_message_warning($signature, $event_notified_count);
-
-            Res_Pong_Util::send_email($email, $subject, $message, $signature);
-        }
-    }
-
 
 
 }
