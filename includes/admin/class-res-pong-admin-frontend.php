@@ -98,10 +98,18 @@ class Res_Pong_Admin_Frontend {
     public function render_configurations_page() {
         $reinitialize_notice = '';
         if (isset($_POST['rp_reinitialize_nonce']) && wp_verify_nonce($_POST['rp_reinitialize_nonce'], 'rp_reinitialize')) {
+
+            // reset DB
             $repo = new Res_Pong_Admin_Repository();
             global $wpdb;
             $repo->drop_tables();
             $repo->create_tables();
+
+            // reset app
+            $res_Pong = new Res_Pong();
+            $res_Pong->copy_app_folder();
+
+            // reset config
             delete_option('res_pong_configuration');
             if (!empty($wpdb->last_error)) {
                 $reinitialize_notice = '<div class="notice notice-error is-dismissible"><p>' . esc_html__('Errore durante la reinizializzazione', 'res-pong') . '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>';
