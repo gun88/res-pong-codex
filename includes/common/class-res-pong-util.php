@@ -4,31 +4,9 @@ class Res_Pong_Util {
 
     public static function send_email($to, $subject, $message, $headers = []) {
         $headers[] = 'Content-Type: text/html; charset=UTF-8';
+        $message = wpautop($message);
+        $message = wp_kses_post($message);
         wp_mail($to, $subject, $message, $headers);
-    }
-
-    private static function sanitize_email() {
-      /*  $allowed_tags = [
-            'p'      => [],
-            'br'     => [],
-            'strong' => [],
-            'em'     => [],
-            'a'      => ['href' => true, 'title' => true, 'target' => true, 'rel' => true],
-            'ul'     => [], 'ol' => [], 'li' => [],
-            'table'  => ['role' => true, 'cellpadding' => true, 'cellspacing' => true, 'border' => true, 'width' => true],
-            'thead'  => [], 'tbody' => [], 'tr' => [],
-            'td'     => ['colspan' => true, 'rowspan' => true, 'align' => true, 'valign' => true, 'width' => true],
-            'th'     => ['colspan' => true, 'rowspan' => true, 'align' => true, 'valign' => true, 'width' => true],
-            'span'   => ['style' => true],
-            // evita <img>, <style> e qualunque script
-        ];
-
-        $raw_html = isset($params['text']) ? $params['text'] : '';
-        $raw_html = is_string($raw_html) ? $raw_html : ''; // hardening
-// Se arriva da REST/POST potrebbe essere "slashed"
-        $raw_html = wp_unslash($raw_html);
-
-        $message = wp_kses($raw_html, $allowed_tags);*/
     }
 
 

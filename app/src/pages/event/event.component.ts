@@ -198,4 +198,8 @@ export class EventComponent implements OnInit {
     if (this.event.other_events.prev_id !== null)
       this.router.navigate(['/events', this.event.other_events.prev_id])
   }
+
+  onNotify() {
+
+  }
 }

@@ -68,6 +68,16 @@
           (click)="onRemove()"
           class="p-button-secondary">
         </button>
+        <button
+          pButton
+          type="button"
+          label="Avvisami"
+          icon="pi pi-envelope"
+          *ngIf="!event.can_notify"
+          [disabled]="loading || !event.can_notify"
+          (click)="onNotify()"
+          class="p-button-info">
+        </button>
       </div>
 
       <div class="mb-2 mt-2" *ngIf="loading">
