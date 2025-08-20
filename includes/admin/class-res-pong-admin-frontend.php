@@ -99,18 +99,27 @@ class Res_Pong_Admin_Frontend {
         $reinitialize_notice = '';
         if (isset($_POST['rp_reinitialize_nonce']) && wp_verify_nonce($_POST['rp_reinitialize_nonce'], 'rp_reinitialize')) {
 
-            // reset DB
-            $repo = new Res_Pong_Admin_Repository();
             global $wpdb;
-            $repo->drop_tables();
-            $repo->create_tables();
 
-            // reset app
-            $res_Pong = new Res_Pong();
-            $res_Pong->copy_app_folder();
+            $reset_config = !empty($_POST['rp_reset_config']);
+            $reset_app = !empty($_POST['rp_reset_app']);
+            $reset_db = !empty($_POST['rp_reset_db']);
 
-            // reset config
-            delete_option('res_pong_configuration');
+            if ($reset_db) {
+                $repo = new Res_Pong_Admin_Repository();
+                $repo->drop_tables();
+                $repo->create_tables();
+            }
+
+            if ($reset_app) {
+                $res_Pong = new Res_Pong();
+                $res_Pong->copy_app_folder();
+            }
+
+            if ($reset_config) {
+                delete_option('res_pong_configuration');
+            }
+
             if (!empty($wpdb->last_error)) {
                 $reinitialize_notice = '<div class="notice notice-error is-dismissible"><p>' . esc_html__('Errore durante la reinizializzazione', 'res-pong') . '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>';
                 $wpdb->last_error = '';
@@ -183,14 +192,27 @@ class Res_Pong_Admin_Frontend {
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva', 'res-pong') . '</button></p>';
         echo '</form>';
         echo '<h2>' . esc_html__('Reinizializza', 'res-pong') . '</h2>';
-        echo '<p>' . esc_html__('Clicca reinizializza per cancellare e ricreare le tabelle del db e reimpostare i parametri di configurazione al default del plugin. L\'esecuzione di questa azione comporta la perdita di tutti i dati, assicurati di aver fatto degli export.', 'res-pong') . '</p>';
-        echo '<form method="post" onsubmit="return confirm(\'' . esc_js(__('Sei sicuro di voler reinizializzare? Questa azione cancellerà tutti i dati.', 'res-pong')) . '\');">';
+        echo '<p>' . esc_html__('Seleziona gli elementi da reinizializzare. L\'esecuzione di questa azione può comportare la perdita dei dati, assicurati di aver fatto degli export.', 'res-pong') . '</p>';
+        echo '<form method="post" onsubmit="return rpConfirmReinitialize();">';
         wp_nonce_field('rp_reinitialize', 'rp_reinitialize_nonce');
+        echo '<p><label><input type="checkbox" name="rp_reset_config" id="rp_reset_config" value="1" checked> ' . esc_html__('Reinizializza Configurazioni', 'res-pong') . '</label></p>';
+        echo '<p><label><input type="checkbox" name="rp_reset_app" id="rp_reset_app" value="1"> ' . esc_html__('Reinizializza App', 'res-pong') . '</label></p>';
+        echo '<p><label><input type="checkbox" name="rp_reset_db" id="rp_reset_db" value="1"> ' . esc_html__('Reinizializza DB', 'res-pong') . '</label></p>';
         echo '<p class="submit"><button type="submit" class="button rp-button-danger">' . esc_html__('Reinizializza', 'res-pong') . '</button></p>';
         if ($reinitialize_notice !== '') {
             echo $reinitialize_notice;
         }
         echo '</form>';
+        echo '<script type="text/javascript">';
+        echo 'function rpConfirmReinitialize() {';
+        echo '    var parts = [];';
+        echo '    if (document.getElementById("rp_reset_config").checked) { parts.push("configurazioni"); }';
+        echo '    if (document.getElementById("rp_reset_app").checked) { parts.push("app"); }';
+        echo '    if (document.getElementById("rp_reset_db").checked) { parts.push("DB"); }';
+        echo '    if (parts.length === 0) { alert("Seleziona almeno un elemento da reinizializzare."); return false; }';
+        echo '    return confirm("Sei sicuro di voler reinizializzare: " + parts.join(", ") + "? Questa azione è irreversibile.");';
+        echo '}';
+        echo '</script>';
         echo '</div>';
     }
 
