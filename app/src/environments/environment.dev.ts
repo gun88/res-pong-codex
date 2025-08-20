@@ -3,6 +3,6 @@ export const environment = {
   server: 'http://localhost:8080/index.php',
   version: 'D.E.V',
   build: '00000000000000',
-  hotjarSiteId: 6498948,
+  hotjarSiteId: 6498983,
   hotjarVersion: 6
 }

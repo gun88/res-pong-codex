@@ -11,6 +11,7 @@ export class HotjarService {
   }
 
   stateChange(url: string) {
+    console.log('Hotjar: stateChange', url);
     Hotjar.stateChange(url); // utile per SPA se necessario
   }
 }
