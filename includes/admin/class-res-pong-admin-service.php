@@ -438,5 +438,25 @@ class Res_Pong_Admin_Service {
         return new WP_REST_Response(['success' => true], 200);
     }
 
+    public function rest_export_configurations() {
+        $config = $this->configuration->get_all();
+        $json = wp_json_encode($config);
+        nocache_headers();
+        header('Content-Type: application/json; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="configurations.json"');
+        echo $json;
+        exit;
+    }
+
+    public function rest_import_configurations($request) {
+        $params = $request->get_json_params();
+        $config = isset($params['config']) && is_array($params['config']) ? $params['config'] : null;
+        if ($config === null) {
+            return new WP_Error('invalid_data', 'Configurazioni non valide', ['status' => 400]);
+        }
+        $this->configuration->update($config);
+        return new WP_REST_Response(['success' => true], 200);
+    }
+
 
 }

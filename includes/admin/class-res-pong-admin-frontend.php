@@ -149,7 +149,8 @@ class Res_Pong_Admin_Frontend {
         $config = $this->configuration->get_all();
         echo '<div class="wrap rp-wrap">';
         echo '<h1>' . esc_html__('Configurazioni', 'res-pong') . '</h1>';
-        echo '<form method="post">';
+        echo '<p><button type="button" class="button" id="rp-config-import">' . esc_html__('Importa configurazioni', 'res-pong') . '</button> <button type="button" class="button" id="rp-config-export">' . esc_html__('Esporta configurazioni', 'res-pong') . '</button></p>';
+        echo '<form method="post" id="rp-config-form">';
         wp_nonce_field('rp_save_configurations', 'rp_configurations_nonce');
         echo '<table class="form-table">';
         echo '<tr><th><label for="almost_closed_minutes">Minuti alla chiusura</label></th><td><input name="almost_closed_minutes" id="almost_closed_minutes" type="number" value="' . esc_attr($config['almost_closed_minutes']) . '"></td></tr>';
