@@ -298,7 +298,7 @@ class Res_Pong_Admin_Service {
     public function rest_send_email($request) {
         $params = $request->get_json_params();
         $subject = isset($params['subject']) ? sanitize_text_field($params['subject']) : '';
-        $text = isset($params['text']) ? sanitize_textarea_field($params['text']) : '';
+        $text = isset($params['text']) ? /*sanitize_textarea_field*/($params['text']) : '';
         $recipients = isset($params['recipients']) && is_array($params['recipients']) ? array_filter(array_map('sanitize_email', $params['recipients'])) : [];
         if ($subject === '' || $text === '' || empty($recipients)) {
             return new WP_Error('invalid_data', 'Oggetto, testo e destinatari sono obbligatori', ['status' => 400]);
@@ -345,7 +345,6 @@ class Res_Pong_Admin_Service {
             return new WP_Error('insert_failed', 'Creazione prenotazione fallita', ['status' => 500]);
         }
         $data['id'] = $id;
-        error_log("Inserted reservation: " . print_r($data, true));
         return new WP_REST_Response($data, 201);
     }
 
