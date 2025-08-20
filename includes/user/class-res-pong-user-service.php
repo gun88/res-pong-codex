@@ -128,6 +128,13 @@ class Res_Pong_User_Service {
                 Res_Pong_Util::send_email($email, $subject, $message, $signature);
 
             }
+
+            $availability = !empty($event->max_players) ? ($event->max_players - $event->players_count) : 0;
+            $notification_subscribers = !empty($event->notification_subscribers) ? json_decode($event->notification_subscribers) : [];
+
+            if ($availability > 0 && !empty($notification_subscribers)) {
+                Res_Pong_Util::enqueue_notification_messages($event, $notification_subscribers);
+            }
         } else {
             if (!empty($event->status_message)) {
                 if (!empty($event->status_message['lines'])) {
@@ -200,8 +207,8 @@ class Res_Pong_User_Service {
         $send_email_on_reservation = $req->get_param('send_email_on_reservation');
         $send_email_on_deletion = $req->get_param('send_email_on_deletion');
         $flags = 0;
-        $flags += ($send_email_on_reservation ? 1: 0) * 1;
-        $flags += ($send_email_on_deletion ? 1: 0) * 2;
+        $flags += ($send_email_on_reservation ? 1 : 0) * 1;
+        $flags += ($send_email_on_deletion ? 1 : 0) * 2;
         $this->repository->update_flags($user_id, $flags);
         return ['success' => true, 'message' => 'Preferenze aggiornate.'];
     }
@@ -323,7 +330,7 @@ class Res_Pong_User_Service {
             $other_events = [];
         }
         $event->players = $players;
-        $event->players_count = count($players);;
+        $event->players_count = count($players);
         $event->other_events = $other_events;
         $event->event_countdown_minutes = $this->minutes_until($event->start_datetime);
         $event->status = $this->calculate_event_status($event);
@@ -580,6 +587,41 @@ class Res_Pong_User_Service {
         error_log("done___________________________");
         die(1);
     }*/
+
+    public function send_notification_messages($event, $notification_subscribers) {
+
+        $event_notified_count = count($notification_subscribers);
+        foreach ($notification_subscribers as $user_id) {
+            $user = $this->repository->get_enabled_user_by_id($user_id);
+            if (!$user) return;
+
+            $email = $user->email;
+            $subject = $this->configuration->get('notify_availability_subject');
+            $message = $this->configuration->get('notify_availability_text');
+            $signature = $this->configuration->get('mail_signature');
+
+            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+            $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+            $subject = Res_Pong_Util::replace_event_placeholders($subject, $event);
+            $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+            $subject = Res_Pong_Util::replace_broadcast_message_warning($subject, $event_notified_count);
+
+            $message = Res_Pong_Util::replace_temporal_placeholders($message);
+            $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+            $message = Res_Pong_Util::replace_event_placeholders($message, $event);
+            $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+            $message = Res_Pong_Util::replace_broadcast_message_warning($message, $event_notified_count);
+
+            $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+            $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+            $signature = Res_Pong_Util::replace_event_placeholders($signature, $event);
+            $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+            $signature = Res_Pong_Util::replace_broadcast_message_warning($signature, $event_notified_count);
+
+            Res_Pong_Util::send_email($email, $subject, $message, $signature);
+        }
+    }
+
 
 
 }

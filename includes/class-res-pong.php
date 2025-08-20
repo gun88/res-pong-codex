@@ -104,4 +104,9 @@ class Res_Pong {
         }
         rmdir($dir);
     }
+
+    public function send_notification_messages($event, $notification_subscribers) {
+        $this->user_service->send_notification_messages($event, $notification_subscribers);
+    }
+
 }

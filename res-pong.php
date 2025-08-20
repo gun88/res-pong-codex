@@ -48,19 +48,17 @@ register_deactivation_hook(__FILE__, function () use ($res_pong) {
     $res_pong->deactivate();
 });
 
-add_action('res_pong_send_email', function (array $data) {
+add_action('res_pong_send_availability_notifications', function (array $data) use ($res_pong) {
 
-    $to = $data['to'] ?? '';
-    $subject = $data['subject'] ?? '';
-    $message = $data['message'] ?? '';
-    $headers = $data['headers'] ?? [];
-    if (!$to || !$subject || !$message) return;
+    $event = !empty($data['event']) ? $data['event'] : '';
+    $notification_subscribers = !empty($data['notification_subscribers']) ? $data['notification_subscribers'] : '';
 
-    wp_mail($to, $subject, $message, $headers);
+    if (!$event || !$notification_subscribers) return;
 
-    if (RES_PONG_DEV) {
-        error_log("SENT EMAIL TO [$to] SUBJECT [$subject]");
-    }
+    require_once RES_PONG_PLUGIN_DIR . 'includes/common/class-res-pong-util.php';
+
+    $res_pong->send_notification_messages($event, $notification_subscribers);
+
 }, 10, 1);
 
 

@@ -2,22 +2,16 @@
 
 class Res_Pong_Util {
 
-    public static function send_email($to, $subject, $message, $signature, $async = false, $wake_up_wp_cron = true) {
+    public static function enqueue_notification_messages($event, $notification_subscribers) {
 
-        $headers = ['Content-Type: text/html; charset=UTF-8'];
-        $message = "$message\n\n<hr>$signature";
-        $message = wpautop($message);
-        $message = wp_kses_post($message);
+        $args = ['event' => $event, 'notification_subscribers' => $notification_subscribers];
+        Res_Pong_Util::rp_normalize_args($args);
 
-        $content = ['to' => $to, 'subject' => $subject, 'message' => $message, 'headers' => $headers];
-        Res_Pong_Util::rp_normalize_args($content);
-
-
-        if ($async && (!defined('DISABLE_WP_CRON') || DISABLE_WP_CRON === false)) {
-            wp_schedule_single_event(time() - 86400, 'res_pong_send_email', [$content]);
+        if (!defined('DISABLE_WP_CRON') || DISABLE_WP_CRON === false) {
+            wp_schedule_single_event(time() - 86400, 'res_pong_send_availability_notifications', [$args]);
 
             for ($i = 0; $i < 5; $i++) {
-                $enqueued = wp_get_scheduled_event('res_pong_send_email', [$content]);
+                $enqueued = wp_get_scheduled_event('res_pong_send_availability_notifications', [$args]);
                 if ($enqueued) {
                     break;
                 }
@@ -25,9 +19,9 @@ class Res_Pong_Util {
                 usleep(200 * 1000);
             }
 
-            if ($wake_up_wp_cron) Res_Pong_Util::wake_up_wp_cron();
+            Res_Pong_Util::wake_up_wp_cron();
         } else {
-            do_action('res_pong_send_email', $content);
+            do_action('res_pong_send_availability_notifications', $args);
         }
     }
 
@@ -42,6 +36,19 @@ class Res_Pong_Util {
                 }
                 wp_remote_post($url, ['timeout' => 5, 'blocking' => false]);
             }
+        }
+    }
+
+    public static function send_email($to, $subject, $message, $signature) {
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
+        $message = "$message\n\n<hr>$signature";
+        $message = wpautop($message);
+        $message = wp_kses_post($message);
+
+        wp_mail($to, $subject, $message, $headers);
+
+        if (RES_PONG_DEV) {
+            error_log("SENT EMAIL TO [$to] SUBJECT [$subject]");
         }
     }
 
@@ -164,10 +171,9 @@ class Res_Pong_Util {
         $event_time_start = Res_Pong_Util::date_now_formatted('HH:mm', $event['start_datetime']);
         $event_time_end = Res_Pong_Util::date_now_formatted('HH:mm', $event['end_datetime']);
         $event_duration = Res_Pong_Util:: format_duration($event['start_datetime'], $event['end_datetime']);
-        $event_notified_count = isset($event['notified_count']) ? $event['notified_count'] : 0;
         $event_note = empty($event['note']) ? 'Nessuna' : $event['note'];
-        $placeholders = ['#event_id', '#event_category', '#event_name', '#event_note', '#event_start_datetime', '#event_end_datetime', '#event_max_players', '#event_players_count', '#event_date_short', '#event_date_full', '#event_notified_count', '#event_date_only', '#event_time_start', '#event_time_end', '#event_duration'];
-        $replacements = [$event['id'], $event['category'], $event['name'], $event_note, $event['start_datetime'], $event['end_datetime'], $event['max_players'], $event['players_count'], $event_date_short, $event_date_full, $event_notified_count, $event_date_only, $event_time_start, $event_time_end, $event_duration];
+        $placeholders = ['#event_id', '#event_category', '#event_name', '#event_note', '#event_start_datetime', '#event_end_datetime', '#event_max_players', '#event_players_count', '#event_date_short', '#event_date_full', '#event_date_only', '#event_time_start', '#event_time_end', '#event_duration'];
+        $replacements = [$event['id'], $event['category'], $event['name'], $event_note, $event['start_datetime'], $event['end_datetime'], $event['max_players'], $event['players_count'], $event_date_short, $event_date_full, $event_date_only, $event_time_start, $event_time_end, $event_duration];
         return str_replace($placeholders, $replacements, $string);
     }
 
@@ -178,6 +184,12 @@ class Res_Pong_Util {
             Res_Pong_Util::date_now_formatted("d MMMM yyyy"),
         ];
         return str_replace($placeholders, $replacements, $string);
+    }
+
+    public static function replace_broadcast_message_warning($string, $event_notified_count) {
+        // broadcast_message_warning
+        $replacement = $event_notified_count > 1 ? "NOTA: questa notifica è stata inviata a <b>$event_notified_count utenti</b> della piattaforma." : '';
+        return str_replace('#broadcast_message_warning', $replacement, $string);
     }
 
     public static function replace_configuration_placeholders($string, Res_Pong_Configuration $configuration) {

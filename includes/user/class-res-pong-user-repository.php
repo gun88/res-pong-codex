@@ -143,6 +143,10 @@ class Res_Pong_User_Repository {
         return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_user} WHERE enabled = 1 AND LOWER(email) = LOWER(%s)", $user_email));
     }
 
+    public function get_enabled_user_by_id($user_id) {
+        return $this->wpdb->get_row($this->wpdb->prepare("SELECT * FROM {$this->table_user} WHERE enabled = 1 AND id = %s", $user_id));
+    }
+
     public function update_user_token($user_id, $token) {
         $this->wpdb->update($this->table_user, ['reset_token' => $token], ['id' => $user_id]);
     }

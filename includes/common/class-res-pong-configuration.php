@@ -35,7 +35,7 @@ class Res_Pong_Configuration {
         'reservation_deleted_text' => "Ciao #first_name,\n\nLa tua prenotazione per <a href=\"#app_url/#/events/#event_id\">#event_name di #event_date_full</a> è stata cancellata correttamente.\n\n&nbsp;",
 
         'notify_availability_subject' => 'Posti Disponibili - #event_name - #event_date_short - #app_name',
-        'notify_availability_text' => "Ciao #first_name,\n\nCi sono posti disponibili per <a href=\"#app_url/#/events/#event_id\">#event_name di #event_date_full</a>.\n\n<i>NOTA: questa notifica è stata inviata a <b>#event_notified_count utenti</b> della piattaforma.</i>\n\n&nbsp;",
+        'notify_availability_text' => "Ciao #first_name,\n\nCi sono posti disponibili per <a href=\"#app_url/#/events/#event_id\">#event_name di #event_date_full</a>.\n\n<i>#broadcast_message_warning</i>\n\n&nbsp;",
 
         'mail_signature' => "<strong>#site_name</strong>\n<em>#app_name</em>\n#app_url\n",
     ];
