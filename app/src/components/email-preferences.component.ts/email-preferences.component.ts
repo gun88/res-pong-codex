@@ -25,19 +25,19 @@ export class EmailPreferencesComponent implements OnInit {
   @Input() loading: boolean = false;
   @Input()
   set user(value: any) {
-    if (!value?.notifications) return
+    if (!value?.flags) return
     this._user = value;
     this.form = this.fb.group({
-      send_email_on_reservation: [this._user?.notifications.send_email_on_reservation],
-      send_email_on_deletion: [this._user?.notifications.send_email_on_deletion]
+      send_email_on_reservation: [this._user?.flags.send_email_on_reservation],
+      send_email_on_deletion: [this._user?.flags.send_email_on_deletion]
     });
   }
   _user: any = null;
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      send_email_on_reservation: [this._user?.notifications.send_email_on_reservation],
-      send_email_on_deletion: [this._user?.notifications.send_email_on_deletion]
+      send_email_on_reservation: [this._user?.flags.send_email_on_reservation],
+      send_email_on_deletion: [this._user?.flags.send_email_on_deletion]
     });
   }
 
@@ -47,8 +47,8 @@ export class EmailPreferencesComponent implements OnInit {
     }
     this.loading = true;
     const {send_email_on_reservation, send_email_on_deletion} = this.form.value;
-    this._user.notifications.send_email_on_reservation = send_email_on_reservation;
-    this._user.notifications.send_email_on_deletion = send_email_on_deletion;
+    this._user.flags.send_email_on_reservation = send_email_on_reservation;
+    this._user.flags.send_email_on_deletion = send_email_on_deletion;
     this.form.disable();
 
     this.resPongService.saveEmailPreferences(send_email_on_reservation, send_email_on_deletion)

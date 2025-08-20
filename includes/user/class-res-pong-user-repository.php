@@ -201,8 +201,8 @@ class Res_Pong_User_Repository {
         }
     }
 
-    public function update_notifications($user_id, $notifications) {
-        $this->wpdb->update($this->table_user, ['notifications' => $notifications], ['id' => $user_id], ['%s'], ['%s']);
+    public function update_flags($user_id, $flags) {
+        $this->wpdb->update($this->table_user, ['flags' => $flags], ['id' => $user_id], ['%s'], ['%s']);
     }
 
 }

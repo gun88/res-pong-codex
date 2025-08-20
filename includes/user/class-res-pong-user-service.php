@@ -51,7 +51,7 @@ class Res_Pong_User_Service {
                     $affected_rows = $this->repository->insert_reservation(['event_id' => $event_id, 'user_id' => $user_id, 'created_at' => $created_at]);
                     $event = $this->_get_event_for_logged_user($event_id, $user_id);
                     $user = $this->repository->get_user_by_id($user_id);
-                    if ($affected_rows > 0 && Res_Pong_Util::parse_notifications($user)['send_email_on_reservation']) {
+                    if ($affected_rows > 0 && Res_Pong_Util::parse_flags($user)['send_email_on_reservation']) {
                         $email = $user->email;
                         $subject = $this->configuration->get('reservation_confirmed_subject');
                         $message = $this->configuration->get('reservation_confirmed_text');
@@ -104,7 +104,7 @@ class Res_Pong_User_Service {
             $affected_rows = $this->repository->delete_reservation_by_user_and_event($user_id, $event_id);
             $event = $this->_get_event_for_logged_user($event_id, $user_id);
             $user = $this->repository->get_user_by_id($user_id);
-            if ($affected_rows > 0 && Res_Pong_Util::parse_notifications($user)['send_email_on_deletion']) {
+            if ($affected_rows > 0 && Res_Pong_Util::parse_flags($user)['send_email_on_deletion']) {
                 $email = $user->email;
                 $subject = $this->configuration->get('reservation_deleted_subject');
                 $message = $this->configuration->get('reservation_deleted_text');
@@ -158,7 +158,7 @@ class Res_Pong_User_Service {
         Res_Pong_Util::res_pong_set_cookie($token, $ttl);
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
-        $user->notifications = Res_Pong_Util::parse_notifications($user);
+        $user->flags = Res_Pong_Util::parse_flags($user);
 
         return new \WP_REST_Response(['success' => true, 'error' => null, 'user' => $user], 200);
 
@@ -199,10 +199,10 @@ class Res_Pong_User_Service {
         $user_id = $this->res_pong_get_logged_user_id();
         $send_email_on_reservation = $req->get_param('send_email_on_reservation');
         $send_email_on_deletion = $req->get_param('send_email_on_deletion');
-        $notifications = 0;
-        $notifications += ($send_email_on_reservation ? 1: 0) * 1;
-        $notifications += ($send_email_on_deletion ? 1: 0) * 2;
-        $this->repository->update_notifications($user_id, $notifications);
+        $flags = 0;
+        $flags += ($send_email_on_reservation ? 1: 0) * 1;
+        $flags += ($send_email_on_deletion ? 1: 0) * 2;
+        $this->repository->update_flags($user_id, $flags);
         return ['success' => true, 'message' => 'Preferenze aggiornate.'];
     }
 
@@ -250,7 +250,7 @@ class Res_Pong_User_Service {
         }
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
-        $user->notifications = Res_Pong_Util::parse_notifications($user);
+        $user->flags = Res_Pong_Util::parse_flags($user);
         return rest_ensure_response($user);
     }
 
@@ -272,7 +272,7 @@ class Res_Pong_User_Service {
 
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
-        $user->notifications = Res_Pong_Util::parse_notifications($user);
+        $user->flags = Res_Pong_Util::parse_flags($user);
         return rest_ensure_response($user);
     }
 

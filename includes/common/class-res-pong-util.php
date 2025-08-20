@@ -150,11 +150,11 @@ class Res_Pong_Util {
         return str_replace($placeholders, $replacements, $string);
     }
 
-    public static function parse_notifications($user) {
-        if (!empty($user->notifications)) {
+    public static function parse_flags($user) {
+        if (!empty($user->flags)) {
             return [
-                'send_email_on_reservation' => (($user->notifications & 1) >> 0) == 1,
-                'send_email_on_deletion' => (($user->notifications & 2) >> 1) == 1,
+                'send_email_on_reservation' => (($user->flags & 1) >> 0) == 1,
+                'send_email_on_deletion' => (($user->flags & 2) >> 1) == 1,
             ];
         } else {
             return [

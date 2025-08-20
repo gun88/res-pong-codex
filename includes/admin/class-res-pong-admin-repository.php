@@ -37,7 +37,7 @@ class Res_Pong_Admin_Repository {
             last_name VARCHAR(100) NOT NULL,
             first_name VARCHAR(100) NOT NULL,
             category VARCHAR(25),
-            notifications INT,
+            flags INT,
             password VARCHAR(255) NOT NULL,
             timeout VARCHAR(25) DEFAULT NULL,
             reset_token VARCHAR(255) DEFAULT NULL,
