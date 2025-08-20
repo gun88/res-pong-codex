@@ -43,19 +43,19 @@ export class ResPongService {
       .pipe(
         tap((res: any) => {
           let user = res?.success ? res.user : null;
-          localStorage.setItem('res_pong_user', JSON.stringify(user));
+          this.updateMemoryUser(user);
           this.userSubject.next(user);
         })
       );
   }
 
+  public updateMemoryUser(user: any) {
+    localStorage.setItem('res_pong_user', JSON.stringify(user));
+  }
+
   public logOut() {
     return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/logout`, {})
-      .pipe(
-        tap(() => {
-          this.resetMemoryUser();
-        })
-      );
+      .pipe(tap(() => this.resetMemoryUser()));
   }
 
 
@@ -66,6 +66,7 @@ export class ResPongService {
 
   public getUserData() {
     return this.http.get(`${this.baseServer}/?rest_route=/res-pong/v1/user`)
+      .pipe(tap((user: any) => this.updateMemoryUser(user)));
   }
 
   public getUserDataByToken(token: string) {
@@ -102,7 +103,10 @@ export class ResPongService {
 
 
   public saveEmailPreferences(send_email_on_reservation: boolean, send_email_on_deletion: boolean) {
-    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/user/email-preferences`, {send_email_on_reservation, send_email_on_deletion});
+    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/user/email-preferences`, {
+      send_email_on_reservation,
+      send_email_on_deletion
+    });
 
   }
 }

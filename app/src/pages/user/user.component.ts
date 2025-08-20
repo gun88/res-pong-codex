@@ -12,12 +12,10 @@ import {UserDataComponent} from "../../components/user/user-data.component";
 import {PasswordFormComponent} from "../../components/password/password-form.component";
 import {BlockUI} from 'primeng/blockui';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {NgIf} from '@angular/common';
-import {ToggleSwitch} from 'primeng/toggleswitch';
 import {EmailPreferencesComponent} from '../../components/email-preferences.component.ts/email-preferences.component';
 
 @Component({
-    selector: 'res-pong-user-user',
+  selector: 'res-pong-user-user',
   imports: [
     ReactiveFormsModule,
     ButtonModule,
@@ -33,59 +31,57 @@ import {EmailPreferencesComponent} from '../../components/email-preferences.comp
     PasswordFormComponent,
     BlockUI,
     ProgressSpinner,
-    NgIf,
-    ToggleSwitch,
     EmailPreferencesComponent
   ],
-    templateUrl: './user.component.html',
-    styleUrl: './user.component.scss'
+  templateUrl: './user.component.html',
+  styleUrl: './user.component.scss'
 })
 export class UserComponent implements OnInit {
-    private resPongService = inject(ResPongService);
-    private router = inject(Router);
-    loading = false;
-    logoutLoading = false;
-    error = '';
-    user: any = {
-        username: '',
-        email: '',
-        first_name: '',
-        last_name: '',
-        monogram: '...'
-    };
+  private resPongService = inject(ResPongService);
+  private router = inject(Router);
+  loading = false;
+  logoutLoading = false;
+  error = '';
+  user: any = {
+    username: '',
+    email: '',
+    first_name: '',
+    last_name: '',
+    monogram: '...'
+  };
 
 
-    ngOnInit(): void {
-        this.loading = true;
-        this.resPongService.user$.pipe(
-            tap((user: any) => this.user = user),
-            tap(() => this.loading = false),
-            switchMap(() => this.resPongService.getUserData()),
-            tap((user: any) => {
-                this.user = user;
-            }),
-            catchError((error: any) => {
-                console.error('Errore nel caricamento dati utente:', error);
-                this.error = 'Si è verificato un errore durante il caricamento dei dati utente.';
-                this.loading = false;
-                return [];
-            })
-        ).subscribe()
+  ngOnInit(): void {
+    this.loading = true;
+    this.resPongService.user$.pipe(
+      tap((user: any) => this.user = user),
+      tap(() => this.loading = false),
+      switchMap(() => this.resPongService.getUserData()),
+      tap((user: any) => {
+        this.user = user;
+      }),
+      catchError((error: any) => {
+        console.error('Errore nel caricamento dati utente:', error);
+        this.error = 'Si è verificato un errore durante il caricamento dei dati utente.';
+        this.loading = false;
+        return [];
+      })
+    ).subscribe()
 
-    }
+  }
 
-    logout() {
-        this.logoutLoading = true;
-        this.resPongService.logOut().subscribe(
-            () => {
-                this.router.navigate(['/login']);
-                this.logoutLoading = false;
-            },
-            error => {
-                console.error(error);
-                alert("Errore durante la logout. Riprova!")
-                this.logoutLoading = false;
-            }
-        );
-    }
+  logout() {
+    this.logoutLoading = true;
+    this.resPongService.logOut().subscribe(
+      () => {
+        this.router.navigate(['/login']);
+        this.logoutLoading = false;
+      },
+      error => {
+        console.error(error);
+        alert("Errore durante la logout. Riprova!")
+        this.logoutLoading = false;
+      }
+    );
+  }
 }

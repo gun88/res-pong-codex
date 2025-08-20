@@ -108,6 +108,7 @@ class Res_Pong_User_Service {
         Res_Pong_Util::res_pong_set_cookie($token, $ttl);
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
+        $user->notifications = $this->parse_notifications($user);
 
         return new \WP_REST_Response(['success' => true, 'error' => null, 'user' => $user], 200);
 
@@ -144,6 +145,17 @@ class Res_Pong_User_Service {
         return $this->password_update($req, $user);
     }
 
+    public function update_logged_user_email_preferences($req) {
+        $user_id = $this->res_pong_get_logged_user_id();
+        $send_email_on_reservation = $req->get_param('send_email_on_reservation');
+        $send_email_on_deletion = $req->get_param('send_email_on_deletion');
+        $notifications = 0;
+        $notifications += ($send_email_on_reservation ? 1: 0) * 1;
+        $notifications += ($send_email_on_deletion ? 1: 0) * 2;
+        $this->repository->update_notifications($user_id, $notifications);
+        return ['success' => true, 'message' => 'Preferenze aggiornate.'];
+    }
+
     public function password_reset(\WP_REST_Request $req) {
         $email = trim((string)$req->get_param('email'));
         if (empty($email) || !is_email($email)) {
@@ -176,6 +188,7 @@ class Res_Pong_User_Service {
         }
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
+        $user->notifications = $this->parse_notifications($user);
         return rest_ensure_response($user);
     }
 
@@ -197,6 +210,7 @@ class Res_Pong_User_Service {
 
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
+        $user->notifications = $this->parse_notifications($user);
         return rest_ensure_response($user);
     }
 
@@ -209,7 +223,7 @@ class Res_Pong_User_Service {
 
     // ---------------------------------------------------------------
 
-    public function load_avatar($user_id) {
+    private function load_avatar($user_id) {
         if ($this->configuration->get('avatar_management') === 'fitet_monitor') {
             $fitet_id = $this->repository->get_fitet_monitor_id($user_id);
             foreach (['jpg', 'jpeg', 'png', 'JPG', 'JPEG', 'PNG'] as $extension) {
@@ -220,6 +234,20 @@ class Res_Pong_User_Service {
             }
         }
         return null;
+    }
+
+    private function parse_notifications($user) {
+        if (!empty($user->notifications)) {
+            return [
+                'send_email_on_reservation' => (($user->notifications & 1) >> 0) == 1,
+                'send_email_on_deletion' => (($user->notifications & 2) >> 1) == 1,
+            ];
+        } else {
+            return [
+                'send_email_on_reservation' => false,
+                'send_email_on_deletion' => false,
+            ];
+        }
     }
 
     private function _get_event_for_logged_user($event_id, int $user_id) {

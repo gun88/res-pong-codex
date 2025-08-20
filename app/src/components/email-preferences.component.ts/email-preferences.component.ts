@@ -16,23 +16,28 @@ import {catchError, finalize, of, tap} from 'rxjs';
   styleUrl: './email-preferences.component.scss'
 })
 export class EmailPreferencesComponent implements OnInit {
+
   private resPongService = inject(ResPongService);
   private fb = inject(FormBuilder);
   form!: FormGroup;
-  @Output()
-  savePreferences = new EventEmitter<{
-    send_email_on_reservation: boolean;
-    send_email_on_deletion: boolean
-  }>();
 
   @Input() message: any = null;
   @Input() loading: boolean = false;
-  @Input() user: any = null;
+  @Input()
+  set user(value: any) {
+    if (!value?.notifications) return
+    this._user = value;
+    this.form = this.fb.group({
+      send_email_on_reservation: [this._user?.notifications.send_email_on_reservation],
+      send_email_on_deletion: [this._user?.notifications.send_email_on_deletion]
+    });
+  }
+  _user: any = null;
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      send_email_on_reservation: [false],
-      send_email_on_deletion: [false]
+      send_email_on_reservation: [this._user?.notifications.send_email_on_reservation],
+      send_email_on_deletion: [this._user?.notifications.send_email_on_deletion]
     });
   }
 
@@ -41,8 +46,10 @@ export class EmailPreferencesComponent implements OnInit {
       return;
     }
     this.loading = true;
-    this.form.disable();
     const {send_email_on_reservation, send_email_on_deletion} = this.form.value;
+    this._user.notifications.send_email_on_reservation = send_email_on_reservation;
+    this._user.notifications.send_email_on_deletion = send_email_on_deletion;
+    this.form.disable();
 
     this.resPongService.saveEmailPreferences(send_email_on_reservation, send_email_on_deletion)
       .pipe(
@@ -61,9 +68,10 @@ export class EmailPreferencesComponent implements OnInit {
         tap((value: any) => {
           if (value?.success) {
             this.message = {
-              text: 'Password reimpostata correttamente.',
+              text: 'Preferenze aggiornate correttamente..',
               severity: 'success',
             };
+            this.resPongService.updateMemoryUser(this._user);
           } else {
             this.message = {
               text: value?.error ?? 'Si è verificato un errore. Riprova.',

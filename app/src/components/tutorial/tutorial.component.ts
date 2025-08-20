@@ -29,7 +29,7 @@ export class TutorialComponent implements OnInit, OnDestroy {
                     setTimeout(() => this.popover?.show(null, el), 250);
 
                 } else {
-                    console.log('Tutorial selector not found:', state.step.selector);
+                    console.debug('Tutorial selector not found:', state.step.selector);
                     this.next()
                 }
             } else {
