@@ -48,5 +48,36 @@ register_deactivation_hook(__FILE__, function () use ($res_pong) {
     $res_pong->deactivate();
 });
 
+add_action('res_pong_send_email', function (array $data) {
 
+    $to = $data['to'] ?? '';
+    $subject = $data['subject'] ?? '';
+    $message = $data['message'] ?? '';
+    $headers = $data['headers'] ?? [];
+    if (!$to || !$subject || !$message) return;
+
+    wp_mail($to, $subject, $message, $headers);
+
+    if (RES_PONG_DEV) {
+        error_log("SENT EMAIL TO [$to] SUBJECT [$subject]");
+    }
+}, 10, 1);
+
+
+if (RES_PONG_DEV) {
+    add_filter('cron_request', function (array $request) {
+        $u = wp_parse_url($request['url']);
+        $scheme = $u['scheme'] ?? 'http';
+        $host = 'localhost';
+        $port = 80;
+        $path = $u['path'] ?? '/wp-cron.php';
+        $query = $u['query'] ?? '';
+
+        $request['url'] = $scheme . '://' . $host . ($port ? ':' . $port : '') . $path . ($query ? '?' . $query : '');
+        $request['args']['timeout'] = 3;
+        $request['args']['blocking'] = false;
+        $request['args']['sslverify'] = false;
+        return $request;
+    });
+}
 

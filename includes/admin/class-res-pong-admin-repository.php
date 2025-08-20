@@ -56,6 +56,7 @@ class Res_Pong_Admin_Repository {
             end_datetime VARCHAR(25) NOT NULL,
             max_players INT,
             enabled TINYINT DEFAULT 1 NOT NULL,
+            notification_subscribers JSON,
             INDEX idx_start_datetime (start_datetime),
             INDEX idx_group_id (group_id)
         ) $charset_collate;

@@ -347,7 +347,6 @@ class Res_Pong_Admin_Service {
             return new WP_Error('invalid_data', 'Oggetto, testo e destinatari sono obbligatori', ['status' => 400]);
         }
 
-        $subject = $this->configuration->get('invitation_subject');
         $message = $text;
         $signature = $this->configuration->get('mail_signature');
 
@@ -370,8 +369,9 @@ class Res_Pong_Admin_Service {
             $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
             $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
 
-            Res_Pong_Util::send_email($email, $subject, $message, $signature);
+            Res_Pong_Util::send_email($email, $subject, $message, $signature, true,false);
         }
+        Res_Pong_Util::wake_up_wp_cron();
         return rest_ensure_response(['success' => true]);
     }
 

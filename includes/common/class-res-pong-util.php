@@ -2,14 +2,55 @@
 
 class Res_Pong_Util {
 
-    public static function send_email($to, $subject, $message, $signature) {
+    public static function send_email($to, $subject, $message, $signature, $async = false, $wake_up_wp_cron = true) {
+
         $headers = ['Content-Type: text/html; charset=UTF-8'];
         $message = "$message\n\n<hr>$signature";
         $message = wpautop($message);
         $message = wp_kses_post($message);
-        wp_mail($to, $subject, $message, $headers);
+
+        $content = ['to' => $to, 'subject' => $subject, 'message' => $message, 'headers' => $headers];
+        Res_Pong_Util::rp_normalize_args($content);
+
+
+        if ($async && (!defined('DISABLE_WP_CRON') || DISABLE_WP_CRON === false)) {
+            wp_schedule_single_event(time() - 86400, 'res_pong_send_email', [$content]);
+
+            for ($i = 0; $i < 5; $i++) {
+                $enqueued = wp_get_scheduled_event('res_pong_send_email', [$content]);
+                if ($enqueued) {
+                    break;
+                }
+                error_log("Enqueued job not found. Tentative: " . ($i + 1) . " of 5. Sleeping 200ms.");
+                usleep(200 * 1000);
+            }
+
+            if ($wake_up_wp_cron) Res_Pong_Util::wake_up_wp_cron();
+        } else {
+            do_action('res_pong_send_email', $content);
+        }
     }
 
+    public static function wake_up_wp_cron() {
+        if (!defined('DISABLE_WP_CRON') || DISABLE_WP_CRON === false) {
+            if (function_exists('spawn_cron')) {
+                spawn_cron();
+            } else {
+                $url = site_url('wp-cron.php?doing_wp_cron=' . rawurlencode(microtime(true)));
+                if (RES_PONG_DEV) {
+                    $url = str_replace(':8080', '', $url);
+                }
+                wp_remote_post($url, ['timeout' => 5, 'blocking' => false]);
+            }
+        }
+    }
+
+    private static function rp_normalize_args(array &$a) {
+        ksort($a);
+        foreach ($a as &$v) {
+            if (is_array($v)) Res_Pong_Util::rp_normalize_args($v);
+        }
+    }
 
     public static function res_pong_token_make(int $userId, int $ttl): string {
         $exp = time() + $ttl;
@@ -163,6 +204,7 @@ class Res_Pong_Util {
             ];
         }
     }
+
 
 }
 
