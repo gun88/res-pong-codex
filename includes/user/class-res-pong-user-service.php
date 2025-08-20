@@ -168,14 +168,24 @@ class Res_Pong_User_Service {
             $this->repository->update_user_token($user->id, $token);
             $url = $this->configuration->get('app_url') . '/#/password-update?token=' . Res_Pong_Util::base64url_encode($token);
             $text = $this->configuration->get('reset_password_text');
-            $message = $text;
             $subject = $this->configuration->get('reset_password_subject');
-            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
-            $subject = Res_Pong_Util::replace_user_placeholders($user, $subject);
-            $message = Res_Pong_Util::replace_temporal_placeholders($message);
-            $message = Res_Pong_Util::replace_user_placeholders($user, $message);
-            $message = str_replace("#link", $url, $message);
+            $message = $text;
             $signature = $this->configuration->get('mail_signature');
+
+            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+            $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+            $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
+            $message = Res_Pong_Util::replace_temporal_placeholders($message);
+            $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+            $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+            $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+            $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+            $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
+            $message = str_replace("#link", $url, $message);
+
             Res_Pong_Util::send_email($email, $subject, $message, $signature);
         }
         // Rispondi comunque success per non rivelare se l'utente esiste
@@ -309,12 +319,22 @@ class Res_Pong_User_Service {
             $this->repository->update_user_token($user->id, null);
 
             $email = $user->email;
-            $text = $this->configuration->get('update_password_text');
-            $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
-            $replacements = [$user->email, $user->username, $user->last_name, $user->first_name, $user->category];
-            $message = str_replace($placeholders, $replacements, $text);
             $subject = $this->configuration->get('update_password_subject');
-            $message = $message . "\n" . $this->configuration->get('mail_signature');
+            $message = $this->configuration->get('update_password_text');
+            $signature = $this->configuration->get('mail_signature');
+
+            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+            $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+            $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
+            $message = Res_Pong_Util::replace_temporal_placeholders($message);
+            $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+            $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+            $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+            $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+            $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
             Res_Pong_Util::send_email($email, $subject, $message, $signature);
 
             return new \WP_REST_Response(['success' => true, 'message' => 'Password aggiornata'], 200);

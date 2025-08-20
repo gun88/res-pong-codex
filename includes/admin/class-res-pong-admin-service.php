@@ -241,16 +241,28 @@ class Res_Pong_Admin_Service {
         $url = $this->configuration->get('app_url') . '/#/first-access?token=' . Res_Pong_Util::base64url_encode($token);
         $params = $request->get_json_params();
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('invitation_text');
-        $message = $text;
-        $subject = $this->configuration->get('invitation_subject');
+
         $email = $user['email'];
-        $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
-        $subject = Res_Pong_Util::replace_user_placeholders($user, $subject);
-        $message = Res_Pong_Util::replace_temporal_placeholders($message);
-        $message = Res_Pong_Util::replace_user_placeholders($user, $message);
-        $message = str_replace("#link", $url, $message);
+        $subject = $this->configuration->get('invitation_subject');
+        $message = $text;
         $signature = $this->configuration->get('mail_signature');
+
+        $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+        $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+        $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
+        $message = Res_Pong_Util::replace_temporal_placeholders($message);
+        $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+        $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+        $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+        $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+        $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
+        $message = str_replace("#link", $url, $message);
+
         Res_Pong_Util::send_email($email, $subject, $message, $signature);
+
         return new WP_REST_Response(['success' => true], 200);
     }
 
@@ -274,13 +286,28 @@ class Res_Pong_Admin_Service {
         $this->repository->update_user($id, ['reset_token' => $token]);
         $url = $this->configuration->get('app_url') . '/#/password-update?token=' . Res_Pong_Util::base64url_encode($token);
         $text = (is_array($params) && isset($params['text']) && $params['text'] !== '') ? $params['text'] : $this->configuration->get('reset_password_text');
-        $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
-        $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
-        $text = str_replace($placeholders, $replacements, $text);
-        $message = $text . "\n\nClicca qui: " . $url;
+
+        $email = $user['email'];
         $subject = $this->configuration->get('reset_password_subject');
+        $message = $text;
         $signature = $this->configuration->get('mail_signature');
-        Res_Pong_Util::send_email($user['email'], $subject, $message, $signature);
+
+        $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+        $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+        $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
+        $message = Res_Pong_Util::replace_temporal_placeholders($message);
+        $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+        $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+        $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+        $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+        $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
+        $message = str_replace("#link", $url, $message);
+
+        Res_Pong_Util::send_email($email, $subject, $message, $signature);
+
         return new WP_REST_Response(['success' => true], 200);
     }
 
@@ -306,17 +333,30 @@ class Res_Pong_Admin_Service {
         if ($subject === '' || $text === '' || empty($recipients)) {
             return new WP_Error('invalid_data', 'Oggetto, testo e destinatari sono obbligatori', ['status' => 400]);
         }
+
+        $subject = $this->configuration->get('invitation_subject');
+        $message = $text;
+        $signature = $this->configuration->get('mail_signature');
+
         foreach ($recipients as $email) {
             $user = $this->repository->find_user_by_email($email);
             if (!$user) {
                 $user = ['email' => $email, 'username' => '', 'last_name' => '', 'first_name' => '', 'category' => ''];
             }
-            $message = $text;
+            $email = $user['email'];
+
             $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
-            $subject = Res_Pong_Util::replace_user_placeholders($user, $subject);
+            $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+            $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
             $message = Res_Pong_Util::replace_temporal_placeholders($message);
-            $message = Res_Pong_Util::replace_user_placeholders($user, $message);
-            $signature = $this->configuration->get('mail_signature');
+            $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+            $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+            $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+            $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+            $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
             Res_Pong_Util::send_email($email, $subject, $message, $signature);
         }
         return rest_ensure_response(['success' => true]);

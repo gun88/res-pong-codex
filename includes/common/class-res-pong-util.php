@@ -4,7 +4,7 @@ class Res_Pong_Util {
 
     public static function send_email($to, $subject, $message, $signature) {
         $headers = ['Content-Type: text/html; charset=UTF-8'];
-        $message =  "$message\n\n<hr>$signature";
+        $message = "$message\n\n<hr>$signature";
         $message = wpautop($message);
         $message = wp_kses_post($message);
         wp_mail($to, $subject, $message, $headers);
@@ -75,7 +75,7 @@ class Res_Pong_Util {
         return $expires . '|' . $random;
     }
 
-    public static function date_now_formatted() {
+    public static function date_now_formatted($pattern = "EEEE dd/MM/yyyy HH:mm") {
         $date = new DateTime("now");
 
         $formatter = new IntlDateFormatter(
@@ -84,24 +84,33 @@ class Res_Pong_Util {
             IntlDateFormatter::SHORT,
             'Europe/Rome',
             IntlDateFormatter::GREGORIAN,
-            "EEEE dd/MM/yyyy HH:mm"
+            $pattern
         );
 
-        $now = $formatter->format($date);
-        return $now;
+        return $formatter->format($date);
     }
 
-    public static function replace_user_placeholders($user, $string) {
+    public static function replace_user_placeholders($string, $user) {
+        $user = (array)$user;
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
         $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
         return str_replace($placeholders, $replacements, $string);
     }
+
     public static function replace_temporal_placeholders($string) {
-        $placeholders = ['#now'];
-        $replacements = [Res_Pong_Util::date_now_formatted()];
+        $placeholders = ['#now_date_and_time', '#now_date_only'];
+        $replacements = [
+            Res_Pong_Util::date_now_formatted("EEEE d MMMM yyyy - HH:mm"),
+            Res_Pong_Util::date_now_formatted("d MMMM yyyy"),
+        ];
         return str_replace($placeholders, $replacements, $string);
     }
 
+    public static function replace_configuration_placeholders($string, Res_Pong_Configuration $configuration) {
+        $placeholders = ['#app_url', '#site_url'];
+        $replacements = [$configuration->get('app_url'), $configuration->get('site_url')];
+        return str_replace($placeholders, $replacements, $string);
+    }
 
 }
 
