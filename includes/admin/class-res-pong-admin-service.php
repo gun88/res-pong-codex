@@ -20,7 +20,8 @@ class Res_Pong_Admin_Service {
         if (!$user) {
             return new WP_Error('not_found', 'Utente non trovato', ['status' => 404]);
         }
-        return rest_ensure_response($user);
+        $flags = Res_Pong_Util::parse_flags((object)$user);
+        return rest_ensure_response(array_merge($user, $flags));
     }
 
     public function rest_create_user($request) {
@@ -34,18 +35,30 @@ class Res_Pong_Admin_Service {
         if ($this->repository->get_user($data['id'])) {
             return new WP_Error('user_exists', 'Utente già esistente', ['status' => 409]);
         }
+        $send_email_on_reservation = isset($data['send_email_on_reservation']) ? intval($data['send_email_on_reservation']) : 0;
+        $send_email_on_deletion = isset($data['send_email_on_deletion']) ? intval($data['send_email_on_deletion']) : 0;
+        $data['flags'] = ($send_email_on_reservation ? 1 : 0) | ($send_email_on_deletion ? 2 : 0);
+        unset($data['send_email_on_reservation'], $data['send_email_on_deletion']);
         $inserted = $this->repository->insert_user($data);
         if ($inserted === false) {
             return new WP_Error('insert_failed', 'Creazione utente fallita', ['status' => 500]);
         }
-        return new WP_REST_Response($data, 201);
+        $user = $this->repository->get_user($data['id']);
+        $flags = Res_Pong_Util::parse_flags((object)$user);
+        return new WP_REST_Response(array_merge($user, $flags), 201);
     }
 
     public function rest_update_user($request) {
         $id = $request['id'];
         $data = $request->get_json_params();
+        $send_email_on_reservation = isset($data['send_email_on_reservation']) ? intval($data['send_email_on_reservation']) : 0;
+        $send_email_on_deletion = isset($data['send_email_on_deletion']) ? intval($data['send_email_on_deletion']) : 0;
+        $data['flags'] = ($send_email_on_reservation ? 1 : 0) | ($send_email_on_deletion ? 2 : 0);
+        unset($data['send_email_on_reservation'], $data['send_email_on_deletion']);
         $this->repository->update_user($id, $data);
-        return rest_ensure_response($this->repository->get_user($id));
+        $user = $this->repository->get_user($id);
+        $flags = Res_Pong_Util::parse_flags((object)$user);
+        return rest_ensure_response(array_merge($user, $flags));
     }
 
     public function rest_delete_user($request) {

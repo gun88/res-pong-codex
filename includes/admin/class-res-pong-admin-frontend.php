@@ -264,6 +264,8 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="last_name">Cognome</label></th><td><input name="last_name" id="last_name" type="text"></td></tr>';
         echo '<tr><th><label for="category">Categoria</label></th><td><input name="category" id="category" type="text"></td></tr>';
         echo '<tr><th><label for="enabled">Abilitato</label></th><td><input name="enabled" id="enabled" type="checkbox" value="1"' . ( $editing ? '' : ' checked' ) . '></td></tr>';
+        echo '<tr><th><label for="send_email_on_reservation">' . esc_html__('Invia email alla prenotazione', 'res-pong') . '</label></th><td><input name="send_email_on_reservation" id="send_email_on_reservation" type="checkbox" value="1"></td></tr>';
+        echo '<tr><th><label for="send_email_on_deletion">' . esc_html__('Invia email alla cancellazione', 'res-pong') . '</label></th><td><input name="send_email_on_deletion" id="send_email_on_deletion" type="checkbox" value="1"></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva', 'res-pong') . '</button>';
         if ($editing) {
