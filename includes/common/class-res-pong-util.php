@@ -75,8 +75,8 @@ class Res_Pong_Util {
         return $expires . '|' . $random;
     }
 
-    public static function date_now_formatted($pattern = "EEEE dd/MM/yyyy HH:mm") {
-        $date = new DateTime("now");
+    public static function date_now_formatted($pattern = "EEEE dd/MM/yyyy HH:mm", $date = 'now') {
+        $date = new DateTime($date);
 
         $formatter = new IntlDateFormatter(
             'it_IT',
@@ -90,10 +90,43 @@ class Res_Pong_Util {
         return $formatter->format($date);
     }
 
+    private static function format_duration($start, $end) {
+        $startDate = new DateTime($start);
+        $endDate = new DateTime($end);
+
+        $diff = $startDate->diff($endDate);
+
+        $parts = [];
+        if ($diff->h > 0) {
+            $parts[] = $diff->h . 'h';
+        }
+        if ($diff->i > 0) {
+            $parts[] = $diff->i . 'm';
+        }
+
+        return implode(' e ', $parts);
+    }
+
     public static function replace_user_placeholders($string, $user) {
         $user = (array)$user;
         $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
         $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
+        return str_replace($placeholders, $replacements, $string);
+    }
+
+    public static function replace_event_placeholders($string, $event) {
+        $event = (array)$event;
+
+        $event_date_short = Res_Pong_Util::date_now_formatted('d MMMM yyyy', $event['start_datetime']);
+        $event_date_full = Res_Pong_Util::date_now_formatted('EEEE d MMMM yyyy - HH:mm', $event['start_datetime']);
+        $event_date_only = Res_Pong_Util::date_now_formatted('EEEE d MMMM yyyy', $event['start_datetime']);
+        $event_time_start = Res_Pong_Util::date_now_formatted('HH:mm', $event['start_datetime']);
+        $event_time_end = Res_Pong_Util::date_now_formatted('HH:mm', $event['end_datetime']);
+        $event_duration = Res_Pong_Util:: format_duration($event['start_datetime'], $event['end_datetime']);
+        $event_notified_count = isset($event['notified_count']) ? $event['notified_count'] : 0;
+        $event_note = empty($event['note']) ? 'Nessuna' : $event['note'];
+        $placeholders = ['#event_id', '#event_category', '#event_name', '#event_note', '#event_start_datetime', '#event_end_datetime', '#event_max_players', '#event_players_count', '#event_date_short', '#event_date_full', '#event_notified_count', '#event_date_only', '#event_time_start', '#event_time_end', '#event_duration'];
+        $replacements = [$event['id'], $event['category'], $event['name'], $event_note, $event['start_datetime'], $event['end_datetime'], $event['max_players'], $event['players_count'], $event_date_short, $event_date_full, $event_notified_count, $event_date_only, $event_time_start, $event_time_end, $event_duration];
         return str_replace($placeholders, $replacements, $string);
     }
 
@@ -115,6 +148,20 @@ class Res_Pong_Util {
             $configuration->get('site_name'),
         ];
         return str_replace($placeholders, $replacements, $string);
+    }
+
+    public static function parse_notifications($user) {
+        if (!empty($user->notifications)) {
+            return [
+                'send_email_on_reservation' => (($user->notifications & 1) >> 0) == 1,
+                'send_email_on_deletion' => (($user->notifications & 2) >> 1) == 1,
+            ];
+        } else {
+            return [
+                'send_email_on_reservation' => false,
+                'send_email_on_deletion' => false,
+            ];
+        }
     }
 
 }

@@ -48,8 +48,33 @@ class Res_Pong_User_Service {
                 $event = $this->_get_event_for_logged_user($event_id, $user_id);
                 if ($event->can_join) {
                     $created_at = date('Y-m-d H:i:s');
-                    $this->repository->insert_reservation(['event_id' => $event_id, 'user_id' => $user_id, 'created_at' => $created_at]);
+                    $affected_rows = $this->repository->insert_reservation(['event_id' => $event_id, 'user_id' => $user_id, 'created_at' => $created_at]);
                     $event = $this->_get_event_for_logged_user($event_id, $user_id);
+                    $user = $this->repository->get_user_by_id($user_id);
+                    if ($affected_rows > 0 && Res_Pong_Util::parse_notifications($user)['send_email_on_reservation']) {
+                        $email = $user->email;
+                        $subject = $this->configuration->get('reservation_confirmed_subject');
+                        $message = $this->configuration->get('reservation_confirmed_text');
+                        $signature = $this->configuration->get('mail_signature');
+
+                        $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+                        $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+                        $subject = Res_Pong_Util::replace_event_placeholders($subject, $event);
+                        $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
+                        $message = Res_Pong_Util::replace_temporal_placeholders($message);
+                        $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+                        $message = Res_Pong_Util::replace_event_placeholders($message, $event);
+                        $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+                        $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+                        $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+                        $signature = Res_Pong_Util::replace_event_placeholders($signature, $event);
+                        $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
+                        Res_Pong_Util::send_email($email, $subject, $message, $signature);
+
+                    }
                 } else {
                     if (!empty($event->status_message)) {
                         if (!empty($event->status_message['lines'])) {
@@ -76,8 +101,33 @@ class Res_Pong_User_Service {
         $event = $this->_get_event_for_logged_user($event_id, $user_id);
 
         if ($event->can_remove) {
-            $this->repository->delete_reservation_by_user_and_event($user_id, $event_id);
+            $affected_rows = $this->repository->delete_reservation_by_user_and_event($user_id, $event_id);
             $event = $this->_get_event_for_logged_user($event_id, $user_id);
+            $user = $this->repository->get_user_by_id($user_id);
+            if ($affected_rows > 0 && Res_Pong_Util::parse_notifications($user)['send_email_on_deletion']) {
+                $email = $user->email;
+                $subject = $this->configuration->get('reservation_deleted_subject');
+                $message = $this->configuration->get('reservation_deleted_text');
+                $signature = $this->configuration->get('mail_signature');
+
+                $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+                $subject = Res_Pong_Util::replace_user_placeholders($subject, $user);
+                $subject = Res_Pong_Util::replace_event_placeholders($subject, $event);
+                $subject = Res_Pong_Util::replace_configuration_placeholders($subject, $this->configuration);
+
+                $message = Res_Pong_Util::replace_temporal_placeholders($message);
+                $message = Res_Pong_Util::replace_user_placeholders($message, $user);
+                $message = Res_Pong_Util::replace_event_placeholders($message, $event);
+                $message = Res_Pong_Util::replace_configuration_placeholders($message, $this->configuration);
+
+                $signature = Res_Pong_Util::replace_temporal_placeholders($signature);
+                $signature = Res_Pong_Util::replace_user_placeholders($signature, $user);
+                $signature = Res_Pong_Util::replace_event_placeholders($signature, $event);
+                $signature = Res_Pong_Util::replace_configuration_placeholders($signature, $this->configuration);
+
+                Res_Pong_Util::send_email($email, $subject, $message, $signature);
+
+            }
         } else {
             if (!empty($event->status_message)) {
                 if (!empty($event->status_message['lines'])) {
@@ -108,7 +158,7 @@ class Res_Pong_User_Service {
         Res_Pong_Util::res_pong_set_cookie($token, $ttl);
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
-        $user->notifications = $this->parse_notifications($user);
+        $user->notifications = Res_Pong_Util::parse_notifications($user);
 
         return new \WP_REST_Response(['success' => true, 'error' => null, 'user' => $user], 200);
 
@@ -200,7 +250,7 @@ class Res_Pong_User_Service {
         }
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
-        $user->notifications = $this->parse_notifications($user);
+        $user->notifications = Res_Pong_Util::parse_notifications($user);
         return rest_ensure_response($user);
     }
 
@@ -222,7 +272,7 @@ class Res_Pong_User_Service {
 
         Res_Pong_Util::adjust_user($user);
         $user->avatar = $this->load_avatar($user->id);
-        $user->notifications = $this->parse_notifications($user);
+        $user->notifications = Res_Pong_Util::parse_notifications($user);
         return rest_ensure_response($user);
     }
 
@@ -246,20 +296,6 @@ class Res_Pong_User_Service {
             }
         }
         return null;
-    }
-
-    private function parse_notifications($user) {
-        if (!empty($user->notifications)) {
-            return [
-                'send_email_on_reservation' => (($user->notifications & 1) >> 0) == 1,
-                'send_email_on_deletion' => (($user->notifications & 2) >> 1) == 1,
-            ];
-        } else {
-            return [
-                'send_email_on_reservation' => false,
-                'send_email_on_deletion' => false,
-            ];
-        }
     }
 
     private function _get_event_for_logged_user($event_id, int $user_id) {

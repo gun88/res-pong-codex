@@ -127,29 +127,29 @@ class Res_Pong_Admin_Frontend {
         }
         if (isset($_POST['rp_configurations_nonce']) && wp_verify_nonce($_POST['rp_configurations_nonce'], 'rp_save_configurations')) {
             $data = [
-                'almost_closed_minutes'     => isset($_POST['almost_closed_minutes']) ? intval($_POST['almost_closed_minutes']) : 0,
-                'almost_full_players'      => isset($_POST['almost_full_players']) ? intval($_POST['almost_full_players']) : 0,
-                'max_active_reservations'  => isset($_POST['max_active_reservations']) ? intval($_POST['max_active_reservations']) : 0,
-                'next_reservation_delay'   => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
-                'default_email_address'    => isset($_POST['default_email_address']) ? sanitize_email($_POST['default_email_address']) : '',
-                'site_name'                => isset($_POST['site_name']) ? sanitize_text_field($_POST['site_name']) : '',
-                'site_url'                 => isset($_POST['site_url']) ? esc_url_raw($_POST['site_url']) : '',
-                'app_name'                 => isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '',
-                'app_url'                  => isset($_POST['app_url']) ? esc_url_raw($_POST['app_url']) : '',
-                'avatar_management'        => isset($_POST['avatar_management']) ? sanitize_text_field($_POST['avatar_management']) : 'none',
-                'invitation_subject'       => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
-                'invitation_text'          => isset($_POST['invitation_text']) ? wp_kses_post($_POST['invitation_text']) : '',
-                'reset_password_subject'   => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
-                'reset_password_text'      => isset($_POST['reset_password_text']) ? wp_kses_post($_POST['reset_password_text']) : '',
-                'update_password_subject'  => isset($_POST['update_password_subject']) ? sanitize_text_field($_POST['update_password_subject']) : '',
-                'update_password_text'     => isset($_POST['update_password_text']) ? wp_kses_post($_POST['update_password_text']) : '',
+                'almost_closed_minutes'         => isset($_POST['almost_closed_minutes']) ? intval($_POST['almost_closed_minutes']) : 0,
+                'almost_full_players'           => isset($_POST['almost_full_players']) ? intval($_POST['almost_full_players']) : 0,
+                'max_active_reservations'       => isset($_POST['max_active_reservations']) ? intval($_POST['max_active_reservations']) : 0,
+                'next_reservation_delay'        => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
+                'default_email_address'         => isset($_POST['default_email_address']) ? sanitize_email($_POST['default_email_address']) : '',
+                'site_name'                     => isset($_POST['site_name']) ? sanitize_text_field($_POST['site_name']) : '',
+                'site_url'                      => isset($_POST['site_url']) ? esc_url_raw($_POST['site_url']) : '',
+                'app_name'                      => isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '',
+                'app_url'                       => isset($_POST['app_url']) ? esc_url_raw($_POST['app_url']) : '',
+                'avatar_management'             => isset($_POST['avatar_management']) ? sanitize_text_field($_POST['avatar_management']) : 'none',
+                'invitation_subject'            => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
+                'invitation_text'               => isset($_POST['invitation_text']) ? wp_unslash(wp_kses_post($_POST['invitation_text'])) : '',
+                'reset_password_subject'        => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
+                'reset_password_text'           => isset($_POST['reset_password_text']) ? wp_unslash(wp_kses_post($_POST['reset_password_text'])) : '',
+                'update_password_subject'       => isset($_POST['update_password_subject']) ? wp_unslash(sanitize_text_field($_POST['update_password_subject'])) : '',
+                'update_password_text'          => isset($_POST['update_password_text']) ? wp_kses_post($_POST['update_password_text']) : '',
                 'reservation_confirmed_subject' => isset($_POST['reservation_confirmed_subject']) ? sanitize_text_field($_POST['reservation_confirmed_subject']) : '',
-                'reservation_confirmed_text'    => isset($_POST['reservation_confirmed_text']) ? wp_kses_post($_POST['reservation_confirmed_text']) : '',
+                'reservation_confirmed_text'    => isset($_POST['reservation_confirmed_text']) ? wp_unslash(wp_kses_post($_POST['reservation_confirmed_text'])) : '',
                 'reservation_deleted_subject'   => isset($_POST['reservation_deleted_subject']) ? sanitize_text_field($_POST['reservation_deleted_subject']) : '',
-                'reservation_deleted_text'      => isset($_POST['reservation_deleted_text']) ? wp_kses_post($_POST['reservation_deleted_text']) : '',
+                'reservation_deleted_text'      => isset($_POST['reservation_deleted_text']) ? wp_unslash(wp_kses_post($_POST['reservation_deleted_text'])) : '',
                 'notify_availability_subject'   => isset($_POST['notify_availability_subject']) ? sanitize_text_field($_POST['notify_availability_subject']) : '',
-                'notify_availability_text'      => isset($_POST['notify_availability_text']) ? wp_kses_post($_POST['notify_availability_text']) : '',
-                'mail_signature'             => isset($_POST['mail_signature']) ? wp_kses_post($_POST['mail_signature']) : '',
+                'notify_availability_text'      => isset($_POST['notify_availability_text']) ? wp_unslash(wp_kses_post($_POST['notify_availability_text'])) : '',
+                'mail_signature'                => isset($_POST['mail_signature']) ? wp_unslash(wp_kses_post($_POST['mail_signature'])) : '',
 
             ];
             $this->configuration->update($data);
@@ -199,27 +199,27 @@ class Res_Pong_Admin_Frontend {
         ob_start();
         wp_editor($config['reservation_confirmed_text'], 'reservation_confirmed_text', $this->editor_settings);
         $reservation_confirmed_editor = ob_get_clean();
-        echo '<tr><th><label for="reservation_confirmed_text">Testo prenotazione confermata</label></th><td><div style="max-width:600px;">' . $reservation_confirmed_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name</p></td></tr>';
+        echo '<tr><th><label for="reservation_confirmed_text">Testo prenotazione confermata</label></th><td><div style="max-width:600px;">' . $reservation_confirmed_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name, #event_id, #event_category, #event_name, #event_note, #event_start_datetime, #event_end_datetime, #event_max_players, #event_players_count, #event_date_short, #event_date_full, #event_notified_count, #event_date_only, #event_time_start, #event_time_end, #event_duration</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail prenotazione cancellata</h2></th></tr>';
         echo '<tr><th><label for="reservation_deleted_subject">Oggetto prenotazione cancellata</label></th><td><input name="reservation_deleted_subject" id="reservation_deleted_subject" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['reservation_deleted_subject']) . '"></td></tr>';
         $this->editor_settings['textarea_name'] = 'reservation_deleted_text';
         ob_start();
         wp_editor($config['reservation_deleted_text'], 'reservation_deleted_text', $this->editor_settings);
         $reservation_deleted_editor = ob_get_clean();
-        echo '<tr><th><label for="reservation_deleted_text">Testo prenotazione cancellata</label></th><td><div style="max-width:600px;">' . $reservation_deleted_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name</p></td></tr>';
+        echo '<tr><th><label for="reservation_deleted_text">Testo prenotazione cancellata</label></th><td><div style="max-width:600px;">' . $reservation_deleted_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name, #event_id, #event_category, #event_name, #event_note, #event_start_datetime, #event_end_datetime, #event_max_players, #event_players_count, #event_date_short, #event_date_full, #event_notified_count, #event_date_only, #event_time_start, #event_time_end, #event_duration</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail notifica disponibilità</h2></th></tr>';
         echo '<tr><th><label for="notify_availability_subject">Oggetto notifica disponibilità</label></th><td><input name="notify_availability_subject" id="notify_availability_subject" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['notify_availability_subject']) . '"></td></tr>';
         $this->editor_settings['textarea_name'] = 'notify_availability_text';
         ob_start();
         wp_editor($config['notify_availability_text'], 'notify_availability_text', $this->editor_settings);
         $notify_availability_editor = ob_get_clean();
-        echo '<tr><th><label for="notify_availability_text">Testo notifica disponibilità</label></th><td><div style="max-width:600px;">' . $notify_availability_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name</p></td></tr>';
+        echo '<tr><th><label for="notify_availability_text">Testo notifica disponibilità</label></th><td><div style="max-width:600px;">' . $notify_availability_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name, #event_id, #event_category, #event_name, #event_note, #event_start_datetime, #event_end_datetime, #event_max_players, #event_players_count, #event_date_short, #event_date_full, #event_notified_count, #event_date_only, #event_time_start, #event_time_end, #event_duration</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">Firma E-mail</h2></th></tr>';
         $this->editor_settings['textarea_name'] = 'mail_signature';
         ob_start();
         wp_editor($config['mail_signature'], 'mail_signature', $this->editor_settings);
         $signature_editor = ob_get_clean();
-        echo '<tr><th><label for="mail_signature">Firma Email</label></th><td><div style="max-width:600px;">' . $signature_editor . '</div></td></tr>';
+        echo '<tr><th><label for="mail_signature">Firma Email</label></th><td><div style="max-width:600px;">' . $signature_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now_date_and_time, #now_date_only, #app_url, #app_name, #site_url, #site_name</p></td></tr>';
         echo '</table>';
         echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva', 'res-pong') . '</button></p>';
         echo '</form>';
