@@ -107,8 +107,13 @@ class Res_Pong_Util {
     }
 
     public static function replace_configuration_placeholders($string, Res_Pong_Configuration $configuration) {
-        $placeholders = ['#app_url', '#site_url'];
-        $replacements = [$configuration->get('app_url'), $configuration->get('site_url')];
+        $placeholders = ['#app_url', '#site_url', '#app_name', '#site_name'];
+        $replacements = [
+            $configuration->get('app_url'),
+            $configuration->get('site_url'),
+            $configuration->get('app_name'),
+            $configuration->get('site_name'),
+        ];
         return str_replace($placeholders, $replacements, $string);
     }
 

@@ -1,6 +1,7 @@
 <?php
 
 define('RES_PONG_CONFIGURATION_SITE_URL', get_site_url());
+define('RES_PONG_CONFIGURATION_SITE_NAME', get_bloginfo('name'));
 
 class Res_Pong_Configuration {
     private $option_name = 'res_pong_configuration';
@@ -11,27 +12,32 @@ class Res_Pong_Configuration {
         'next_reservation_delay' => 300,
         'avatar_management' => 'none',
         'default_email_address' => 'prenotazioni@my-site.com',
+
+        'site_url' => RES_PONG_CONFIGURATION_SITE_URL,
+        'site_name' => RES_PONG_CONFIGURATION_SITE_NAME,
+
         'app_url' => RES_PONG_CONFIGURATION_SITE_URL . "/prenotazioni",
+        'app_name' => "#app_name",
 
+        'invitation_subject' => "Effettua il tuo primo accesso - #app_name",
+        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel #app_name!\n\nPer per completare la configurazione del tuo profilo, clicca su questo link:\n\n<strong><a href=\"#link\">Completa configurazione<\/a><\/strong>\n\n&nbsp;\n\nSe il collegamento non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
+      
+        'reset_password_subject' => "Reset password - #app_name - #now_date_only",
+        'reset_password_text' => "Ciao #first_name,\n\nAbbiamo ricevuto una richiesta di reset della tua password in data: #now_date_and_time.\n\nSe non sei stato tu a richiedere il reset, ignora questa email, altrimenti clicca sul seguente link per reimpostare la tua password:\n\n<a href=\"#link\"><strong>Reimposta password<\/strong><\/a>\n\n&nbsp;\n\nSe il collegamento non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
+      
+        'update_password_subject' => "Password aggiornata - #app_name - #now_date_only",
+        'update_password_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nOra puoi accedere al #app_name usando le tue nuove credenziali.\n\nPer autenticarti, inserisci:\n<ul>\n \t<li>Il tuo username (<em>#username<\/em>) o la tua email (<em>#email<\/em>)<\/li>\n \t<li>La password che hai appena creato<\/li>\n<\/ul>\n<a href=\"#app_url\"><strong>Accedi al portale<\/strong><\/a>\n\nOppure visita il nostro sito #site_url e clicca sul collegamento al #app_name.\n\n&nbsp;",
 
-        'invitation_subject' => 'Effettua il tuo primo accesso - Portale Prenotazioni',
-        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel portale prenotazioni!\n\nPer per completare la configurazione del tuo profilo, clicca sul questo link: <a href=\"#link\">Completa configurazione</a>\n\nSe il pulsante non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
+        'reservation_confirmed_subject' => 'Prenotazione Confermata - #event_name - #event_date_short - #app_name',
+        'reservation_confirmed_text' => "Ciao #first_name,\n\nLa tua prenotazione per l'evento <a href\"#event_link\">#event_name di #event_date_full</a> è confermata.\n\nTi aspettiamo in palestra!\n\n&nbsp;",
 
-        'reset_password_subject' => 'Reset password - Portale Prenotazioni',
-        'reset_password_text' => "Ciao #first_name,\n\nAbbiamo ricevuto una richiesta di reset della tua password. Se non sei stato tu a richiedere il reset, ignora questa email, altrimenti clicca sul seguente link per reimpostare la tua password.",
-        'update_password_subject' => 'Password aggiornata - Portale Prenotazioni',
-        'update_password_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: #app_url usando le tue nuove credenziali.",
+        'reservation_deleted_subject' => 'Prenotazione Confermata - #event_name - #event_date_short - #app_name',
+        'reservation_deleted_text' => "Ciao #first_name,\n\nLa tua prenotazione per l'evento <a href\"#event_link\">#event_name di #event_date_full</a> è stata cancellata correttamente.\n\n&nbsp;",
 
-        'reservation_subject' => 'Prenotazione Confermata - #event_name #event_date - Portale Prenotazioni',
-        'reservation_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: #app_url usando le tue nuove credenziali.",
+        'notify_availability_subject' => 'Posti Disponibili - #event_name - #event_date_short - #app_name',
+        'notify_availability_text' => "Ciao #first_name,\n\nCi sono posti disponibili per <a href\"#event_link\">#event_name di #event_date_full</a>.\n\n<i>NOTA: questa notifica è stata inviata a #event_notified_count utenti della piattaforma.</i>\n\n&nbsp;",
 
-        'deletion_subject' => 'Prenotazione Cancellata - #event_name #event_date - Portale Prenotazioni',
-        'deletion_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: #app_url usando le tue nuove credenziali.",
-
-        'notify_availability_subject' => 'Prenotazione Cancellata - #event_name #event_date - Portale Prenotazioni',
-        'notify_availability_text' => "Ciao #first_name,\n\nLa tua password è stata aggiornata correttamente.\n\nPuoi accedere al Portale Prenotazioni al seguente link: #app_url usando le tue nuove credenziali.",
-
-        'mail_signature' => "\n<hr>\nPortale Prenotazioni\n#app_url\n",
+        'mail_signature' => "\n<hr>\n<strong>#site_name</strong>\n<em>#app_name</em>\n#app_url\n",
     ];
 
     public function get_all() {
