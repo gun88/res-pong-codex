@@ -2,8 +2,9 @@
 
 class Res_Pong_Util {
 
-    public static function send_email($to, $subject, $message, $headers = []) {
-        $headers[] = 'Content-Type: text/html; charset=UTF-8';
+    public static function send_email($to, $subject, $message, $signature) {
+        $headers = ['Content-Type: text/html; charset=UTF-8'];
+        $message =  "$message\n\n<hr>$signature";
         $message = wpautop($message);
         $message = wp_kses_post($message);
         wp_mail($to, $subject, $message, $headers);
@@ -73,5 +74,34 @@ class Res_Pong_Util {
         $random = bin2hex(random_bytes(16));
         return $expires . '|' . $random;
     }
+
+    public static function date_now_formatted() {
+        $date = new DateTime("now");
+
+        $formatter = new IntlDateFormatter(
+            'it_IT',
+            IntlDateFormatter::FULL,
+            IntlDateFormatter::SHORT,
+            'Europe/Rome',
+            IntlDateFormatter::GREGORIAN,
+            "EEEE dd/MM/yyyy HH:mm"
+        );
+
+        $now = $formatter->format($date);
+        return $now;
+    }
+
+    public static function replace_user_placeholders($user, $string) {
+        $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
+        $replacements = [$user['email'], $user['username'], $user['last_name'], $user['first_name'], $user['category']];
+        return str_replace($placeholders, $replacements, $string);
+    }
+    public static function replace_temporal_placeholders($string) {
+        $placeholders = ['#now'];
+        $replacements = [Res_Pong_Util::date_now_formatted()];
+        return str_replace($placeholders, $replacements, $string);
+    }
+
+
 }
 

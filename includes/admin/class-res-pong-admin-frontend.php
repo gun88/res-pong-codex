@@ -10,8 +10,6 @@ class Res_Pong_Admin_Frontend {
 
     public function __construct(Res_Pong_Configuration $configuration) {
         $this->configuration = $configuration;
-        add_action('admin_menu', [ $this, 'register_menu' ]);
-        add_action('admin_enqueue_scripts', [ $this, 'enqueue_assets' ]);
     }
 
     public function init() {
@@ -87,7 +85,7 @@ class Res_Pong_Admin_Frontend {
         ob_start();
         wp_editor('', 'rp-messenger-text', $this->editor_settings);
         $editor = ob_get_clean();
-        echo '<tr><th><label for="rp-messenger-text">Messaggio</label></th><td><div style="max-width:600px;">' . $editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
+        echo '<tr><th><label for="rp-messenger-text">Messaggio</label></th><td><div style="max-width:600px;">' . $editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now</p></td></tr>';
         echo '<tr><th></th><td><button type="submit" class="button button-primary">Invia</button></td></tr>';
         echo '</table>';
         echo '</form>';
@@ -137,12 +135,12 @@ class Res_Pong_Admin_Frontend {
                 'app_url' => isset($_POST['app_url']) ? esc_url_raw($_POST['app_url']) : '',
                 'avatar_management'       => isset($_POST['avatar_management']) ? sanitize_text_field($_POST['avatar_management']) : 'none',
                 'invitation_subject'       => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
-                'invitation_text'          => isset($_POST['invitation_text']) ? sanitize_textarea_field($_POST['invitation_text']) : '',
+                'invitation_text'          => isset($_POST['invitation_text']) ? wp_kses_post($_POST['invitation_text']) : '',
                 'reset_password_subject'   => isset($_POST['reset_password_subject']) ? sanitize_text_field($_POST['reset_password_subject']) : '',
-                'reset_password_text'      => isset($_POST['reset_password_text']) ? sanitize_textarea_field($_POST['reset_password_text']) : '',
+                'reset_password_text'      => isset($_POST['reset_password_text']) ? wp_kses_post($_POST['reset_password_text']) : '',
                 'update_password_subject'   => isset($_POST['update_password_subject']) ? sanitize_text_field($_POST['update_password_subject']) : '',
-                'update_password_text'      => isset($_POST['update_password_text']) ? sanitize_textarea_field($_POST['update_password_text']) : '',
-                'mail_signature'            => isset($_POST['mail_signature']) ? sanitize_textarea_field($_POST['mail_signature']) : '',
+                'update_password_text'      => isset($_POST['update_password_text']) ? wp_kses_post($_POST['update_password_text']) : '',
+                'mail_signature'            => isset($_POST['mail_signature']) ? wp_kses_post($_POST['mail_signature']) : '',
 
             ];
             $this->configuration->update($data);
@@ -167,21 +165,21 @@ class Res_Pong_Admin_Frontend {
         ob_start();
         wp_editor($config['invitation_text'], 'invitation_text', $this->editor_settings);
         $invitation_editor = ob_get_clean();
-        echo '<tr><th><label for="invitation_text">Testo invito</label></th><td><div style="max-width:600px;">' . $invitation_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
+        echo '<tr><th><label for="invitation_text">Testo invito</label></th><td><div style="max-width:600px;">' . $invitation_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail reset password</h2></th></tr>';
         echo '<tr><th><label for="reset_password_subject">Oggetto reset password</label></th><td><input name="reset_password_subject" id="reset_password_subject" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['reset_password_subject']) . '"></td></tr>';
         $this->editor_settings['textarea_name'] = 'reset_password_text';
         ob_start();
         wp_editor($config['reset_password_text'], 'reset_password_text', $this->editor_settings);
         $reset_editor = ob_get_clean();
-        echo '<tr><th><label for="reset_password_text">Testo reset password</label></th><td><div style="max-width:600px;">' . $reset_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
+        echo '<tr><th><label for="reset_password_text">Testo reset password</label></th><td><div style="max-width:600px;">' . $reset_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail aggiornamento password</h2></th></tr>';
         echo '<tr><th><label for="update_password_subject">Oggetto aggiornamento password</label></th><td><input name="update_password_subject" id="update_password_subject" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['update_password_subject']) . '"></td></tr>';
         $this->editor_settings['textarea_name'] = 'update_password_text';
         ob_start();
         wp_editor($config['update_password_text'], 'update_password_text', $this->editor_settings);
         $update_editor = ob_get_clean();
-        echo '<tr><th><label for="update_password_text">Testo aggiornamento password</label></th><td><div style="max-width:600px;">' . $update_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p></td></tr>';
+        echo '<tr><th><label for="update_password_text">Testo aggiornamento password</label></th><td><div style="max-width:600px;">' . $update_editor . '</div><p style="font-size:12px;color:#555;margin-top:0;max-width:600px;">Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now</p></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">Firma E-mail</h2></th></tr>';
         $this->editor_settings['textarea_name'] = 'mail_signature';
         ob_start();
@@ -257,7 +255,7 @@ class Res_Pong_Admin_Frontend {
             wp_editor($config['invitation_text'], 'rp-invite-text', $this->editor_settings);
             $invite_editor = ob_get_clean();
             echo '<div style="margin-bottom: 0; max-width:600px;">' . $invite_editor . '</div>';
-            echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
+            echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di invito sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now</p>';
             echo '<p><button type="button" class="button button-primary" id="rp-send-invite">' . esc_html__('Invia', 'res-pong') . '</button></p>';
             echo '</div>';
             echo '<div id="rp-reset-wrapper" style="display:none;">';
@@ -268,7 +266,7 @@ class Res_Pong_Admin_Frontend {
             wp_editor($config['reset_password_text'], 'rp-reset-text', $this->editor_settings);
             $reset_text_editor = ob_get_clean();
             echo '<div style="margin-bottom: 0; max-width:600px;">' . $reset_text_editor . '</div>';
-            echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category</p>';
+            echo '<p style="font-size:12px;color:#555; margin-top: 0; max-width:600px;">Il link di reset password sarà aggiunto in coda all\'email. Usa i seguenti placeholder per personalizzare l\'email: #email, #username, #last_name, #first_name, #category, #now</p>';
             echo '<p><button type="button" class="button button-primary" id="rp-send-reset">' . esc_html__('Invia', 'res-pong') . '</button></p>';
             echo '</div>';
             $default_timeout = date('Y-m-d\\T00:00:00', strtotime('+7 days'));

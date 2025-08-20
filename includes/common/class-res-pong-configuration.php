@@ -15,7 +15,8 @@ class Res_Pong_Configuration {
 
 
         'invitation_subject' => 'Effettua il tuo primo accesso - Portale Prenotazioni',
-        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel portale prenotazioni!\nClicca sul link per effettuare il primo accesso.",
+        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel portale prenotazioni!\n\nPer per completare la configurazione del tuo profilo, clicca sul questo link: <a href=\"#link\">Completa configurazione</a>\n\nSe il pulsante non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
+
         'reset_password_subject' => 'Reset password - Portale Prenotazioni',
         'reset_password_text' => "Ciao #first_name,\n\nAbbiamo ricevuto una richiesta di reset della tua password. Se non sei stato tu a richiedere il reset, ignora questa email, altrimenti clicca sul seguente link per reimpostare la tua password.",
         'update_password_subject' => 'Password aggiornata - Portale Prenotazioni',

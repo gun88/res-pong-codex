@@ -168,13 +168,15 @@ class Res_Pong_User_Service {
             $this->repository->update_user_token($user->id, $token);
             $url = $this->configuration->get('app_url') . '/#/password-update?token=' . Res_Pong_Util::base64url_encode($token);
             $text = $this->configuration->get('reset_password_text');
-            $placeholders = ['#email', '#username', '#last_name', '#first_name', '#category'];
-            $replacements = [$user->email, $user->username, $user->last_name, $user->first_name, $user->category];
-            $text = str_replace($placeholders, $replacements, $text);
-            $message = $text . "\n\nClicca qui: " . $url;
+            $message = $text;
             $subject = $this->configuration->get('reset_password_subject');
-            $message = $message . "\n" . $this->configuration->get('mail_signature');
-            Res_Pong_Util::send_email($email, $subject, $message);
+            $subject = Res_Pong_Util::replace_temporal_placeholders($subject);
+            $subject = Res_Pong_Util::replace_user_placeholders($user, $subject);
+            $message = Res_Pong_Util::replace_temporal_placeholders($message);
+            $message = Res_Pong_Util::replace_user_placeholders($user, $message);
+            $message = str_replace("#link", $url, $message);
+            $signature = $this->configuration->get('mail_signature');
+            Res_Pong_Util::send_email($email, $subject, $message, $signature);
         }
         // Rispondi comunque success per non rivelare se l'utente esiste
         return new \WP_REST_Response(['success' => true], 200);
@@ -313,7 +315,7 @@ class Res_Pong_User_Service {
             $message = str_replace($placeholders, $replacements, $text);
             $subject = $this->configuration->get('update_password_subject');
             $message = $message . "\n" . $this->configuration->get('mail_signature');
-            Res_Pong_Util::send_email($email, $subject, $message);
+            Res_Pong_Util::send_email($email, $subject, $message, $signature);
 
             return new \WP_REST_Response(['success' => true, 'message' => 'Password aggiornata'], 200);
         }
