@@ -1004,6 +1004,64 @@
             });
         });
     }
+    function initUserReservationAdder(dt, uid){
+        var wrapper = $(dt.table().container());
+        var addBtn = wrapper.find('#res-pong-add');
+        addBtn.off('click');
+        addBtn.prop('disabled', true);
+        var select = $('<select id="rp-user-reservation-event"><option value="">Seleziona evento</option></select>');
+        var bullet = addBtn.prev('span');
+        bullet.after(select).after($('<span>•</span>'));
+        var message = $('#res-pong-user-reservations-message');
+        $.ajax({
+            url: restUrl('events', 'open_only=1'),
+            method: 'GET',
+            beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+            success: function(events){
+                events.sort(function(a, b){
+                    var da = new Date(a.start_datetime.replace(' ', 'T'));
+                    var db = new Date(b.start_datetime.replace(' ', 'T'));
+                    return da - db;
+                });
+                events.forEach(function(ev){
+                    var label = ev.name + ' - ' + ev.start_datetime + ' (' + ev.id + ')';
+                    select.append('<option value="' + ev.id + '">' + label + '</option>');
+                });
+            }
+        });
+        function check(){
+            var eid = select.val();
+            if(!eid){ addBtn.prop('disabled', true); return; }
+            var exists = dt.rows().data().toArray().some(function(r){ return String(r.event_id) === eid; });
+            addBtn.prop('disabled', exists);
+        }
+        select.on('change', check);
+        addBtn.on('click', function(e){
+            e.preventDefault();
+            var eid = select.val();
+            if(!eid){ return; }
+            addBtn.prop('disabled', true);
+            $.ajax({
+                url: restUrl('reservations'),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ user_id: uid, event_id: eid }),
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                success: function(){
+                    message.html('<div class="notice notice-success is-dismissible"><p>Prenotazione aggiunta</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                    select.val('');
+                    dt.ajax.reload(null, false);
+                    addBtn.prop('disabled', true);
+                },
+                error: function(xhr){
+                    var msg = 'Errore aggiunta prenotazione';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    message.html('<div class="notice notice-error is-dismissible"><p>' + msg + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                    check();
+                }
+            });
+        });
+    }
     function initEventNotifications(table, eid){
         var message = $('#res-pong-event-notifications-message');
         var subs = [];
@@ -1131,7 +1189,8 @@
         var ur = $('#res-pong-user-reservations');
         if(ur.length){
             var uid = ur.data('user');
-            initTable(ur, 'reservations', function(showAll){ return restUrl('reservations', 'user_id=' + uid + '&active_only=' + (showAll ? '0' : '1')); }, { columns: columns.user_reservations, addParams: 'user_id=' + uid, noCsv: true, filterFuture: true, selectable: false, order: [[1, 'desc']] });
+            var urTable = initTable(ur, 'reservations', function(showAll){ return restUrl('reservations', 'user_id=' + uid + '&active_only=' + (showAll ? '0' : '1')); }, { columns: columns.user_reservations, addParams: 'user_id=' + uid, noCsv: true, filterFuture: true, selectable: false, order: [[1, 'desc']] });
+            initUserReservationAdder(urTable, uid);
         }
         var er = $('#res-pong-event-reservations');
         if(er.length){

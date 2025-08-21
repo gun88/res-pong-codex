@@ -314,6 +314,7 @@ class Res_Pong_Admin_Frontend {
             echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Salva timeout', 'res-pong') . '</button> <button type="button" class="button" id="rp-remove-timeout">' . esc_html__('Rimuovi timeout', 'res-pong') . '</button></p>';
             echo '</form>';
             echo '<h2>' . esc_html__('Prenotazioni utente', 'res-pong') . '</h2>';
+            echo '<div id="res-pong-user-reservations-message"></div>';
             echo '<table id="res-pong-user-reservations" class="display" data-user="' . esc_attr($id) . '"></table>';
         }
         $this->render_progress_overlay();
