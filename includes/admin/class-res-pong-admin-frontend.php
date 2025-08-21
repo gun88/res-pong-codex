@@ -30,6 +30,7 @@ class Res_Pong_Admin_Frontend {
         add_submenu_page('res-pong-users', 'Email', 'Email', 'manage_options', 'res-pong-email', [ $this, 'render_email_page' ]);
         add_submenu_page(null, 'Dettaglio Utente', 'Dettaglio Utente', 'manage_options', 'res-pong-user-detail', [ $this, 'render_user_detail' ]);
         add_submenu_page(null, 'Dettaglio Evento', 'Dettaglio Evento', 'manage_options', 'res-pong-event-detail', [ $this, 'render_event_detail' ]);
+        add_submenu_page(null, 'Prenotazioni Evento', 'Prenotazioni Evento', 'manage_options', 'res-pong-event-reservations', [ $this, 'render_event_reservations_page' ]);
         add_submenu_page(null, 'Dettaglio Prenotazione', 'Dettaglio Prenotazione', 'manage_options', 'res-pong-reservation-detail', [ $this, 'render_reservation_detail' ]);
     }
 
@@ -353,13 +354,23 @@ class Res_Pong_Admin_Frontend {
         echo '</p></form>';
         if ($editing) {
             echo '<p><a class="button" href="' . esc_url(admin_url('admin.php?page=res-pong-email&event_id=' . $id)) . '">Contatta i partecipanti</a></p>';
-            echo '<h2>' . esc_html__('Prenotazioni evento', 'res-pong') . '</h2>';
+            echo '<h2><a href="' . esc_url(admin_url('admin.php?page=res-pong-event-reservations&id=' . $id)) . '" class="dashicons dashicons-external rp-heading-link"></a>' . esc_html__('Prenotazioni evento', 'res-pong') . '</h2>';
             echo '<div id="res-pong-event-reservations-message"></div>';
             echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
             echo '<h2>' . esc_html__('Richiesta Notifiche', 'res-pong') . '</h2>';
             echo '<div id="res-pong-event-notifications-message"></div>';
             echo '<table id="res-pong-event-notifications" class="display" data-event="' . esc_attr($id) . '"></table>';
         }
+        $this->render_progress_overlay();
+        echo '</div>';
+    }
+
+    public function render_event_reservations_page() {
+        $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+        echo '<div class="wrap rp-wrap">';
+        echo '<h1 id="rp-event-reservations-title">' . esc_html__('Prenotazioni evento', 'res-pong') . '</h1>';
+        echo '<div id="res-pong-event-reservations-message"></div>';
+        echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
         $this->render_progress_overlay();
         echo '</div>';
     }
