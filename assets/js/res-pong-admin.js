@@ -935,6 +935,70 @@
             });
         });
     }
+    function initEventReservationAdder(dt, eid){
+        var wrapper = $(dt.table().container());
+        var addBtn = wrapper.find('#res-pong-add');
+        addBtn.off('click');
+        addBtn.prop('disabled', true);
+        var select = $('<select id="rp-event-reservation-user"><option value="">Seleziona utente</option></select>');
+        var bullet = addBtn.prev('span');
+        bullet.after(select).after($('<span>•</span>'));
+        var message = $('#res-pong-event-reservations-message');
+        $.ajax({
+            url: restUrl('users'),
+            method: 'GET',
+            beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+            success: function(users){
+                users.sort(function(a, b){
+                    var la = a.last_name.toLowerCase();
+                    var lb = b.last_name.toLowerCase();
+                    if(la < lb){ return -1; }
+                    if(la > lb){ return 1; }
+                    var fa = a.first_name.toLowerCase();
+                    var fb = b.first_name.toLowerCase();
+                    if(fa < fb){ return -1; }
+                    if(fa > fb){ return 1; }
+                    return a.id - b.id;
+                });
+                users.forEach(function(u){
+                    var label = u.last_name + ' ' + u.first_name + ' (' + u.id + ')';
+                    select.append('<option value="' + u.id + '">' + label + '</option>');
+                });
+            }
+        });
+        function check(){
+            var uid = select.val();
+            if(!uid){ addBtn.prop('disabled', true); return; }
+            var exists = dt.rows().data().toArray().some(function(r){ return String(r.user_id) === uid; });
+            addBtn.prop('disabled', exists);
+        }
+        select.on('change', check);
+        addBtn.on('click', function(e){
+            e.preventDefault();
+            var uid = select.val();
+            if(!uid){ return; }
+            addBtn.prop('disabled', true);
+            $.ajax({
+                url: restUrl('reservations'),
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ event_id: eid, user_id: uid }),
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                success: function(){
+                    message.html('<div class="notice notice-success is-dismissible"><p>Prenotazione aggiunta</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                    select.val('');
+                    dt.ajax.reload(null, false);
+                    addBtn.prop('disabled', true);
+                },
+                error: function(xhr){
+                    var msg = 'Errore aggiunta prenotazione';
+                    if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                    message.html('<div class="notice notice-error is-dismissible"><p>' + msg + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                    check();
+                }
+            });
+        });
+    }
     $(function(){
         var list = $('#res-pong-list');
         if(list.length){
@@ -956,7 +1020,8 @@
         var er = $('#res-pong-event-reservations');
         if(er.length){
             var eid = er.data('event');
-            initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=0'); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
+            var erTable = initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=0'); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
+            initEventReservationAdder(erTable, eid);
         }
         initConfigPage();
         initDetail();
