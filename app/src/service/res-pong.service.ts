@@ -109,6 +109,14 @@ export class ResPongService {
     });
 
   }
+
+  subscribeEvent(eventId: any) {
+    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`, {});
+  }
+
+  unsubscribeEvent(eventId: any) {
+    return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`);
+  }
 }
 
 

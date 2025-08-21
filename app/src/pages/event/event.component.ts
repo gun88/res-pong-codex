@@ -15,6 +15,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Common} from '../../util/common';
 import {ConfirmDialog} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
+import {ToggleSwitch} from 'primeng/toggleswitch';
+import {Popover} from 'primeng/popover';
 
 @Component({
   selector: 'res-pong-user-event',
@@ -33,7 +35,9 @@ import {ConfirmationService} from 'primeng/api';
     NgStyle,
     Skeleton,
     Button,
-    ConfirmDialog
+    ConfirmDialog,
+    ToggleSwitch,
+    Popover
   ],
   standalone: true,
   providers: [ConfirmationService],
@@ -199,7 +203,31 @@ export class EventComponent implements OnInit {
       this.router.navigate(['/events', this.event.other_events.prev_id])
   }
 
-  onNotify() {
 
+  toggleSubscribe() {
+    this.loading = true;
+    let subscribe = this.event.can_unsubscribe;
+    this.event.can_subscribe = !this.event.can_subscribe;
+    console.log("send " + subscribe);
+    ((subscribe) ? this.resPongService.subscribeEvent(this.event.id) :this.resPongService.unsubscribeEvent(this.event.id))
+      .pipe(
+        catchError((err) => {
+          console.error(err);
+          let msg = err?.status === 400 ? 'Azione non concessa.' : 'Si è verificato un errore. Riprova.';
+          if (err?.error?.message) {
+            msg = err.error.message;
+          }
+          return of({
+            ...this.event,
+            status_message: {type: (err?.status === 400 ? 'warn' : 'error'), text: msg,}
+          });
+        }),
+        finalize(() => this.loading = false),
+        tap((response: any) => {
+          this.event = response;
+          this.enrichEvent(this.event);
+        })
+
+      ).subscribe()
   }
 }

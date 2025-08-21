@@ -34,6 +34,34 @@ class Res_Pong_User_Service {
         return rest_ensure_response($event);
     }
 
+    public function create_event_subscription_for_logged_user($request) {
+        $event_id = $request->get_param('event_id');
+        $user_id = $this->res_pong_get_logged_user_id();
+        $event = $this->_get_event_for_logged_user($event_id, $user_id);
+        if (!in_array($user_id, $event->notification_subscribers)) {
+            $event->notification_subscribers[] = $user_id;
+            $this->repository->update_event_notification_subscribers($event->id, json_encode($event->notification_subscribers));
+        }
+        $event = $this->_get_event_for_logged_user($event_id, $user_id);
+        return rest_ensure_response($event);
+    }
+
+    public function delete_event_subscription_for_logged_user($request) {
+        $event_id = $request->get_param('event_id');
+        $user_id = $this->res_pong_get_logged_user_id();
+        $event = $this->_get_event_for_logged_user($event_id, $user_id);
+        if (in_array($user_id, $event->notification_subscribers)) {
+            $key = array_search($user_id, $event->notification_subscribers);
+            if ($key !== false) {
+                unset($event->notification_subscribers[$key]);
+                $event->notification_subscribers = array_values($event->notification_subscribers);
+                $this->repository->update_event_notification_subscribers($event->id, json_encode($event->notification_subscribers));
+            }
+        }
+        $event = $this->_get_event_for_logged_user($event_id, $user_id);
+        return rest_ensure_response($event);
+    }
+
     public function create_user_reservations_for_logged_user($request) {
         $event_id = $request->get_param('event_id');
         $user_id = $this->res_pong_get_logged_user_id();
@@ -372,12 +400,14 @@ class Res_Pong_User_Service {
         $event->status = $this->calculate_event_status($event);
         $event->user_status = $this->calculate_user_status($user, $event);
         $event->booked = $this->calculate_reservation_status($event);
-
+        $event->notification_subscribers = !empty($event->notification_subscribers) ? json_decode($event->notification_subscribers) : [];
         $out = $this->decide_event($event, $user);
 
         $event->status_message = $out['status_message'];
         $event->can_join = $out['can_join'];
         $event->can_remove = $out['can_remove'];
+        $event->can_subscribe = $out['can_subscribe'];
+        $event->can_unsubscribe = $out['can_unsubscribe'];
         return $event;
     }
 
@@ -470,6 +500,8 @@ class Res_Pong_User_Service {
         $status_message = null;
         $can_join = false;
         $can_remove = false;
+        $can_subscribe = false;
+        $can_unsubscribe = false;
         if ($event->user_status == 'disabled') {
             // se evento chiuso... messaggio e no azioni
             $status_message = ['type' => 'error', 'text' => 'Utente disabilitato.'];
@@ -492,7 +524,17 @@ class Res_Pong_User_Service {
             $status_message = ['type' => 'warn', 'text' => 'Evento riservato alle categorie: ' . $event->category];
         } else if ($event->status == 'full') {
             // evento al completo, inutile approfondire... messaggio e no azioni
-            $status_message = ['type' => 'info', 'text' => "Evento al completo."];
+
+            $subscribed = in_array($user->id, $event->notification_subscribers);
+            $can_unsubscribe = $subscribed;
+            $can_subscribe = !$can_unsubscribe;
+
+            $message = "Evento al completo.";
+            if ($subscribed) {
+                $message .= " Avviso disponibilità attivo.";
+            }
+            $status_message = ['type' => 'info', 'text' => $message];
+
         } else if ($event->user_status == 'max-booking-reached') {
             // max numero prenotazioni raggiunto... messaggio e no azioni
             $active_reservations = $user->active_reservations;
@@ -502,19 +544,13 @@ class Res_Pong_User_Service {
                     "Per garantire a tutti la possibilità di partecipare, è possibile avere solo una " .
                     "prenotazione attiva alla volta per questo tipo di evento."]
                 ];
-                /*
-                 Prenotazione non disponibile
-                Hai già una prenotazione attiva per un altro evento della stessa tipologia.
-                Per garantire a tutti la possibilità di partecipare, è possibile avere solo una prenotazione attiva alla volta per questo tipo di evento.
-
-                Puoi:
-
-                partecipare all’evento già prenotato (dopo la sua conclusione il pulsante “Prenota” tornerà disponibile),
-
-                oppure cancellare la tua prenotazione attuale per liberare lo slot e prenotarti a questo evento.
-                 */
             } else {
-                $status_message = ['type' => 'warn', 'text' => "Hai " . ($active_reservations == 1 ? "una prenotazione attiva in un altra data" : "$active_reservations prenotazioni attive in altre date") . " per questa tipologia di evento. Non puoi effettuare altre prenotazioni."];
+                $status_message = ['type' => 'warn', 'lines' =>
+                    [
+                        "Hai già $active_reservations prenotazioni attive per altri eventi della stessa tipologia.",
+                        "Per garantire a tutti la possibilità di partecipare, è possibile avere solo una " .
+                        "prenotazione attiva alla volta per questo tipo di evento."]
+                ];
 
             }
         } else if ($event->user_status == 'timeout') {
@@ -531,6 +567,8 @@ class Res_Pong_User_Service {
         return [
             'can_join' => $can_join,
             'can_remove' => $can_remove,
+            'can_subscribe' => $can_subscribe,
+            'can_unsubscribe' => $can_unsubscribe,
             'status_message' => $status_message
         ];
     }

@@ -44,6 +44,22 @@ class Res_Pong_User_Controller {
             }
         ]);
 
+        register_rest_route('res-pong/v1', '/events/(?P<event_id>[\w-]+?)/subscription', [
+            'methods' => 'POST',
+            'callback' => [$res_pong_admin, 'create_event_subscription_for_logged_user'],
+            'permission_callback' => function () use ($res_pong_admin) {
+                return $res_pong_admin->res_pong_get_logged_user_id();
+            }
+        ]);
+
+        register_rest_route('res-pong/v1', '/events/(?P<event_id>[\w-]+?)/subscription', [
+            'methods' => 'DELETE',
+            'callback' => [$res_pong_admin, 'delete_event_subscription_for_logged_user'],
+            'permission_callback' => function () use ($res_pong_admin) {
+                return $res_pong_admin->res_pong_get_logged_user_id();
+            }
+        ]);
+
         register_rest_route('res-pong/v1', '/events', [
             'methods' => 'GET',
             'callback' => [$res_pong_admin, 'get_events'],

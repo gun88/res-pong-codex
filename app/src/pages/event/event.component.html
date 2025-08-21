@@ -68,16 +68,22 @@
           (click)="onRemove()"
           class="p-button-secondary">
         </button>
-        <!--<button
-          pButton
-          type="button"
-          label="Avvisami"
-          icon="pi pi-envelope"
-          *ngIf="!event.can_notify"
-          [disabled]="loading || !event.can_notify"
-          (click)="onNotify()"
-          class="p-button-info">
-        </button>-->
+        <div *ngIf="event.can_subscribe || event.can_unsubscribe"
+             class="flex flex-row gap-2 align-items-center ml-auto">
+          <div class="text-600">Avvisami</div>
+          <p-toggle-switch [(ngModel)]="event.can_unsubscribe" (onChange)="toggleSubscribe()"
+          styleClass="block"
+          ></p-toggle-switch>
+          <div>
+            <p-button styleClass="rp-info-button" icon="pi pi-info"
+                      (onClick)="op.toggle($event)"
+                      [rounded]="true" severity="info" [outlined]="true" />
+            <p-popover #op styleClass="rp-tutorial-popover">
+              <p>Ricevi un'e-mail nel caso dei posti per l'evento tornassero disponibili.</p>
+              <p><b>ATTENZIONE:</b> questa notifica non garantisce l'iscrizione né è una lista d'attesa.</p>
+            </p-popover>
+          </div>
+        </div>
       </div>
 
       <div class="mb-2 mt-2" *ngIf="loading">
