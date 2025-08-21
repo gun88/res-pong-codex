@@ -492,7 +492,7 @@ class Res_Pong_User_Service {
             $status_message = ['type' => 'warn', 'text' => 'Evento riservato alle categorie: ' . $event->category];
         } else if ($event->status == 'full') {
             // evento al completo, inutile approfondire... messaggio e no azioni
-            $status_message = ['type' => 'info', 'text' => "Evento al completo."];;
+            $status_message = ['type' => 'info', 'text' => "Evento al completo."];
         } else if ($event->user_status == 'max-booking-reached') {
             // max numero prenotazioni raggiunto... messaggio e no azioni
             $active_reservations = $user->active_reservations;
