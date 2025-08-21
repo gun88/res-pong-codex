@@ -947,7 +947,7 @@
         addBtn.prop('disabled', true);
         var select = $('<select id="rp-event-reservation-user"><option value="">Seleziona utente</option></select>');
         var bullet = addBtn.prev('span');
-        bullet.after(select).after($('<span>•</span>'));
+        bullet.after(select);
         var message = $('#res-pong-event-reservations-message');
         $.ajax({
             url: restUrl('users'),

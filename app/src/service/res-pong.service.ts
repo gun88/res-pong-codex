@@ -9,7 +9,7 @@ import {BehaviorSubject, catchError, map, switchMap, tap} from 'rxjs';
 })
 export class ResPongService {
   private http = inject(HttpClient)
-  private baseServer = environment.server
+  private baseServer = `${environment.server}/index.php`
   private userSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('res_pong_user') || 'null'));
   readonly user$ = this.userSubject.asObservable();
   readonly loggedIn$ = this.user$.pipe(map(u => !!u));
@@ -98,7 +98,14 @@ export class ResPongService {
   }
 
   public deleteReservation(eventId: number) {
-    return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/reservations&event_id=${eventId}`);
+    return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/reservations&event_id=${eventId}`)
+      .pipe(
+        tap(() => {
+          const microtime = Date.now() * 1000;
+          this.http.get(`${environment.server}/wp-cron.php?doing_wp_cron=${microtime}`).subscribe()
+        })
+      )
+      ;
   }
 
 

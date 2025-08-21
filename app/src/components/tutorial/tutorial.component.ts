@@ -3,76 +3,85 @@ import {NgIf} from '@angular/common';
 import {Popover, PopoverModule} from 'primeng/popover';
 import {TutorialService, TutorialState} from '../../service/tutorial.service';
 import {Button} from "primeng/button";
+import {FocusTrap} from 'primeng/focustrap';
+import {AutoFocus} from 'primeng/autofocus';
 
 @Component({
-    selector: 'res-pong-user-tutorial',
-    standalone: true,
-    imports: [NgIf, PopoverModule, Button],
-    templateUrl: './tutorial.component.html'
+  selector: 'res-pong-user-tutorial',
+  standalone: true,
+  imports: [NgIf, PopoverModule, Button, FocusTrap, AutoFocus],
+  templateUrl: './tutorial.component.html'
 })
 export class TutorialComponent implements OnInit, OnDestroy {
-    private tutorial = inject(TutorialService);
-    state: TutorialState | null = null;
-    private sub: any;
-    @ViewChild('popover') popover?: Popover;
+  private tutorial = inject(TutorialService);
+  state: TutorialState | null = null;
+  private sub: any;
+  private running = false;
+  @ViewChild('popover') popover?: Popover;
 
-    ngOnInit() {
-        this.sub = this.tutorial.tutorial$.subscribe(state => {
-            this.removeHighlight();
-            this.popover?.hide();
-            this.state = state;
-            if (state) {
-                const el = document.querySelector(state.step.selector) as HTMLElement | null;
-                if (el) {
-                    el.classList.add('tutorial-highlight');
-                    el.scrollIntoView({behavior: 'smooth', block: 'center'});
-                    setTimeout(() => this.popover?.show(null, el), 250);
+  ngOnInit() {
+    this.sub = this.tutorial.tutorial$.subscribe(state => {
+      this.removeHighlight();
+      this.popover?.hide();
+      this.running = false;
+      this.state = state;
+      if (state) {
 
-                } else {
-                    console.debug('Tutorial selector not found:', state.step.selector);
-                    this.next()
-                }
-            } else {
-                setTimeout(() => {
-                    this.popover?.hide();
-                });
-            }
+        const el = document.querySelector(state.step.selector) as HTMLElement | null;
+        if (el) {
+          this.running = true
+          el.classList.add('tutorial-highlight');
+          el.scrollIntoView({behavior: 'smooth', block: 'center'});
+          setTimeout(() => this.popover?.show(null, el), 250);
+
+        } else {
+          console.debug('Tutorial selector not found:', state.step.selector);
+          this.next()
+        }
+      } else {
+        this.running = false;
+        setTimeout(() => {
+          this.popover?.hide();
         });
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    this.sub?.unsubscribe();
+    this.removeHighlight();
+  }
+
+  next() {
+    this.tutorial.next();
+  }
+
+  end() {
+    this.running = false;
+    this.tutorial.end();
+    this.popover?.hide();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboard(event: KeyboardEvent) {
+    if (!this.running) return;
+    if (event.key === 'Escape') {
+      this.end();
+    }
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.next();
+    }
+  }
+
+  private removeHighlight() {
+
+    if (this.state) {
+      const el = document.querySelector(this.state.step.selector) as HTMLElement | null;
+      el?.classList.remove('tutorial-highlight');
     }
 
-    ngOnDestroy() {
-        this.sub?.unsubscribe();
-        this.removeHighlight();
-    }
-
-    next() {
-        this.tutorial.next();
-    }
-
-    end() {
-        this.tutorial.end();
-        this.popover?.hide();
-    }
-
-    @HostListener('document:keydown', ['$event'])
-    handleKeyboard(event: KeyboardEvent) {
-        if (event.key === 'Escape') {
-            this.end();
-        }
-        if (event.key === 'Enter') {
-            event.preventDefault();
-            this.next();
-        }
-    }
-
-    private removeHighlight() {
-
-        if (this.state) {
-            const el = document.querySelector(this.state.step.selector) as HTMLElement | null;
-            el?.classList.remove('tutorial-highlight');
-        }
-
-    }
+  }
 }
 
 
