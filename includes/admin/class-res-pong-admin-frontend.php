@@ -354,7 +354,7 @@ class Res_Pong_Admin_Frontend {
         echo '</p></form>';
         if ($editing) {
             echo '<p><a class="button" href="' . esc_url(admin_url('admin.php?page=res-pong-email&event_id=' . $id)) . '">Contatta i partecipanti</a></p>';
-            echo '<h2><a href="' . esc_url(admin_url('admin.php?page=res-pong-event-reservations&id=' . $id)) . '" class="dashicons dashicons-external rp-heading-link"></a>' . esc_html__('Prenotazioni evento', 'res-pong') . '</h2>';
+            echo '<h2>' . esc_html__('Prenotazioni evento', 'res-pong') . '<a href="' . esc_url(admin_url('admin.php?page=res-pong-event-reservations&id=' . $id)) . '" class="dashicons dashicons-external rp-heading-link"></a></h2>';
             echo '<div id="res-pong-event-reservations-message"></div>';
             echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
             echo '<h2>' . esc_html__('Richiesta Notifiche', 'res-pong') . '</h2>';

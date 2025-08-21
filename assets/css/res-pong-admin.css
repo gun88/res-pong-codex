@@ -27,7 +27,7 @@
 }
 
 .rp-heading-link {
-    float: right;
+    margin-left: 1rem;
     text-decoration: none;
 }
 
@@ -194,4 +194,8 @@ button.rp-unsign,
     display: flex;
     gap: 10px;
     justify-content: center;
+}
+
+#rp-event-reservations-title {
+    margin-bottom: 1rem;
 }
