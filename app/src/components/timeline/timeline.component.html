@@ -22,8 +22,12 @@
         </div>
       </div>
       <div *ngIf="!loading && monthPointerChangeWorked && !_events[day.date]" class="rp-timeline-content-day-no-event">(Nessun evento)</div>
-      <div *ngIf="loading || !monthPointerChangeWorked">
-        <p-skeleton height="2rem" styleClass="mb-2"/>
+      <div *ngIf="loading || !monthPointerChangeWorked" class="rp-calendar-events">
+        <div class="rp-calendar-event">
+          <div class="rp-skeleton">
+            <p-skeleton height="2rem" styleClass="mb-2"/>
+          </div>
+        </div>
       </div>
     </div>
   </ng-template>

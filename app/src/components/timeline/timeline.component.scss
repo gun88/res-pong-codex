@@ -43,5 +43,8 @@
 @media screen and (max-width: 575px) {
   .rp-timeline-content-day {
     min-width: unset;
+    .rp-skeleton {
+      min-width: 150px;
+    }
   }
 }

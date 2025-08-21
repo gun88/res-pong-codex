@@ -620,26 +620,6 @@ p-menubar {
 }
 
 .rp-info-button {
-  --p-button-border-radius: var(--p-form-field-border-radius);
-  --p-button-rounded-border-radius: 2rem;
-  --p-button-gap: 0.5rem;
-  --p-button-padding-x: 1rem;
-  --p-button-padding-y: var(--p-form-field-padding-y);
-
-  --p-button-sm-font-size: var(--p-form-field-sm-font-size);
-  --p-button-sm-padding-x: var(--p-form-field-sm-padding-x);
-  --p-button-sm-padding-y: var(--p-form-field-sm-padding-y);
-  --p-button-sm-icon-only-width: 2.25rem;
-  --p-button-lg-font-size: var(--p-form-field-lg-font-size);
-  --p-button-lg-padding-x: var(--p-form-field-lg-padding-x);
-  --p-button-lg-padding-y: var(--p-form-field-lg-padding-y);
-  --p-button-lg-icon-only-width: 3.25rem;
-  --p-button-label-font-weight: 600;
-
-  --p-button-badge-size: 1rem;
-
-
-
   --p-button-icon-only-width: 22px;
   --p-icon-size: 12px;
 }
