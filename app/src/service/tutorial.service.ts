@@ -25,6 +25,7 @@ export class TutorialService {
         {selector: '.rp-event-title-block-container', text: "event-title"},
         {selector: '.rp-event-navigator', text: "event-navigator"},
         {selector: '.rp-event-actions-block', text: "event-actions"},
+        {selector: '.rp-event-subscribe-block', text: "event-subscribe"},
         {selector: '.rp-event-status-message-block', text: "event-status"},
         {selector: '.rp-event-participants-block', text: "event-participants"},
 
@@ -38,6 +39,7 @@ export class TutorialService {
         {selector: '.rp-user-data-section-username', text: "user-data-section-username"},
         {selector: '.rp-user-data-section-email', text: "user-data-section-email"},
         {selector: '.rp-user-logout', text: "user-logout"},
+        {selector: '.rp-user-email-preferences', text: "user-email-preferences"},
         {selector: '.rp-user-password-update', text: "user-password"},
 
         {selector: '.rp-history-name-col', text: "history-name-col"},

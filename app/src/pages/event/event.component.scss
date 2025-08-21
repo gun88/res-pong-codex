@@ -17,3 +17,42 @@
   gap: 0.5rem;
   align-items: center;
 }
+
+.br-red {
+  background: #d63638;
+}
+
+.br-green {
+  background: #2e7d32;
+}
+
+.rp-event-subscribe-block {
+  margin: 0 0 0 auto;
+
+}
+@media screen and (max-width: 991px) {
+  .rp-event-title-block-container {
+    width: 100%;
+  }
+  .rp-event-subscribe-block {
+    margin: 0 auto 0 auto;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .rp-event-title-block-container {
+    width: unset;
+  }
+  .rp-event-subscribe-block {
+    margin: 0 0 0 auto;
+  }
+}
+
+@media screen and (max-width: 575px) {
+  .rp-event-title-block-container {
+    width: 100%;
+  }
+  .rp-event-subscribe-block {
+    margin: 0 auto 0 auto;
+  }
+}

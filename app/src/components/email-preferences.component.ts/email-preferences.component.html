@@ -1,5 +1,5 @@
 <h2 class="rp-email-section">Preferenze Email</h2>
-<form [formGroup]="form" (ngSubmit)="submit()" class="p-fluid rp-email-form" *ngIf="_user?.flags">
+<form [formGroup]="form" (ngSubmit)="submit()" class="p-fluid rp-email-form rp-user-email-preferences" *ngIf="_user?.flags">
   <div class="field rp-email-form-field">
     <label for="send_email_on_reservation" class="rp-email-form-label">Invia email alla prenotazione</label>
     <p-toggle-switch

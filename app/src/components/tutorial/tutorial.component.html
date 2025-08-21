@@ -15,6 +15,10 @@
                 <p>Usa questi pulsanti per <strong>Prenotare</strong> un evento o <strong>Cancellare</strong> la tua prenotazione.</p>
                 <p>Se un pulsante è disabilitato, non puoi eseguire l'azione corrispondente.</p>
             }
+            @case ('event-subscribe') {
+              <p>Ricevi un'e-mail nel caso dei posti tornassero disponibili.</p>
+              <p><b>ATTENZIONE:</b> questa notifica non è una lista d'attesa e non garantisce la partecipazione.</p>
+            }
             @case ('event-status') {
                 <p>Questo è il messaggio con le informazioni sull'evento e sulla tua prenotazione.</p>
             }
@@ -54,7 +58,7 @@
                 <p><u>Puoi usarlo per autenticarti</u> al posto dell'e-mail.</p>
             }
             @case ('user-data-section-email') {
-                <p>Questo  è l'indirizzo e-mail che hai fornito alla società durante il tesseramento.</p>
+                <p>Questo è l'indirizzo e-mail che hai fornito alla società durante il tesseramento.</p>
             }
             @case ('user-logout') {
                 <p>Pulsante di logout.</p>
@@ -63,6 +67,10 @@
             @case ('user-password') {
                 <p>In questa sezione trovi il modulo per reimpostare la password.</p>
                 <p>Inserisci la nuova password e la conferma, poi premi Invia.</p>
+            }
+             @case ('user-email-preferences') {
+                <p>In questa sezione controlla e modifica le tue preferenze per ricevere notifiche via e-mail.</p>
+                <p>Premi <i>Salva Preferenze Email</i> dopo la modifica.</p>
             }
             @case ('menubar-menu') {
                 <p>Dal menu accedi alle pagine principali del sito:</p>
