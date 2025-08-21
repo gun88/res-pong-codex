@@ -969,14 +969,23 @@
                     var label = u.last_name + ' ' + u.first_name + ' (' + u.id + ')';
                     select.append('<option value="' + u.id + '">' + label + '</option>');
                 });
+                sync();
             }
         });
+        function sync(){
+            var existing = dt.rows().data().toArray().map(function(r){ return String(r.user_id); });
+            select.find('option').each(function(){
+                var val = $(this).val();
+                if(!val){ return; }
+                $(this).prop('disabled', existing.indexOf(val) !== -1);
+            });
+            check();
+        }
         function check(){
             var uid = select.val();
-            if(!uid){ addBtn.prop('disabled', true); return; }
-            var exists = dt.rows().data().toArray().some(function(r){ return String(r.user_id) === uid; });
-            addBtn.prop('disabled', exists);
+            addBtn.prop('disabled', !uid || select.find('option:selected').is(':disabled'));
         }
+        dt.on('draw', sync);
         select.on('change', check);
         addBtn.on('click', function(e){
             e.preventDefault();
@@ -992,7 +1001,7 @@
                 success: function(){
                     message.html('<div class="notice notice-success is-dismissible"><p>Prenotazione aggiunta</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
                     select.val('');
-                    dt.ajax.reload(null, false);
+                    dt.ajax.reload(sync, false);
                     addBtn.prop('disabled', true);
                 },
                 error: function(xhr){
@@ -1027,14 +1036,23 @@
                     var label = ev.name + ' - ' + ev.start_datetime + ' (' + ev.id + ')';
                     select.append('<option value="' + ev.id + '">' + label + '</option>');
                 });
+                sync();
             }
         });
+        function sync(){
+            var existing = dt.rows().data().toArray().map(function(r){ return String(r.event_id); });
+            select.find('option').each(function(){
+                var val = $(this).val();
+                if(!val){ return; }
+                $(this).prop('disabled', existing.indexOf(val) !== -1);
+            });
+            check();
+        }
         function check(){
             var eid = select.val();
-            if(!eid){ addBtn.prop('disabled', true); return; }
-            var exists = dt.rows().data().toArray().some(function(r){ return String(r.event_id) === eid; });
-            addBtn.prop('disabled', exists);
+            addBtn.prop('disabled', !eid || select.find('option:selected').is(':disabled'));
         }
+        dt.on('draw', sync);
         select.on('change', check);
         addBtn.on('click', function(e){
             e.preventDefault();
@@ -1050,7 +1068,7 @@
                 success: function(){
                     message.html('<div class="notice notice-success is-dismissible"><p>Prenotazione aggiunta</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
                     select.val('');
-                    dt.ajax.reload(null, false);
+                    dt.ajax.reload(sync, false);
                     addBtn.prop('disabled', true);
                 },
                 error: function(xhr){
@@ -1105,15 +1123,23 @@
                 var label = u.last_name + ' ' + u.first_name + ' (' + u.id + ')';
                 select.append('<option value="' + u.id + '">' + label + '</option>');
             });
+            function check(){
+                var uid = select.val();
+                addBtn.prop('disabled', !uid || select.find('option:selected').is(':disabled'));
+            }
+            function sync(){
+                select.find('option').each(function(){
+                    var val = $(this).val();
+                    if(!val){ return; }
+                    $(this).prop('disabled', subs.indexOf(val) !== -1);
+                });
+                check();
+            }
             var length = wrapper.find('div.dataTables_length');
             var filter = wrapper.find('div.dataTables_filter');
             var toolbar = $('<div class="rp-toolbar"></div>');
             toolbar.append(length).append($('<span>•</span>'), select).append($('<span>•</span>'), addBtn).append(filter);
             wrapper.prepend(toolbar);
-            function check(){
-                var uid = select.val();
-                addBtn.prop('disabled', !uid || subs.indexOf(uid) !== -1);
-            }
             select.on('change', check);
             addBtn.on('click', function(e){
                 e.preventDefault();
@@ -1133,7 +1159,7 @@
                         dt.row.add({ user_id: uid, name: user.last_name + ' ' + user.first_name }).draw();
                         message.html('<div class="notice notice-success is-dismissible"><p>Utente aggiunto</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
                         select.val('');
-                        check();
+                        sync();
                     },
                     error: function(xhr){
                         var msg = 'Errore aggiunta notifica';
@@ -1161,7 +1187,7 @@
                         subs = newSubs;
                         dt.row(btn.closest('tr')).remove().draw();
                         message.html('<div class="notice notice-success is-dismissible"><p>Utente rimosso</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
-                        check();
+                        sync();
                     },
                     error: function(xhr){
                         var msg = 'Errore rimozione notifica';
@@ -1170,7 +1196,7 @@
                     }
                 });
             });
-            check();
+            sync();
         });
     }
     $(function(){
