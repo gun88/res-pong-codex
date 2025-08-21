@@ -288,7 +288,8 @@
                 beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
             },
             columns: columnsDef,
-            order: order
+            order: order,
+            pageLength: 50
         });
         dt.on('preXhr.dt', function(){ showOverlay(true); });
         dt.on('xhr.dt error.dt', function(){ hideOverlay(); });
@@ -1115,7 +1116,12 @@
                 var name = u ? u.last_name + ' ' + u.first_name : uid;
                 return { user_id: String(uid), name: name };
             });
-            var dt = table.DataTable({ data: data, columns: columns.event_notifications, order: [[0, 'asc']] });
+            var dt = table.DataTable({
+                data: data,
+                columns: columns.event_notifications,
+                order: [[0, 'asc']],
+                pageLength: 50
+            });
             var wrapper = $(dt.table().container());
             var addBtn = $('<button class="button rp-button-add" id="res-pong-notification-add"><span class="dashicons dashicons-plus"></span><span>Aggiungi</span></button>');
             var select = $('<select id="rp-event-notification-user"><option value="">Seleziona utente</option></select>');
