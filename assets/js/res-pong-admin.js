@@ -1020,7 +1020,7 @@
         addBtn.prop('disabled', true);
         var select = $('<select id="rp-user-reservation-event"><option value="">Seleziona evento</option></select>');
         var bullet = addBtn.prev('span');
-        bullet.after(select).after($('<span>•</span>'));
+        bullet.after(select);
         var message = $('#res-pong-user-reservations-message');
         $.ajax({
             url: restUrl('events', 'open_only=1'),

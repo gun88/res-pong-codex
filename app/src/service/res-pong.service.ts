@@ -58,7 +58,6 @@ export class ResPongService {
       .pipe(tap(() => this.resetMemoryUser()));
   }
 
-
   public resetMemoryUser() {
     localStorage.removeItem('res_pong_user');
     this.userSubject.next(null);
@@ -104,10 +103,8 @@ export class ResPongService {
           const microtime = Date.now() * 1000;
           this.http.get(`${environment.server}/wp-cron.php?doing_wp_cron=${microtime}`).subscribe()
         })
-      )
-      ;
+      );
   }
-
 
   public saveEmailPreferences(send_email_on_reservation: boolean, send_email_on_deletion: boolean) {
     return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/user/email-preferences`, {
@@ -117,12 +114,16 @@ export class ResPongService {
 
   }
 
-  subscribeEvent(eventId: any) {
+  public subscribeEvent(eventId: any) {
     return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`, {});
   }
 
-  unsubscribeEvent(eventId: any) {
+  public unsubscribeEvent(eventId: any) {
     return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`);
+  }
+
+  public getConfigurations() {
+    return this.http.get(`${this.baseServer}/?rest_route=/res-pong/v1/configurations`);
   }
 }
 

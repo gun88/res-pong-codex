@@ -1,17 +1,21 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import Hotjar from '@hotjar/browser';
-import {environment} from '../environments/environment';
+import {ResPongService} from './res-pong.service';
 
 @Injectable({providedIn: 'root'})
 export class HotjarService {
-  init() {
-    const hotjarSiteId = environment.hotjarSiteId
-    const hotjarVersion = environment.hotjarVersion
-    Hotjar.init(hotjarSiteId, hotjarVersion);
-  }
+  private resPongService = inject(ResPongService);
+  private initialized = false;
 
-  stateChange(url: string) {
-    console.log('Hotjar: stateChange', url);
-    Hotjar.stateChange(url); // utile per SPA se necessario
+  public stateChange(url: string) {
+    if (this.initialized) {
+      Hotjar.stateChange(url);
+    } else {
+      this.resPongService.getConfigurations().subscribe((configurations: any) => {
+        Hotjar.init(configurations.hotjar_id, configurations.hotjar_version);
+        this.initialized = true;
+        Hotjar.stateChange(url);
+      })
+    }
   }
 }

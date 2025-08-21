@@ -125,6 +125,12 @@ class Res_Pong_User_Controller {
             'callback' => [$res_pong_admin, 'password_update_by_token'],
             'permission_callback' => '__return_true'
         ]);
+
+        register_rest_route('res-pong/v1', '/configurations', [
+            'methods' => 'GET',
+            'callback' => [$res_pong_admin, 'get_public_configurations'],
+            'permission_callback' => '__return_true'
+        ]);
     }
 
 }

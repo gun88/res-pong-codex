@@ -11,7 +11,7 @@ class Res_Pong_Configuration {
         'max_active_reservations' => 1,
         'next_reservation_delay' => 300,
         'hotjar_id' => '',
-        'hotjar_version' => '',
+        'hotjar_version' => 6,
         'avatar_management' => 'none',
         'default_email_address' => 'prenotazioni@my-site.com',
 
@@ -74,5 +74,19 @@ class Res_Pong_Configuration {
         $config[$key] = $value;
         update_option($this->option_name, $config);
     }
+
+    public function get_public_configurations() {
+        $arr = [];
+        $config = $this->get('hotjar_id');
+        if (!empty($config)) {
+            $arr['hotjar_id'] = $config;
+        }
+        $config = $this->get('hotjar_version');
+        if (!empty($config)) {
+            $arr['hotjar_version'] = $config;
+        }
+        return $arr;
+    }
+
 }
 

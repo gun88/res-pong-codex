@@ -24,15 +24,9 @@ export class AppComponent implements OnInit {
   build: string = environment.build;
 
   ngOnInit(): void {
-    this.hotjarService.init();
-
     this.router.events
       .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: NavigationEnd) => {
-        // avvisa Hotjar del cambio “pagina” nelle SPA
-
-        this.hotjarService.stateChange(e.urlAfterRedirects);
-      });
+      .subscribe((e: NavigationEnd) => this.hotjarService.stateChange(e.urlAfterRedirects));
   }
 
 }

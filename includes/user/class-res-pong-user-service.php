@@ -204,6 +204,11 @@ class Res_Pong_User_Service {
         return new \WP_REST_Response(['success' => true], 200);
     }
 
+    public function get_public_configurations() {
+        $configurations = $this->configuration->get_public_configurations();
+        return rest_ensure_response($configurations);
+    }
+
     public function password_update_by_token(\WP_REST_Request $req) {
 
         try {
