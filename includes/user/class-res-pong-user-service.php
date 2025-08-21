@@ -158,10 +158,8 @@ class Res_Pong_User_Service {
             }
 
             $availability = !empty($event->max_players) ? ($event->max_players - $event->players_count) : 0;
-            $notification_subscribers = !empty($event->notification_subscribers) ? json_decode($event->notification_subscribers) : [];
-
-            if ($availability > 0 && !empty($notification_subscribers)) {
-                Res_Pong_Util::enqueue_notification_messages($event, $notification_subscribers);
+            if ($availability > 0 && !empty($event->notification_subscribers)) {
+                Res_Pong_Util::enqueue_notification_messages($event, $event->notification_subscribers);
             }
         } else {
             if (!empty($event->status_message)) {
