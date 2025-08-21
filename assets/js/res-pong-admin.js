@@ -9,10 +9,10 @@
     function renderCheckbox(data){
         return '<input type="checkbox" class="rp-select" value="' + data.id + '">';
     }
-    function renderBool(val){
+    function renderBool(val, id){
         return parseInt(val) === 1
-            ? '<span class="dashicons dashicons-yes rp-icon-yes"></span>'
-            : '<span class="dashicons dashicons-no-alt rp-icon-no"></span>';
+            ? '<span class="dashicons dashicons-yes rp-icon-yes rp-toggle" data-id="' + id + '"></span>'
+            : '<span class="dashicons dashicons-no-alt rp-icon-no rp-toggle" data-id="' + id + '"></span>';
     }
     function showOverlay(indeterminate){
         var overlay = $('#rp-progress-overlay');
@@ -77,19 +77,6 @@
         var edit = '<button class="button rp-edit rp-action-btn" data-id="' + data.id + '" title="Modifica"><span class="dashicons dashicons-edit"></span></button>';
         var del = '<button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + data.id + '" title="Elimina"><span class="dashicons dashicons-trash"></span></button>';
         var buttons = edit + del;
-        if(entity === 'reservations' || entity === 'user_reservations'){
-            var state = parseInt(data.presence_confirmed);
-            var toggleLabel = state ? 'Assente' : 'Presente';
-            var toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
-            var toggleIcon = state ? 'dashicons-no-alt' : 'dashicons-yes';
-            buttons += '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '" title="' + toggleLabel + '"><span class="dashicons ' + toggleIcon + '"></span></button>';
-        }else if(entity !== 'event_reservations'){
-            var state2 = parseInt(data.enabled);
-            var toggleLabel2 = state2 ? 'Disabilita' : 'Abilita';
-            var toggleClass2 = state2 ? 'rp-button-disable' : 'rp-button-enable';
-            var toggleIcon2 = state2 ? 'dashicons-no-alt' : 'dashicons-yes';
-            buttons += '<button class="button rp-toggle rp-action-btn ' + toggleClass2 + '" data-id="' + data.id + '" title="' + toggleLabel2 + '"><span class="dashicons ' + toggleIcon2 + '"></span></button>';
-        }
         if(entity === 'users'){
             buttons += '<button class="button rp-impersonate rp-action-btn" data-id="' + data.id + '" title="Impersona"><span class="dashicons dashicons-admin-users"></span></button>';
             if(!data.password){
@@ -100,14 +87,6 @@
         }
         return '<div class="rp-action-group">' + buttons + '</div>';
     }
-    function presenceToggle(data){
-        var state = parseInt(data.presence_confirmed);
-        var toggleLabel = state ? 'Assente' : 'Presente';
-        var toggleClass = state ? 'rp-button-disable' : 'rp-button-enable';
-        var toggleIcon = state ? 'dashicons-no-alt' : 'dashicons-yes';
-        var toggle = '<button class="button rp-toggle rp-action-btn ' + toggleClass + '" data-id="' + data.id + '" title="' + toggleLabel + '"><span class="dashicons ' + toggleIcon + '"></span></button>';
-        return '<div class="rp-action-group">' + toggle + '</div>';
-    }
     var columns = {
         users: [
             { data: null, title: '', orderable: false, render: renderCheckbox },
@@ -116,7 +95,7 @@
             { data: 'email', title: 'Email' },
             { data: 'username', title: 'Nome utente' },
             { data: 'category', title: 'Categoria' },
-            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
+            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type, row){ return type === 'display' ? renderBool(d, row.id) : d; } },
             { data: 'timeout', title: 'Timeout', render: function(d, type){ if(type === 'display'){ if(!d){ return ''; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); return now < t ? d : ''; } return d; } },
             { data: 'timeout', title: 'In timeout', className: 'rp-icon-col', render: function(d, type){ if(!d){ return type === 'display' ? '' : 0; } var now = new Date(); var t = new Date(d.replace(' ', 'T')); var active = now < t; if(type === 'display'){ return active ? '<span class="dashicons dashicons-clock rp-icon-clock"></span>' : ''; } return active ? 1 : 0; } },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('users', d); } }
@@ -135,7 +114,7 @@
             { data: 'start_datetime', title: 'Inizio' },
             { data: 'end_datetime', title: 'Fine' },
             { data: 'category', title: 'Categoria' },
-            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type){ return type === 'display' ? renderBool(d) : d; } },
+            { data: 'enabled', title: 'Abilitato', className: 'rp-icon-col', render: function(d, type, row){ return type === 'display' ? renderBool(d, row.id) : d; } },
             { data: null, title: 'Stato', render: function(d){ var now = new Date(); var start = new Date(d.start_datetime.replace(' ', 'T')); return now > start ? 'chiuso' : 'aperto'; } },
             { data: 'players_count', title: 'Giocatori' },
             { data: 'max_players', title: 'Giocatori max' },
@@ -144,6 +123,7 @@
         reservations: [
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'name', title: 'Utente', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
+            { data: 'presence_confirmed', title: 'Presenza', className: 'rp-icon-col', render: function(d, type, row){ return type === 'display' ? renderBool(d, row.id) : d; } },
             { data: 'event_name', title: 'Evento', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.event_id + '">' + d + ' (' + row.event_id + ')</a>'; } },
             { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
             { data: 'event_start_datetime', title: 'Data evento' },
@@ -156,11 +136,12 @@
             { data: 'group_name', title: 'Gruppo Evento', render: function(d, type, row){ if(!row.group_id || !d){ return ''; } return '<a href="' + rp_admin.admin_url + '?page=res-pong-event-detail&id=' + row.group_id + '">' + d + '</a>'; } },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'created_at', title: 'Prenotato il' },
+            { data: 'presence_confirmed', title: 'Presenza', className: 'rp-icon-col', render: function(d, type, row){ return type === 'display' ? renderBool(d, row.id) : d; } },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('user_reservations', d); } }
         ],
         event_reservations: [
             { data: 'name', title: 'Utente', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
-            { data: null, title: 'Presenza', className: 'rp-action-group-col', orderable: false, render: function(d){ return presenceToggle(d); } },
+            { data: 'presence_confirmed', title: 'Presenza', className: 'rp-icon-col', render: function(d, type, row){ return type === 'display' ? renderBool(d, row.id) : d; } },
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'created_at', title: 'Prenotato il' },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('event_reservations', d); } }
