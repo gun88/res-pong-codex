@@ -80,6 +80,10 @@ button.rp-unsign,
     color: #e65100;
 }
 
+.rp-icon-col .rp-toggle {
+    cursor: pointer;
+}
+
 .rp-action-group-col {
     padding: 0 !important;
 }
