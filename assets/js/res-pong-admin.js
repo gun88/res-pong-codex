@@ -145,6 +145,11 @@
             { data: 'id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-reservation-detail&id=' + d + '">' + d + '</a>'; } },
             { data: 'created_at', title: 'Prenotato il' },
             { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return actionButtons('event_reservations', d); } }
+        ],
+        event_notifications: [
+            { data: 'user_id', title: 'ID', render: function(d){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + d + '">' + d + '</a>'; } },
+            { data: 'name', title: 'Nome', render: function(d, type, row){ return '<a href="' + rp_admin.admin_url + '?page=res-pong-user-detail&id=' + row.user_id + '">' + d + '</a>'; } },
+            { data: null, title: 'Azioni', className: 'rp-action-group-col', orderable: false, render: function(d){ return '<div class="rp-action-group"><button class="button rp-delete rp-button-danger rp-action-btn" data-id="' + d.user_id + '" title="Elimina"><span class="dashicons dashicons-trash"></span></button></div>'; } }
         ]
     };
     function handleActions(table, entity){
@@ -999,6 +1004,117 @@
             });
         });
     }
+    function initEventNotifications(table, eid){
+        var message = $('#res-pong-event-notifications-message');
+        var subs = [];
+        var users = [];
+        $.when(
+            $.ajax({
+                url: restUrl('events/' + eid),
+                method: 'GET',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
+            }),
+            $.ajax({
+                url: restUrl('users'),
+                method: 'GET',
+                beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); }
+            })
+        ).done(function(evRes, usersRes){
+            var event = evRes[0];
+            users = usersRes[0];
+            users.sort(function(a, b){
+                var la = a.last_name.toLowerCase();
+                var lb = b.last_name.toLowerCase();
+                if(la < lb){ return -1; }
+                if(la > lb){ return 1; }
+                var fa = a.first_name.toLowerCase();
+                var fb = b.first_name.toLowerCase();
+                if(fa < fb){ return -1; }
+                if(fa > fb){ return 1; }
+                return a.id - b.id;
+            });
+            subs = event.notification_subscribers ? JSON.parse(event.notification_subscribers) : [];
+            var data = subs.map(function(uid){
+                var u = users.find(function(us){ return String(us.id) === String(uid); });
+                var name = u ? u.last_name + ' ' + u.first_name : uid;
+                return { user_id: String(uid), name: name };
+            });
+            var dt = table.DataTable({ data: data, columns: columns.event_notifications, order: [[0, 'asc']] });
+            var wrapper = $(dt.table().container());
+            var addBtn = $('<button class="button rp-button-add" id="res-pong-notification-add"><span class="dashicons dashicons-plus"></span><span>Aggiungi</span></button>');
+            var select = $('<select id="rp-event-notification-user"><option value="">Seleziona utente</option></select>');
+            users.forEach(function(u){
+                var label = u.last_name + ' ' + u.first_name + ' (' + u.id + ')';
+                select.append('<option value="' + u.id + '">' + label + '</option>');
+            });
+            var length = wrapper.find('div.dataTables_length');
+            var filter = wrapper.find('div.dataTables_filter');
+            var toolbar = $('<div class="rp-toolbar"></div>');
+            toolbar.append(length).append($('<span>•</span>'), select).append($('<span>•</span>'), addBtn).append(filter);
+            wrapper.prepend(toolbar);
+            function check(){
+                var uid = select.val();
+                addBtn.prop('disabled', !uid || subs.indexOf(uid) !== -1);
+            }
+            select.on('change', check);
+            addBtn.on('click', function(e){
+                e.preventDefault();
+                var uid = select.val();
+                if(!uid){ return; }
+                var newSubs = subs.slice();
+                newSubs.push(uid);
+                $.ajax({
+                    url: restUrl('events/' + eid),
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ notification_subscribers: JSON.stringify(newSubs) }),
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    success: function(){
+                        subs = newSubs;
+                        var user = users.find(function(u){ return String(u.id) === uid; });
+                        dt.row.add({ user_id: uid, name: user.last_name + ' ' + user.first_name }).draw();
+                        message.html('<div class="notice notice-success is-dismissible"><p>Utente aggiunto</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                        select.val('');
+                        check();
+                    },
+                    error: function(xhr){
+                        var msg = 'Errore aggiunta notifica';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        message.html('<div class="notice notice-error is-dismissible"><p>' + msg + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                        check();
+                    }
+                });
+            });
+            table.on('click', '.rp-delete', function(e){
+                e.preventDefault();
+                var btn = $(this);
+                var uid = String(btn.data('id'));
+                var idx = subs.indexOf(uid);
+                if(idx === -1){ return; }
+                var newSubs = subs.slice();
+                newSubs.splice(idx, 1);
+                $.ajax({
+                    url: restUrl('events/' + eid),
+                    method: 'PUT',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ notification_subscribers: JSON.stringify(newSubs) }),
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    success: function(){
+                        subs = newSubs;
+                        dt.row(btn.closest('tr')).remove().draw();
+                        message.html('<div class="notice notice-success is-dismissible"><p>Utente rimosso</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                        check();
+                    },
+                    error: function(xhr){
+                        var msg = 'Errore rimozione notifica';
+                        if(xhr.responseJSON && xhr.responseJSON.message){ msg += ': ' + xhr.responseJSON.message; }
+                        message.html('<div class="notice notice-error is-dismissible"><p>' + msg + '</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Ignora questa notifica.</span></button></div>');
+                    }
+                });
+            });
+            check();
+        });
+    }
     $(function(){
         var list = $('#res-pong-list');
         if(list.length){
@@ -1022,6 +1138,11 @@
             var eid = er.data('event');
             var erTable = initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=0'); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
             initEventReservationAdder(erTable, eid);
+        }
+        var en = $('#res-pong-event-notifications');
+        if(en.length){
+            var eidn = en.data('event');
+            initEventNotifications(en, eidn);
         }
         initConfigPage();
         initDetail();

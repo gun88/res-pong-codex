@@ -351,6 +351,9 @@ class Res_Pong_Admin_Frontend {
             echo '<h2>' . esc_html__('Prenotazioni evento', 'res-pong') . '</h2>';
             echo '<div id="res-pong-event-reservations-message"></div>';
             echo '<table id="res-pong-event-reservations" class="display" data-event="' . esc_attr($id) . '"></table>';
+            echo '<h2>' . esc_html__('Richiesta Notifiche', 'res-pong') . '</h2>';
+            echo '<div id="res-pong-event-notifications-message"></div>';
+            echo '<table id="res-pong-event-notifications" class="display" data-event="' . esc_attr($id) . '"></table>';
         }
         $this->render_progress_overlay();
         echo '</div>';
