@@ -131,6 +131,8 @@ class Res_Pong_Admin_Frontend {
                 'almost_full_players'           => isset($_POST['almost_full_players']) ? intval($_POST['almost_full_players']) : 0,
                 'max_active_reservations'       => isset($_POST['max_active_reservations']) ? intval($_POST['max_active_reservations']) : 0,
                 'next_reservation_delay'        => isset($_POST['next_reservation_delay']) ? intval($_POST['next_reservation_delay']) : 0,
+                'hotjar_id'                     => isset($_POST['hotjar_id']) ? sanitize_text_field($_POST['hotjar_id']) : '',
+                'hotjar_version'                => isset($_POST['hotjar_version']) ? sanitize_text_field($_POST['hotjar_version']) : '',
                 'default_email_address'         => isset($_POST['default_email_address']) ? sanitize_email($_POST['default_email_address']) : '',
                 'site_name'                     => isset($_POST['site_name']) ? sanitize_text_field($_POST['site_name']) : '',
                 'site_url'                      => isset($_POST['site_url']) ? esc_url_raw($_POST['site_url']) : '',
@@ -166,6 +168,8 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="almost_full_players">Giocatori quasi completi</label></th><td><input name="almost_full_players" id="almost_full_players" type="number" value="' . esc_attr($config['almost_full_players']) . '"></td></tr>';
         echo '<tr><th><label for="max_active_reservations">Max prenotazioni attive</label></th><td><input name="max_active_reservations" id="max_active_reservations" type="number" value="' . esc_attr($config['max_active_reservations']) . '"></td></tr>';
         echo '<tr><th><label for="next_reservation_delay">Ritardo prossima prenotazione</label></th><td><input name="next_reservation_delay" id="next_reservation_delay" type="number" value="' . esc_attr($config['next_reservation_delay']) . '"></td></tr>';
+        echo '<tr><th><label for="hotjar_id">Hotjar ID</label></th><td><input name="hotjar_id" id="hotjar_id" type="text" value="' . esc_attr($config['hotjar_id']) . '"></td></tr>';
+        echo '<tr><th><label for="hotjar_version">Hotjar Version</label></th><td><input name="hotjar_version" id="hotjar_version" type="text" value="' . esc_attr($config['hotjar_version']) . '"></td></tr>';
         echo '<tr><th><label for="default_email_address">Email di default</label></th><td><input name="default_email_address" id="default_email_address" type="email" class="regular-text" value="' . esc_attr($config['default_email_address']) . '"></td></tr>';
         echo '<tr><th><label for="site_name">Nome Sito</label></th><td><input name="site_name" id="site_name" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['site_name']) . '"></td></tr>';
         echo '<tr><th><label for="site_url">URL Sito</label></th><td><input name="site_url" id="site_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['site_url']) . '"></td></tr>';

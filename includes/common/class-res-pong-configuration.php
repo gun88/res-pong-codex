@@ -10,6 +10,8 @@ class Res_Pong_Configuration {
         'almost_full_players' => 4,
         'max_active_reservations' => 1,
         'next_reservation_delay' => 300,
+        'hotjar_id' => '',
+        'hotjar_version' => '',
         'avatar_management' => 'none',
         'default_email_address' => 'prenotazioni@my-site.com',
 
