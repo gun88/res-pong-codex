@@ -47,7 +47,7 @@ class Res_Pong_Util {
 
         wp_mail($to, $subject, $message, $headers);
 
-        if (RES_PONG_DEV) {
+        if (true || RES_PONG_DEV) {
             error_log("SENT EMAIL TO [$to] SUBJECT [$subject]");
         }
     }
