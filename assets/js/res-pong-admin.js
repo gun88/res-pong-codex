@@ -1223,6 +1223,18 @@
             var eid = er.data('event');
             var erTable = initTable(er, 'reservations', function(){ return restUrl('reservations', 'event_id=' + eid + '&active_only=0'); }, { columns: columns.event_reservations, addParams: 'event_id=' + eid, noCsv: true, filterFuture: false, selectable: false, order: [[0, 'asc']] });
             initEventReservationAdder(erTable, eid);
+            var title = $('#rp-event-reservations-title');
+            if(title.length){
+                $.ajax({
+                    url: restUrl('events/' + eid),
+                    method: 'GET',
+                    beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
+                    success: function(ev){
+                        var dt = ev.start_datetime ? ev.start_datetime.substring(0, 16) : '';
+                        title.text('Prenotazioni ' + ev.name + ' - ' + dt);
+                    }
+                });
+            }
         }
         var en = $('#res-pong-event-notifications');
         if(en.length){

@@ -26,6 +26,11 @@
 
 }
 
+.rp-heading-link {
+    float: right;
+    text-decoration: none;
+}
+
 .rp-bulk {
     display: flex;
     align-items: center;
