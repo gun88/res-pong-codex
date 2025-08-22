@@ -7,16 +7,13 @@
   "requires": "4.5",
   "tested": "4.8",
   "last_updated": "2017-01-01 16:17:00",
-  "upgrade_notice": "Here's why you should upgrade...",
+  "upgrade_notice": "New version released!",
 
   "author": "tpomante",
   "author_homepage": "https://github.com/gun88/",
 
   "sections": {
-    "description": "(Required) Plugin description. Basic HTML can be used in all sections.",
-    "installation": "(Recommended) Installation instructions.",
-    "changelog": "(Recommended) Changelog. <p>This section will be displayed by default when the user clicks 'View version x.y.z details'.</p>",
-    "custom_section": "This is a custom section labeled 'Custom Section'."
+    "description": "Prenotazioni per giornate di gioco libero in palestra."
   },
 
   "icons" : {
