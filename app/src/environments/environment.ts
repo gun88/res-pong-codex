@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
   server: '',
-  version: '0.3.11',
-  build: '20250822152651'
+  version: '0.3.13',
+  build: '20250822152831'
 }
