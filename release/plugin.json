@@ -1,12 +1,12 @@
 {
   "name": "Res Pong",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "download_url": "https://raw.githubusercontent.com/gun88/res-pong-codex/refs/heads/main/release/res-pong-0.3.5-2025-08-22_13-19.zip",
 
   "homepage": "https://github.com/gun88/res-pong-codex/",
   "requires": "4.5",
   "tested": "4.8",
-  "last_updated": "2017-01-01 16:17:00",
+  "last_updated": "2026-01-01 16:17:00",
   "upgrade_notice": "New version released!",
 
   "author": "tpomante",
