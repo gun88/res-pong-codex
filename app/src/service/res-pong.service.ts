@@ -13,6 +13,8 @@ export class ResPongService {
   private userSubject = new BehaviorSubject<any>(JSON.parse(localStorage.getItem('res_pong_user') || 'null'));
   readonly user$ = this.userSubject.asObservable();
   readonly loggedIn$ = this.user$.pipe(map(u => !!u));
+  private eventSubject = new BehaviorSubject<string>('');
+  readonly event$ = this.eventSubject.asObservable();
 
   constructor() {
     this.user$.pipe(
@@ -45,7 +47,8 @@ export class ResPongService {
           let user = res?.success ? res.user : null;
           this.updateMemoryUser(user);
           this.userSubject.next(user);
-        })
+        }),
+        tap(this.manageEvent('login'))
       );
   }
 
@@ -55,7 +58,10 @@ export class ResPongService {
 
   public logOut() {
     return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/logout`, {})
-      .pipe(tap(() => this.resetMemoryUser()));
+      .pipe(
+        tap(this.manageEvent('logout')),
+        tap(() => this.resetMemoryUser())
+      );
   }
 
   public resetMemoryUser() {
@@ -73,15 +79,18 @@ export class ResPongService {
   }
 
   public recoverPassword(email: string, updatePageUrl: string) {
-    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/password/reset`, {email, updatePageUrl});
+    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/password/reset`, {email, updatePageUrl})
+      .pipe(tap(this.manageEvent('recover_password')));
   }
 
   public updatePassword(password: string, confirm: string, token = '') {
     if (token)
       return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/password/update-by-token`,
-        {password, confirm, token});
+        {password, confirm, token})
+        .pipe(tap(this.manageEvent('update_password_by_token')));
     else
-      return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/password/update`, {password, confirm});
+      return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/password/update`, {password, confirm})
+        .pipe(tap(this.manageEvent('update_password')));
   }
 
   public getUserReservations() {
@@ -93,12 +102,14 @@ export class ResPongService {
   }
 
   public createReservation(eventId: number) {
-    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/reservations`, {event_id: eventId});
+    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/reservations`, {event_id: eventId})
+      .pipe(tap(this.manageEvent('reservations')));
   }
 
   public deleteReservation(eventId: number) {
     return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/reservations&event_id=${eventId}`)
       .pipe(
+        tap(this.manageEvent('delete_reservation')),
         tap(() => {
           const microtime = Date.now() * 1000;
           this.http.get(`${environment.server}/wp-cron.php?doing_wp_cron=${microtime}`).subscribe()
@@ -110,20 +121,33 @@ export class ResPongService {
     return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/user/email-preferences`, {
       send_email_on_reservation,
       send_email_on_deletion
-    });
+    })
+      .pipe(tap(this.manageEvent('save_email_preferences')));
 
   }
 
   public subscribeEvent(eventId: any) {
-    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`, {});
+    return this.http.post(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`, {})
+      .pipe(tap(this.manageEvent('subscribe_event')));
   }
 
   public unsubscribeEvent(eventId: any) {
-    return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`);
+    return this.http.delete(`${this.baseServer}/?rest_route=/res-pong/v1/events/${eventId}/subscription`)
+      .pipe(tap(this.manageEvent('unsubscribe_event')));
   }
 
   public getConfigurations() {
     return this.http.get(`${this.baseServer}/?rest_route=/res-pong/v1/configurations`);
+  }
+
+  private manageEvent(eventName: string) {
+    return {
+      next: () => this.eventSubject.next(`${eventName}_success`),
+      error: (err: any) => {
+        const code = err?.status ? `_${err.status}` : '';
+        this.eventSubject.next(`${eventName}_error${code}`);
+      }
+    };
   }
 }
 

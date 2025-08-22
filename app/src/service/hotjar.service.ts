@@ -26,13 +26,18 @@ export class HotjarService {
             }
             Hotjar.init(cfg.hotjar_id, cfg.hotjar_version);
 
-            this.router.events
-              .pipe(filter(e => e instanceof NavigationEnd))
-              .subscribe((e: NavigationEnd) => this.stateChange(e.urlAfterRedirects));
-
+            this.router.events.pipe(
+              filter(e => e instanceof NavigationEnd),
+              tap((e: NavigationEnd) => this.stateChange(e.urlAfterRedirects))
+            ).subscribe();
 
             this.resPongService.user$.pipe(
               tap((user: any) => this.identify(user))
+            ).subscribe()
+
+            this.resPongService.event$.pipe(
+              filter(event => !!event),
+              tap((event: string) => this.event(event))
             ).subscribe()
 
             this.enabled = true;
@@ -51,12 +56,20 @@ export class HotjarService {
   public async stateChange(url: string): Promise<void> {
     if (!this.enabled) return;
     await this.init();
+    console.log('Hotjar stateChange', url);
     Hotjar.stateChange(url);
   }
 
   public async identify(user: any): Promise<void> {
     if (!this.enabled) return;
     await this.init();
+    console.log('Hotjar identify', user);
     Hotjar.identify(user?.id, user);
+  }
+
+  public async event(name: string): Promise<void> {
+    await this.init();
+    console.log('Hotjar event', name);
+    Hotjar.event(name);
   }
 }
