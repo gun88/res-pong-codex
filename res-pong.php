@@ -79,3 +79,17 @@ if (RES_PONG_DEV) {
     });
 }
 
+// Carica la libreria PUC
+require __DIR__ . '/includes/plugin-update-checker/plugin-update-checker.php';
+
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$resPongUpdateChecker = PucFactory::buildUpdateChecker(
+    'https://github.com/gun88/res-pong-codex/', // URL repo o JSON metadata
+    __FILE__,                                // file principale del plugin
+    'res-pong'                               // slug
+);
+
+// Se usi GitHub:
+$resPongUpdateChecker->setBranch('main');
+// $resPongUpdateChecker->getVcsApi()->enableReleaseAssets(); // se rilasci ZIP nelle release

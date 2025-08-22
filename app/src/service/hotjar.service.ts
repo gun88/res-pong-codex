@@ -56,7 +56,6 @@ export class HotjarService {
   public async stateChange(url: string): Promise<void> {
     if (!this.enabled) return;
     await this.init();
-    console.log('Hotjar stateChange', url);
     Hotjar.stateChange(url);
   }
 
@@ -64,13 +63,11 @@ export class HotjarService {
     if (!this.enabled) return;
     if (!user) return;
     await this.init();
-    console.log('Hotjar identify', user);
     Hotjar.identify(user?.id, user);
   }
 
   public async event(name: string): Promise<void> {
     await this.init();
-    console.log('Hotjar event', name);
     Hotjar.event(name);
   }
 }
