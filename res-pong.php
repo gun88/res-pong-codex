@@ -3,7 +3,7 @@
  * Plugin Name: Res Pong
  * Plugin URI: https://github.com/gun88/res-pong-codex
  * Description: Prenotazioni per giornate di gioco libero in palestra.
- * Version: 0.3.14
+ * Version: 0.3.15
  * Author: tpomante
  * Author URI: https://github.com/gun88
  * License: GPL v2 or later
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 
 // Define plugin constants
 define('RES_PONG_DEV', true);
-define('RES_PONG_VERSION', RES_PONG_DEV ? time() : '0.3.14');
+define('RES_PONG_VERSION', RES_PONG_DEV ? time() : '0.3.15');
 define('RES_PONG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('RES_PONG_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RS_FITET_MONITOR_ACTIVE', is_plugin_active('fitet-monitor/fitet-monitor.php'));
@@ -84,9 +84,7 @@ require_once RES_PONG_PLUGIN_DIR . 'includes/plugin-update-checker/plugin-update
 use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
 
 $resPongUpdateChecker = PucFactory::buildUpdateChecker(
-    'https://github.com/gun88/res-pong-codex/',
+    'https://raw.githubusercontent.com/gun88/res-pong-codex/refs/heads/main/release/plugin.json',
     __FILE__,
     'res-pong'
 );
-
-$resPongUpdateChecker->setBranch('main');

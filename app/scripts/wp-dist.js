@@ -99,6 +99,17 @@ function pad(n) {
       archive.finalize();
     });
 
+    const pluginJsonPath = path.join(releaseDir, 'plugin.json');
+    if (fs.existsSync(pluginJsonPath)) {
+      const pluginData = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+      pluginData.version = version;
+      pluginData.download_url = pluginData.download_url.replace(/release\/[^/]+\.zip/, `release/${zipName}`);
+      const updated = new Date();
+      const updatedStr = `${updated.getFullYear()}-${pad(updated.getMonth() + 1)}-${pad(updated.getDate())} ${pad(updated.getHours())}:${pad(updated.getMinutes())}:${pad(updated.getSeconds())}`;
+      pluginData.last_updated = updatedStr;
+      fs.writeFileSync(pluginJsonPath, JSON.stringify(pluginData, null, 2) + '\n');
+    }
+
     try {
       execSync(`git add ${zipPath}`, {cwd: rootDir, stdio: 'ignore'});
     } catch (e) {
