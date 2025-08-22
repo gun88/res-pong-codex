@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Res Pong
- * Plugin URI: https://tennistavolomorelli.it
+ * Plugin URI: https://github.com/gun88/res-pong-codex
  * Description: Prenotazioni per giornate di gioco libero in palestra.
- * Version: 0.3.10
+ * Version: 0.3.11
  * Author: tpomante
- * Author URI: https://tpomante.it
+ * Author URI: https://github.com/gun88
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: res-pong
@@ -17,7 +17,7 @@ defined('ABSPATH') || exit;
 
 // Define plugin constants
 define('RES_PONG_DEV', true);
-define('RES_PONG_VERSION', RES_PONG_DEV ? time() : '0.3.10');
+define('RES_PONG_VERSION', RES_PONG_DEV ? time() : '0.3.11');
 define('RES_PONG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('RES_PONG_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('RS_FITET_MONITOR_ACTIVE', is_plugin_active('fitet-monitor/fitet-monitor.php'));
