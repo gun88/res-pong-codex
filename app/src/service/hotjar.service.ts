@@ -25,6 +25,7 @@ export class HotjarService {
               return;
             }
             Hotjar.init(cfg.hotjar_id, cfg.hotjar_version);
+            this.enabled = true;
 
             this.router.events.pipe(
               filter(e => e instanceof NavigationEnd),
@@ -40,7 +41,6 @@ export class HotjarService {
               tap((event: string) => this.event(event))
             ).subscribe()
 
-            this.enabled = true;
             resolve();
           } catch (e) {
             reject(e);
@@ -62,6 +62,7 @@ export class HotjarService {
 
   public async identify(user: any): Promise<void> {
     if (!this.enabled) return;
+    if (!user) return;
     await this.init();
     console.log('Hotjar identify', user);
     Hotjar.identify(user?.id, user);
