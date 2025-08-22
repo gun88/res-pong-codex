@@ -43,8 +43,16 @@ function pad(n) {
     fs.writeFileSync(pluginFile, content);
 
     const releaseDir = path.join(rootDir, 'release');
-    const tempDir = path.join(releaseDir, 'temp');
     fs.mkdirSync(releaseDir, {recursive: true});
+
+    // remove previous zip files
+    for (const file of fs.readdirSync(releaseDir)) {
+      if (file.endsWith('.zip')) {
+        fs.rmSync(path.join(releaseDir, file), {force: true});
+      }
+    }
+
+    const tempDir = path.join(releaseDir, 'temp');
     fs.rmSync(tempDir, {recursive: true, force: true});
     fs.mkdirSync(tempDir);
 
@@ -90,6 +98,23 @@ function pad(n) {
       archive.pipe(output);
       archive.finalize();
     });
+
+    const pluginJsonPath = path.join(releaseDir, 'plugin.json');
+    if (fs.existsSync(pluginJsonPath)) {
+      const pluginData = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf8'));
+      pluginData.version = version;
+      pluginData.download_url = pluginData.download_url.replace(/release\/[^/]+\.zip/, `release/${zipName}`);
+      const updated = new Date();
+      const updatedStr = `${updated.getFullYear()}-${pad(updated.getMonth() + 1)}-${pad(updated.getDate())} ${pad(updated.getHours())}:${pad(updated.getMinutes())}:${pad(updated.getSeconds())}`;
+      pluginData.last_updated = updatedStr;
+      fs.writeFileSync(pluginJsonPath, JSON.stringify(pluginData, null, 2) + '\n');
+    }
+
+    try {
+      execSync(`git add ${zipPath}`, {cwd: rootDir, stdio: 'ignore'});
+    } catch (e) {
+      // ignore git errors
+    }
   } catch (err) {
     console.error(err);
     process.exit(1);
