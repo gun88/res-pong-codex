@@ -208,7 +208,6 @@ export class EventComponent implements OnInit {
     this.loading = true;
     let subscribe = this.event.can_unsubscribe;
     this.event.can_subscribe = !this.event.can_subscribe;
-    console.log("send " + subscribe);
     ((subscribe) ? this.resPongService.subscribeEvent(this.event.id) :this.resPongService.unsubscribeEvent(this.event.id))
       .pipe(
         catchError((err) => {

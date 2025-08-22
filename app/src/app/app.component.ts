@@ -7,6 +7,7 @@ import {TutorialComponent} from '../components/tutorial/tutorial.component';
 import {environment} from '../environments/environment';
 import {HotjarService} from '../service/hotjar.service';
 import {filter} from 'rxjs';
+import {ResPongService} from '../service/res-pong.service';
 
 @Component({
   selector: 'res-pong-user-root',
@@ -24,9 +25,8 @@ export class AppComponent implements OnInit {
   build: string = environment.build;
 
   ngOnInit(): void {
-    this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: NavigationEnd) => this.hotjarService.stateChange(e.urlAfterRedirects));
+    this.hotjarService.init();
+
   }
 
 }
