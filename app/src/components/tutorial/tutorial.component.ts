@@ -3,13 +3,11 @@ import {NgIf} from '@angular/common';
 import {Popover, PopoverModule} from 'primeng/popover';
 import {TutorialService, TutorialState} from '../../service/tutorial.service';
 import {Button} from "primeng/button";
-import {FocusTrap} from 'primeng/focustrap';
-import {AutoFocus} from 'primeng/autofocus';
 
 @Component({
   selector: 'res-pong-user-tutorial',
   standalone: true,
-  imports: [NgIf, PopoverModule, Button, FocusTrap, AutoFocus],
+  imports: [NgIf, PopoverModule, Button],
   templateUrl: './tutorial.component.html'
 })
 export class TutorialComponent implements OnInit, OnDestroy {
