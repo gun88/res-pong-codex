@@ -66,13 +66,14 @@ class Res_Pong_User_Service {
         $event_id = $request->get_param('event_id');
         $user_id = $this->res_pong_get_logged_user_id();
 
-        $event = $this->repository->transaction(function () use ($event_id, $user_id) {
-            $ev = $this->repository->get_event_by_id($event_id);
-            $group_id = isset($ev->group_id) && $ev->group_id > 0 ? $ev->group_id : $ev->id;
+        $group_id = null;
+        try {
+            $event = $this->repository->transaction(function () use ($event_id, $user_id, &$group_id) {
+                $ev = $this->repository->get_event_by_id($event_id);
+                $group_id = isset($ev->group_id) && $ev->group_id > 0 ? $ev->group_id : $ev->id;
 
-            $this->repository->acquire_guard($user_id, $group_id);
+                $this->repository->acquire_guard($user_id, $group_id);
 
-            try {
                 $event = $this->_get_event_for_logged_user($event_id, $user_id);
                 if ($event->can_join) {
                     $created_at = date('Y-m-d H:i:s');
@@ -113,12 +114,14 @@ class Res_Pong_User_Service {
                         $event->status_message['type'] = 'error';
                     }
                 }
-            } finally {
+
+                return $event;
+            });
+        } finally {
+            if ($group_id !== null) {
                 $this->repository->release_guard($user_id, $group_id);
             }
-
-            return $event;
-        });
+        }
 
         return rest_ensure_response($event);
     }
