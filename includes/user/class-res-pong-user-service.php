@@ -66,11 +66,15 @@ class Res_Pong_User_Service {
         $event_id = $request->get_param('event_id');
         $user_id = $this->res_pong_get_logged_user_id();
 
-        $group_id = null;
+        $ev = $this->repository->get_event_by_id($event_id);
+        $group_id = isset($ev->group_id) && $ev->group_id > 0 ? $ev->group_id : $ev->id;
+
+        if (!$this->repository->acquire_named_lock($group_id, 1)) {
+            return new \WP_REST_Response(['success' => false, 'error' => 'Operazione in corso. Riprovare.'], 409);
+        }
+
         try {
-            $event = $this->repository->transaction(function () use ($event_id, $user_id, &$group_id) {
-                $ev = $this->repository->get_event_by_id($event_id);
-                $group_id = isset($ev->group_id) && $ev->group_id > 0 ? $ev->group_id : $ev->id;
+            $event = $this->repository->transaction(function () use ($event_id, $user_id, $group_id) {
 
                 $this->repository->acquire_guard($user_id, $group_id);
 
@@ -118,9 +122,8 @@ class Res_Pong_User_Service {
                 return $event;
             });
         } finally {
-            if ($group_id !== null) {
-                $this->repository->release_guard($user_id, $group_id);
-            }
+            $this->repository->release_guard($user_id, $group_id);
+            $this->repository->release_named_lock($group_id);
         }
 
         return rest_ensure_response($event);

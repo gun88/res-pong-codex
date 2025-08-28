@@ -12,7 +12,7 @@ import {UserDataComponent} from "../../components/user/user-data.component";
 import {PasswordFormComponent} from "../../components/password/password-form.component";
 import {BlockUI} from 'primeng/blockui';
 import {ProgressSpinner} from 'primeng/progressspinner';
-import {EmailPreferencesComponent} from '../../components/email-preferences.component.ts/email-preferences.component';
+import {EmailPreferencesComponent} from '../../components/email-preferences/email-preferences.component';
 
 @Component({
   selector: 'res-pong-user-user',

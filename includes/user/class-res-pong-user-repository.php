@@ -55,6 +55,16 @@ class Res_Pong_User_Repository {
         $this->wpdb->query($sql);
     }
 
+    public function acquire_named_lock($group_id, $timeout) {
+        $sql = $this->wpdb->prepare('SELECT GET_LOCK(%s, %d)', $group_id, $timeout);
+        return (int)$this->wpdb->get_var($sql);
+    }
+
+    public function release_named_lock($group_id) {
+        $sql = $this->wpdb->prepare('SELECT RELEASE_LOCK(%s)', $group_id);
+        $this->wpdb->get_var($sql);
+    }
+
     public function get_reservations_by_user_id($user_id) {
         $query = "
         SELECT 
