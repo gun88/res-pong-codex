@@ -139,6 +139,7 @@ class Res_Pong_Admin_Frontend {
                 'site_url'                      => isset($_POST['site_url']) ? esc_url_raw($_POST['site_url']) : '',
                 'app_name'                      => isset($_POST['app_name']) ? sanitize_text_field($_POST['app_name']) : '',
                 'app_url'                       => isset($_POST['app_url']) ? esc_url_raw($_POST['app_url']) : '',
+                'login_disclaimer'              => isset($_POST['login_disclaimer']) ? wp_unslash(wp_kses_post($_POST['login_disclaimer'])) : '',
                 'avatar_management'             => isset($_POST['avatar_management']) ? sanitize_text_field($_POST['avatar_management']) : 'none',
                 'invitation_subject'            => isset($_POST['invitation_subject']) ? sanitize_text_field($_POST['invitation_subject']) : '',
                 'invitation_text'               => isset($_POST['invitation_text']) ? wp_unslash(wp_kses_post($_POST['invitation_text'])) : '',
@@ -176,6 +177,11 @@ class Res_Pong_Admin_Frontend {
         echo '<tr><th><label for="site_url">URL Sito</label></th><td><input name="site_url" id="site_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['site_url']) . '"></td></tr>';
         echo '<tr><th><label for="app_name">Nome Applicazione</label></th><td><input name="app_name" id="app_name" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['app_name']) . '"></td></tr>';
         echo '<tr><th><label for="app_url">URL Applicazione</label></th><td><input name="app_url" id="app_url" type="text" style="max-width:600px;" class="large-text" value="' . esc_attr($config['app_url']) . '"></td></tr>';
+        $this->editor_settings['textarea_name'] = 'login_disclaimer';
+        ob_start();
+        wp_editor($config['login_disclaimer'], 'login_disclaimer', $this->editor_settings);
+        $login_disclaimer_editor = ob_get_clean();
+        echo '<tr><th><label for="login_disclaimer">Disclaimer login</label></th><td><div style="max-width:600px;">' . $login_disclaimer_editor . '</div></td></tr>';
         echo '<tr><th><label for="avatar_management">Gestione Avatar</label></th><td><select name="avatar_management" id="avatar_management"><option value="none"' . selected($config['avatar_management'], 'none', false) . '>Nessuna</option><option value="fitet_monitor"' . selected($config['avatar_management'], 'fitet_monitor', false) . '>Fitet Monitor</option><option value="custom"' . selected($config['avatar_management'], 'custom', false) . '>Personalizzata</option></select></td></tr>';
         echo '<tr><th colspan="2"><h2 style="margin: 0">E-mail primo accesso</h2></th></tr>';
         echo '<tr><th><label for="invitation_subject">Oggetto invito</label></th><td><input name="invitation_subject" id="invitation_subject" type="text" class="large-text" style="max-width:600px;" value="' . esc_attr($config['invitation_subject']) . '"></td></tr>';

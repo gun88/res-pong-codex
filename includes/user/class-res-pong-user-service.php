@@ -208,6 +208,11 @@ class Res_Pong_User_Service {
         return new \WP_REST_Response(['success' => true], 200);
     }
 
+    public function get_login_disclaimer() {
+        $disclaimer = $this->configuration->get('login_disclaimer');
+        return rest_ensure_response($disclaimer);
+    }
+
     public function get_public_configurations() {
         $configurations = $this->configuration->get_public_configurations();
         return rest_ensure_response($configurations);

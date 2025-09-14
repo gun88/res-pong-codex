@@ -126,6 +126,12 @@ class Res_Pong_User_Controller {
             'permission_callback' => '__return_true'
         ]);
 
+        register_rest_route('res-pong/v1', '/login-disclaimer', [
+            'methods' => 'GET',
+            'callback' => [$res_pong_admin, 'get_login_disclaimer'],
+            'permission_callback' => '__return_true'
+        ]);
+
         register_rest_route('res-pong/v1', '/configurations', [
             'methods' => 'GET',
             'callback' => [$res_pong_admin, 'get_public_configurations'],
