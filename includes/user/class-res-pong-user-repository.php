@@ -23,9 +23,9 @@ class Res_Pong_User_Repository {
 
     public function get_user_by_id_with_active_reservations($user_id, $date, $group_id) {
         $query = "SELECT U.*, COUNT(E.id) AS active_reservations
-                    FROM wp_RP_USER AS U
-                             LEFT JOIN wp_RP_RESERVATION AS R ON R.user_id = U.id
-                             LEFT JOIN wp_RP_EVENT AS E ON E.id = R.event_id AND E.end_datetime > %s AND (E.group_id = %s OR E.id = %s)
+                    FROM {$this->table_user} AS U
+                             LEFT JOIN {$this->table_reservation} AS R ON R.user_id = U.id
+                             LEFT JOIN {$this->table_event} AS E ON E.id = R.event_id AND E.end_datetime > %s AND (E.group_id = %s OR E.id = %s)
                     WHERE U.id = %s
                     GROUP BY U.id, U.email, U.username, U.last_name, U.first_name, U.category,
                              U.password, U.timeout, U.reset_token, U.enabled";

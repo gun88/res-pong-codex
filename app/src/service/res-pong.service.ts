@@ -136,6 +136,9 @@ export class ResPongService {
       .pipe(tap(this.manageEvent('unsubscribe_event')));
   }
 
+  public getLoginDisclaimer() {
+    return this.http.get<string>(`${this.baseServer}/?rest_route=/res-pong/v1/login-disclaimer`);
+  }
   public getConfigurations() {
     return this.http.get(`${this.baseServer}/?rest_route=/res-pong/v1/configurations`);
   }

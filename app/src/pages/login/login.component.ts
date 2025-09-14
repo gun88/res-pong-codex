@@ -1,4 +1,4 @@
-import {Component, inject} from '@angular/core';
+import {Component, inject, OnInit} from '@angular/core';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputTextModule} from 'primeng/inputtext';
 import {PasswordModule} from 'primeng/password';
@@ -6,11 +6,12 @@ import {ButtonModule} from 'primeng/button';
 import {CheckboxModule} from 'primeng/checkbox';
 import {Router, RouterModule} from '@angular/router';
 import {ResPongService} from '../../service/res-pong.service';
-import {catchError, finalize, of} from 'rxjs';
+import {catchError, finalize, of, tap} from 'rxjs';
 import {Message} from 'primeng/message';
 import {NgIf} from '@angular/common';
 import {ProgressBar} from 'primeng/progressbar';
 import {FloatLabel} from 'primeng/floatlabel';
+import {SafeHtmlPipe} from 'primeng/menu';
 
 @Component({
   selector: 'res-pong-login',
@@ -27,10 +28,11 @@ import {FloatLabel} from 'primeng/floatlabel';
     Message,
     NgIf,
     ProgressBar,
-    FloatLabel
+    FloatLabel,
+    SafeHtmlPipe
   ]
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   private resPongService = inject(ResPongService);
   private router = inject(Router);
   loading = false;
@@ -40,7 +42,15 @@ export class LoginComponent {
     remember: [true]
   });
   error: string = '';
+  loginDisclaimer = '...';
 
+  ngOnInit(): void {
+    this.resPongService.getLoginDisclaimer()
+      .pipe(
+        tap(value => this.loginDisclaimer = value)
+      )
+      .subscribe()
+  }
   onSubmit() {
     if (this.form.invalid || this.loading) return;
 

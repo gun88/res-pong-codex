@@ -2,6 +2,7 @@
   <div style="text-align: center">
     <img src="logo-morelli.bn.svg" alt="logo" style="width: 100%; max-width: 200px;">
     <p class="rp-note">Piattaforma prenotazione gioco libero.</p>
+    <div *ngIf="loginDisclaimer" [innerHTML]="loginDisclaimer | safeHtml"></div>
   </div>
   <div>
     <h2>Login</h2>
