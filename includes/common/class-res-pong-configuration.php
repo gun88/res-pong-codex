@@ -21,6 +21,8 @@ class Res_Pong_Configuration {
         'app_url' => RES_PONG_CONFIGURATION_SITE_URL . "/prenotazioni",
         'app_name' => "Portale Prenotazioni",
 
+        'login_disclaimer' => '',
+
         'invitation_subject' => "Effettua il tuo primo accesso - #app_name",
         'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel #app_name!\n\nPer per completare la configurazione del tuo profilo, clicca su questo link:\n\n<strong><a href=\"#link\">Completa configurazione</a></strong>\n\n&nbsp;\n\nSe il collegamento non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
       
