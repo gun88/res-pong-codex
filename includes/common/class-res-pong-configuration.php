@@ -24,7 +24,7 @@ class Res_Pong_Configuration {
         'login_disclaimer' => '',
 
         'invitation_subject' => "Effettua il tuo primo accesso - #app_name",
-        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel #app_name!\n\nPer per completare la configurazione del tuo profilo, clicca su questo link:\n\n<strong><a href=\"#link\">Completa configurazione</a></strong>\n\n&nbsp;\n\nSe il collegamento non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
+        'invitation_text' => "Ciao #first_name,\n\nStai per entrare nel #app_name!\n\nPer completare la configurazione del tuo profilo, clicca su questo link:\n\n<strong><a href=\"#link\">Completa configurazione</a></strong>\n\n&nbsp;\n\nSe il collegamento non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
       
         'reset_password_subject' => "Reset password - #app_name - #now_date_only",
         'reset_password_text' => "Ciao #first_name,\n\nAbbiamo ricevuto una richiesta di reset della tua password in data: #now_date_and_time.\n\nSe non sei stato tu a richiedere il reset, ignora questa email, altrimenti clicca sul seguente link per reimpostare la tua password:\n\n<a href=\"#link\"><strong>Reimposta password</strong></a>\n\n&nbsp;\n\nSe il collegamento non dovesse funzionare, copia e incolla il seguente indirizzo nel tuo browser:\n#link\n\n&nbsp;",
