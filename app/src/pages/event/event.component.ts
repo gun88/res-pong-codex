@@ -17,6 +17,7 @@ import {ConfirmDialog} from 'primeng/confirmdialog';
 import {ConfirmationService} from 'primeng/api';
 import {ToggleSwitch} from 'primeng/toggleswitch';
 import {Popover} from 'primeng/popover';
+import {SafeHtmlPipe} from 'primeng/menu';
 
 @Component({
   selector: 'res-pong-user-event',
@@ -37,7 +38,8 @@ import {Popover} from 'primeng/popover';
     Button,
     ConfirmDialog,
     ToggleSwitch,
-    Popover
+    Popover,
+    SafeHtmlPipe
   ],
   standalone: true,
   providers: [ConfirmationService],

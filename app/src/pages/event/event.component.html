@@ -46,8 +46,7 @@
           </div>
         </div>
       </div>
-      <div class="mt-3" *ngIf="event?.note"><strong>Note:</strong> {{ event?.note }}</div>
-
+      <div class="mt-3" *ngIf="event?.note"  [innerHTML]="event?.note | safeHtml"></div>
       <p-divider/>
       <div class="flex flex-wrap flex-column sm:flex-row md:flex-column lg:flex-row gap-2 rp-event-actions-block">
         <button
