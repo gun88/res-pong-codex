@@ -385,6 +385,7 @@ class Res_Pong_User_Service {
 
     private function _get_event_for_logged_user($event_id, int $user_id) {
         $event = $this->repository->get_event_by_id($event_id);
+        $event->note = !empty($event->note) ? wpautop($event->note) : '';
         if (!$event) {
             return new \WP_REST_Response(['error' => 'Evento non trovato'], 404);
         }
