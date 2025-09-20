@@ -346,7 +346,11 @@ class Res_Pong_Admin_Frontend {
         echo '<tr id="recurrence_end_row"><th><label for="recurrence_end">Termine ricorrenza</label></th><td><input name="recurrence_end" id="recurrence_end" type="date" disabled></td></tr>';
         echo '<tr><th><label for="category">Categoria</label></th><td><input name="category" id="category" type="text"></td></tr>';
         echo '<tr><th><label for="name">Nome</label></th><td><input name="name" id="name" type="text"></td></tr>';
-        echo '<tr><th><label for="note">Nota</label></th><td><textarea name="note" id="note"></textarea></td></tr>';
+        $this->editor_settings['textarea_name'] = 'note';
+        ob_start();
+        wp_editor('', 'rp-event-note', $this->editor_settings);
+        $note_editor = ob_get_clean();
+        echo '<tr><th><label for="note">Nota</label></th><td><div style="max-width:600px;">' . $note_editor . '</div></td></tr>';
         echo '<tr><th><label for="start_datetime">Inizio</label></th><td><input name="start_datetime" id="start_datetime" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_start) . '"' ) . '></td></tr>';
         echo '<tr><th><label for="end_datetime">Fine</label></th><td><input name="end_datetime" id="end_datetime" type="datetime-local" step="1"' . ( $editing ? '' : ' value="' . esc_attr($default_end) . '"' ) . '></td></tr>';
         echo '<tr><th><label for="max_players">Giocatori max</label></th><td><input name="max_players" id="max_players" type="number"></td></tr>';

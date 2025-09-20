@@ -88,6 +88,9 @@ class Res_Pong_Admin_Service {
         if (!isset($data['name']) || trim($data['name']) === '') {
             return new WP_Error('invalid_data', 'Il nome evento è obbligatorio', ['status' => 400]);
         }
+        if (array_key_exists('note', $data)) {
+            $data['note'] = wp_kses_post($data['note']);
+        }
         unset($data['id']);
         $group_id = isset($data['group_id']) && $data['group_id'] !== '' ? (int)$data['group_id'] : null;
         $recurrence = isset($data['recurrence']) ? $data['recurrence'] : 'none';
@@ -169,6 +172,9 @@ class Res_Pong_Admin_Service {
         $id = (int)$request['id'];
         unset($request['recurrence'], $request['recurrence_end']);
         $data = $request->get_json_params();
+        if (array_key_exists('note', $data)) {
+            $data['note'] = wp_kses_post($data['note']);
+        }
         if (array_key_exists('group_id', $data)) {
             $group_id = $data['group_id'] !== '' ? (int)$data['group_id'] : null;
             if ($group_id) {

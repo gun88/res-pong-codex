@@ -455,14 +455,31 @@
             beforeSend: function(xhr){ xhr.setRequestHeader('X-WP-Nonce', rp_admin.nonce); },
             success: function(data){
                 for(var key in data){
+                    if(!Object.prototype.hasOwnProperty.call(data, key)){ continue; }
                     var field = form.find('[name='+key+']');
                     if(!field.length){ continue; }
+                    var value = data[key];
+                    if(value === null || typeof value === 'undefined'){
+                        value = '';
+                    }
                     if(field.attr('type') === 'checkbox'){
                         field.prop('checked', parseInt(data[key]) === 1);
                     } else if(field.attr('type') === 'datetime-local'){
-                        field.val(data[key].replace(' ', 'T'));
+                        if(typeof data[key] === 'string'){
+                            field.val(data[key].replace(' ', 'T'));
+                        } else {
+                            field.val('');
+                        }
+                    } else if(field.hasClass('wp-editor-area')){
+                        field.val(value);
+                        if(typeof tinymce !== 'undefined'){
+                            var editor = tinymce.get(field.attr('id'));
+                            if(editor){
+                                editor.setContent(value);
+                            }
+                        }
                     } else {
-                        field.val(data[key]);
+                        field.val(value);
                     }
                 }
                 if(entity === 'events'){
@@ -579,6 +596,9 @@
         }
         form.on('submit', function(e){
             e.preventDefault();
+            if(typeof tinymce !== 'undefined' && typeof tinymce.triggerSave === 'function'){
+                tinymce.triggerSave();
+            }
             var data = {};
             form.serializeArray().forEach(function(item){ data[item.name] = item.value; });
             form.find('input[type=checkbox]').each(function(){ data[this.name] = $(this).is(':checked') ? 1 : 0; });
