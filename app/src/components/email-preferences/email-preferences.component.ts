@@ -68,7 +68,7 @@ export class EmailPreferencesComponent implements OnInit {
         tap((value: any) => {
           if (value?.success) {
             this.message = {
-              text: 'Preferenze aggiornate correttamente..',
+              text: 'Preferenze aggiornate correttamente.',
               severity: 'success',
             };
             this.resPongService.updateMemoryUser(this._user);
