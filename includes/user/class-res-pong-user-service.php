@@ -496,10 +496,18 @@ class Res_Pong_User_Service {
 
     private function calculate_user_status($user, $event) {
         // stato utente: disabled, timeout, max-booking-reached, enabled
-        if (!$user->enabled) return 'disabled';
-        if (!empty ($event->category) && strpos(strtolower($event->category), strtolower($user->category)) === false) return 'out-of-category';
-        if ($user->active_reservations >= $this->configuration->get('max_active_reservations')) return 'max-booking-reached';
-        if ($this->minutes_until($user->timeout) > 0) return 'timeout';
+        if (!$user->enabled) {
+            return 'disabled';
+        }
+        if (!empty ($event->category) && strpos(strtolower($event->category), strtolower($user->category)) === false) {
+            return 'out-of-category';
+        }
+        if ($user->active_reservations >= $this->configuration->get('max_active_reservations')) {
+            return 'max-booking-reached';
+        }
+        if ($this->minutes_until($user->timeout) > 0) {
+            return 'timeout';
+        }
         return 'enabled';
     }
 
@@ -588,94 +596,6 @@ class Res_Pong_User_Service {
         ];
     }
 
-    /*private function test() {
-        $matrix = [
-            // event-status   user-status           booked   can_join  can_remove  message
-            ['closed', 'disabled', true, false, false, 'Utente disabilitato.'],
-            ['closed', 'disabled', false, false, false, 'Utente disabilitato.'],
-            ['closed', 'out-of-category', true, false, false, 'Evento terminato.'],
-            ['closed', 'out-of-category', false, false, false, 'Evento terminato.'],
-            ['closed', 'timeout', true, false, false, 'Evento terminato.'],
-            ['closed', 'timeout', false, false, false, 'Evento terminato.'],
-            ['closed', 'max-booking-reached', true, false, false, 'Evento terminato.'],
-            ['closed', 'max-booking-reached', false, false, false, 'Evento terminato.'],
-            ['closed', 'enabled', true, false, false, 'Evento terminato.'],
-            ['closed', 'enabled', false, false, false, 'Evento terminato.'],
-
-            ['almost-closed', 'disabled', true, false, false, 'Utente disabilitato.'],
-            ['almost-closed', 'disabled', false, false, false, 'Utente disabilitato.'],
-            ['almost-closed', 'out-of-category', true, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'out-of-category', false, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'timeout', true, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'timeout', false, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'max-booking-reached', true, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'max-booking-reached', false, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'enabled', true, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-            ['almost-closed', 'enabled', false, false, false, 'Manca poco all\'inizio dell\'evento. Per comunicazioni urgenti, contattare il responsabile.'],
-
-            ['disabled', 'disabled', true, false, false, 'Utente disabilitato.'],
-            ['disabled', 'disabled', false, false, false, 'Utente disabilitato.'],
-            ['disabled', 'out-of-category', true, false, false, 'Evento disabilitato.'],
-            ['disabled', 'out-of-category', false, false, false, 'Evento disabilitato.'],
-            ['disabled', 'timeout', true, false, false, 'Evento disabilitato.'],
-            ['disabled', 'timeout', false, false, false, 'Evento disabilitato.'],
-            ['disabled', 'max-booking-reached', true, false, false, 'Evento disabilitato.'],
-            ['disabled', 'max-booking-reached', false, false, false, 'Evento disabilitato.'],
-            ['disabled', 'enabled', true, false, false, 'Evento disabilitato.'],
-            ['disabled', 'enabled', false, false, false, 'Evento disabilitato.'],
-
-            ['available', 'disabled', true, false, false, 'Utente disabilitato.'],
-            ['available', 'disabled', false, false, false, 'Utente disabilitato.'],
-            ['available', 'out-of-category', true, false, true, null],
-            ['available', 'out-of-category', false, false, false, 'Evento riservato alle categorie: VIP'],
-            ['available', 'timeout', true, false, true, null],
-            ['available', 'timeout', false, false, false, 'Sei in timeout! Potrai effettuare di nuovo la prenotazione solo dopo questa data: 2030-01-01.'],
-            ['available', 'max-booking-reached', true, false, true, null],
-            ['available', 'max-booking-reached', false, false, false, 'Hai raggiunto il numero massimo di prenotazioni per questa tipologia di evento.'],
-            ['available', 'enabled', true, false, true, null],
-            ['available', 'enabled', false, true, false, null],
-
-            ['almost-full', 'disabled', true, false, false, 'Utente disabilitato.'],
-            ['almost-full', 'disabled', false, false, false, 'Utente disabilitato.'],
-            ['almost-full', 'out-of-category', true, false, true, null],
-            ['almost-full', 'out-of-category', false, false, false, 'Evento riservato alle categorie: VIP'],
-            ['almost-full', 'timeout', true, false, true, null],
-            ['almost-full', 'timeout', false, false, false, 'Sei in timeout! Potrai effettuare di nuovo la prenotazione solo dopo questa data: 2030-01-01.'],
-            ['almost-full', 'max-booking-reached', true, false, true, null],
-            ['almost-full', 'max-booking-reached', false, false, false, 'Hai raggiunto il numero massimo di prenotazioni per questa tipologia di evento.'],
-            ['almost-full', 'enabled', true, false, true, null],
-            ['almost-full', 'enabled', false, true, false, null],
-
-            ['full', 'disabled', true, false, false, 'Utente disabilitato.'],
-            ['full', 'disabled', false, false, false, 'Utente disabilitato.'],
-            ['full', 'out-of-category', true, false, true, null],
-            ['full', 'out-of-category', false, false, false, 'Evento riservato alle categorie: VIP'],
-            ['full', 'timeout', true, false, true, null],
-            ['full', 'timeout', false, false, false, 'Evento al completo.'],
-            ['full', 'max-booking-reached', true, false, true, null],
-            ['full', 'max-booking-reached', false, false, false, 'Evento al completo.'],
-            ['full', 'enabled', true, false, true, null],
-            ['full', 'enabled', false, false, false, 'Evento al completo.'],
-        ];
-
-        foreach ($matrix as $row) {
-            $event = new \stdClass();
-            $event->status = $row[0];
-            $event->user_status = $row[1];
-            $event->booked = $row[2];
-            $event->category = 'VIP';
-            $user = new \stdClass();
-            $user->timeout = '2030-01-01';
-
-            $decide_event = $this->decide_event($event, $user);
-            if ($decide_event['can_join'] != $row[3] || $decide_event['can_remove'] != $row[4] || $decide_event['status_message']['text'] != $row[5]) {
-                error_log("error at " . json_encode($row) . " " . json_encode($decide_event));
-            }
-
-        }
-        error_log("done___________________________");
-        die(1);
-    }*/
 
 
 }
