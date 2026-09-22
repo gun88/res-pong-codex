@@ -499,8 +499,20 @@ class Res_Pong_User_Service {
         if (!$user->enabled) {
             return 'disabled';
         }
-        if (!empty ($event->category) && strpos(strtolower($event->category), strtolower($user->category)) === false) {
-            return 'out-of-category';
+        if (!empty($event->category)) {
+            $user_categories = array_map(
+                'trim',
+                explode(',', strtolower($user->category ?? ''))
+            );
+            $event_categories = array_map(
+                'trim',
+                explode(',', strtolower($event->category))
+            );
+
+            // Se non esiste nemmeno una categoria in comune
+            if (empty(array_intersect($user_categories, $event_categories))) {
+                return 'out-of-category';
+            }
         }
         if ($user->active_reservations >= $this->configuration->get('max_active_reservations')) {
             return 'max-booking-reached';
